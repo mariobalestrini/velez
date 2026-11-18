@@ -86,13 +86,11 @@
                     <span class="text-pizarra-electric font-bold">ART</span>
                     <span id="header-art-clock">--:--:--</span>
                 </div>
-                <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-sky-500/10 border border-sky-500/30 text-xs font-mono">
-                    <span class="relative flex h-2.5 w-2.5">
-                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-pizarra-electric animate-pulse"></span>
-                    </span>
-                    <span class="font-bold text-pizarra-electric tracking-wide">API BACKEND CONNECTED</span>
+                <div id="polling-status-pill" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700 text-xs font-mono">
+                    <span id="polling-status-dot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+                    <span id="polling-status-label" class="font-bold text-slate-300 tracking-wide">MODO REPOSO</span>
                     <span class="text-slate-600">|</span>
-                    <span id="polling-countdown" class="text-slate-200 font-bold">15s</span>
+                    <span id="polling-countdown" class="text-slate-400 font-bold">MANUAL</span>
                 </div>
                 <button onclick="manualRefresh()" title="Actualizar datos" class="p-2 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-white transition active:scale-95">
                     <svg id="refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -421,6 +419,8 @@
         const STATE = {
             pollingIntervalSec: 15,
             countdown: 15,
+            isLiveMatch: false,
+            livePollingTimer: null,
             activeTableTab: 'TORNEO',
             squadFilterGroup: 'TODOS',
             squadSortCol: 'number',
@@ -456,6 +456,50 @@
             if (el) el.textContent = horaStr;
         }
 
+        // Activa o desactiva la actualización cada 15s exclusivamente si hay partido en vivo
+        function syncLivePollingMode(isLive) {
+            const pill = document.getElementById('polling-status-pill');
+            const dot = document.getElementById('polling-status-dot');
+            const label = document.getElementById('polling-status-label');
+            const cdEl = document.getElementById('polling-countdown');
+
+            STATE.isLiveMatch = Boolean(isLive);
+
+            if (STATE.isLiveMatch) {
+                if (pill) pill.className = 'flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-500/15 border border-red-500/40 text-xs font-mono';
+                if (dot) dot.className = 'relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 animate-ping';
+                if (label) {
+                    label.className = 'font-bold text-red-400 tracking-wide';
+                    label.textContent = 'EN VIVO AUTO';
+                }
+                if (!STATE.livePollingTimer) {
+                    STATE.countdown = STATE.pollingIntervalSec;
+                    if (cdEl) {
+                        cdEl.className = 'text-slate-200 font-bold';
+                        cdEl.textContent = `${STATE.countdown}s`;
+                    }
+                    STATE.livePollingTimer = setInterval(() => {
+                        fetchBackendData(false);
+                    }, STATE.pollingIntervalSec * 1000);
+                }
+            } else {
+                if (STATE.livePollingTimer) {
+                    clearInterval(STATE.livePollingTimer);
+                    STATE.livePollingTimer = null;
+                }
+                if (pill) pill.className = 'flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700 text-xs font-mono';
+                if (dot) dot.className = 'relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400';
+                if (label) {
+                    label.className = 'font-bold text-slate-300 tracking-wide';
+                    label.textContent = 'SIN PARTIDO EN VIVO';
+                }
+                if (cdEl) {
+                    cdEl.className = 'text-slate-400 font-bold';
+                    cdEl.textContent = 'MANUAL';
+                }
+            }
+        }
+
         const BACKEND_URL = 'https://velez-backend.onrender.com';
 
         async function fetchBackendData(isManual = false) {
@@ -480,9 +524,13 @@
                     if (data.lastLineup) STATE.lastLineup = data.lastLineup;
                     if (data.standingsClausura) STATE.standingsClausura = data.standingsClausura;
                     if (data.standingsAnual) STATE.standingsAnual = data.standingsAnual;
+
+                    const isLiveNow = data.currentMatch?.type === 'LIVE';
+                    syncLivePollingMode(isLiveNow);
                 }
             } catch (err) {
                 console.error("Error sincronizando backend:", err);
+                syncLivePollingMode(false);
             } finally {
                 registrarMarcaDeTiempoActualizacion();
                 renderAll();
@@ -492,8 +540,11 @@
         }
 
         function manualRefresh() {
-            STATE.countdown = STATE.pollingIntervalSec;
-            document.getElementById('polling-countdown').textContent = `${STATE.countdown}s`;
+            if (STATE.isLiveMatch) {
+                STATE.countdown = STATE.pollingIntervalSec;
+                const cdEl = document.getElementById('polling-countdown');
+                if (cdEl) cdEl.textContent = `${STATE.countdown}s`;
+            }
             fetchBackendData(true);
         }
 
@@ -522,7 +573,11 @@
 
             const diff = targetMs - Date.now();
             if (diff <= 0) {
-                cdEl.textContent = 'Partido en curso / Finalizado';
+                cdEl.textContent = 'Partido próximo a iniciar';
+                // Si llegó la hora exacta de inicio, hacemos una verificación única por si arrancó
+                if (!STATE.isLiveMatch && diff > -60000) {
+                    fetchBackendData(false);
+                }
                 return;
             }
 
@@ -535,17 +590,18 @@
             cdEl.textContent = `Faltan: ${pad(d)}d ${pad(h)}h ${pad(m)}m ${pad(s)}s`;
         }
 
-        setInterval(() => { fetchBackendData(false); }, 15000);
-
+        // Reloj en vivo de hora ART y contador (solo descuenta 15s cuando hay partido en vivo)
         setInterval(() => {
             const now = new Date();
             const artStr = now.toLocaleTimeString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', hour12: false });
             const clockHeader = document.getElementById('header-art-clock');
             if (clockHeader) clockHeader.textContent = artStr;
 
-            STATE.countdown = STATE.countdown > 1 ? STATE.countdown - 1 : STATE.pollingIntervalSec;
-            const cdEl = document.getElementById('polling-countdown');
-            if (cdEl) cdEl.textContent = `${STATE.countdown}s`;
+            if (STATE.isLiveMatch) {
+                STATE.countdown = STATE.countdown > 1 ? STATE.countdown - 1 : STATE.pollingIntervalSec;
+                const cdEl = document.getElementById('polling-countdown');
+                if (cdEl) cdEl.textContent = `${STATE.countdown}s`;
+            }
 
             updateMatchCountdown();
         }, 1000);
