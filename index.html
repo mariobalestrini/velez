@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LA V AZULADA</title>
+    <title>LA V AZULADA | Pizarra Táctica & Estadísticas de Vélez Sarsfield</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Diccionario propio de posiciones tácticas del plantel -->
@@ -75,7 +75,7 @@
                             C.A. Vélez Sarsfield • 1910
                         </span>
                     </div>
-                    <p class="text-xs text-slate-400 mt-0.5">Estadísticas en Vivo & Pizarra Táctica</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Sitio Exclusivo • Pizarra Táctica & Estadísticas en Vivo</p>
                 </div>
             </div>
 
@@ -156,7 +156,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-5 border-t border-pizarra-border/80">
                     <div class="bg-[#0b0e14]/90 rounded-xl border border-pizarra-border p-4 space-y-3.5">
                         <div class="flex items-center justify-between border-b border-pizarra-border pb-2.5">
-                            <h3 class="font-display text-base sm:text-lg font-bold uppercase text-white tracking-wide">Cómo llega El Fortín</h3>
+                            <h3 class="font-display text-base sm:text-lg font-bold uppercase text-white tracking-wide">Cómo llega Vélez Sarsfield</h3>
                             <span class="font-mono text-[11px] text-emerald-400 font-bold">Últimos 2 encuentros</span>
                         </div>
                         <div>
@@ -284,21 +284,19 @@
             </div>
         </section>
 
-        <!-- PIZARRA TÁCTICA (ÚLTIMOS 11 TITULARES QUE FORMARON + RENDIMIENTO Y ESTADÍSTICAS) -->
+        <!-- PIZARRA TÁCTICA (SELECTOR DE FORMACIONES DE LOS ÚLTIMOS 5 PARTIDOS + RENDIMIENTO Y XI) -->
         <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div class="lg:col-span-7 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden flex flex-col">
                 <div class="p-4 border-b border-pizarra-border flex flex-wrap items-center justify-between gap-2 bg-[#0e131c]">
                     <div>
                         <h3 class="font-display text-xl font-bold uppercase tracking-wide text-white flex items-center gap-2">
                             <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
-                            La Pizarra Táctica • Último XI Titular
+                            La Pizarra Táctica • Formaciones
                         </h3>
-                        <p id="lineup-match-subtitle" class="text-[11px] font-mono text-pizarra-electric mt-0.5">Sincronizando formación del último partido...</p>
+                        <p id="lineup-match-subtitle" class="text-[11px] font-mono text-pizarra-electric mt-0.5">Sincronizando formaciones de los últimos 5 partidos...</p>
                     </div>
-                    <select id="formation-selector" onchange="renderPitch(this.value)" class="bg-[#0b0e14] border border-pizarra-border text-xs font-mono text-white rounded-lg px-3 py-1.5 focus:outline-none focus:border-pizarra-electric">
-                        <option value="LAST_MATCH">Último XI Oficial</option>
-                        <option value="4-2-3-1">Esquema 4-2-3-1</option>
-                        <option value="4-3-3">Esquema 4-3-3</option>
+                    <select id="formation-selector" onchange="renderPitch(this.value)" class="bg-[#0b0e14] border border-pizarra-border text-xs font-mono text-white rounded-lg px-3 py-1.5 focus:outline-none focus:border-pizarra-electric max-w-[230px] sm:max-w-xs truncate">
+                        <option value="0">Último XI Oficial</option>
                     </select>
                 </div>
                 <div class="p-4 sm:p-6 bg-[#0b0e14] flex-1 flex items-center justify-center tactical-grid">
@@ -432,17 +430,14 @@
             return (texto || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').trim();
         }
 
-        // Busca el puesto (1 al 11) del jugador en el archivo posiciones.js
         function obtenerPuestoDeMapa(player) {
             const mapa = window.POSICIONES_VELEZ || {};
             const fullName = normalizarTexto(player.name || '');
             const shortName = normalizarTexto(player.shortName || '');
 
-            // 1. Coincidencia exacta por nombre completo o nombre corto
             if (mapa[fullName]) return Number(mapa[fullName]);
             if (mapa[shortName]) return Number(mapa[shortName]);
 
-            // 2. Coincidencia por apellido / clave incluida (priorizando claves más largas como "elias gomez" antes que "gomez")
             const sortedKeys = Object.keys(mapa).sort((a, b) => b.length - a.length);
             for (const key of sortedKeys) {
                 const normKey = normalizarTexto(key);
@@ -451,27 +446,22 @@
                 }
             }
 
-            // 3. Respaldo por línea general si llega un juvenil nuevo que aún no cargaste en posiciones.js
             if (player.group === 'ARQ') return 1;
             if (player.group === 'DEF') return 3;
             if (player.group === 'DEL') return 11;
             return 7;
         }
 
-        // Asigna a cada titular su slot (1 al 11) sin que nunca se encimen dos jugadores en la misma coordenada
         function asignarSlotsEnCancha(startersList) {
             const ocupados = new Set();
             const asignados = [];
 
-            // Orden de prioridad para resolver empates cuando dos jugadores tienen el mismo número en posiciones.js
-            // (ej: Elías Gómez tiene 4, si juega junto a Magallón que también tiene 4, Elías va al 5 [lateral izq] y Magallón al 4 [central izq])
             const jugadoresConSlot = startersList.map(p => ({
                 player: p,
                 desiredSlot: obtenerPuestoDeMapa(p),
                 normName: normalizarTexto(p.name || p.shortName || '')
             }));
 
-            // Si juegan juntos Elías Gómez (4) y Magallón (4), Elías Gómez ocupa el lateral izquierdo (5)
             const hasMagallon = jugadoresConSlot.some(j => j.normName.includes('magallon'));
             if (hasMagallon) {
                 jugadoresConSlot.forEach(j => {
@@ -481,7 +471,6 @@
                 });
             }
 
-            // Primer paso: ubicar a los que tienen su slot libre
             const pendientes = [];
             jugadoresConSlot.forEach(item => {
                 const slot = item.desiredSlot;
@@ -493,7 +482,6 @@
                 }
             });
 
-            // Segundo paso: si algún slot quedó duplicado (ej. dos jugadores con 10), ubicarlo en el hueco libre más cercano
             const ordenAlternativo = {
                 1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
                 2: [2, 3, 8, 6, 4, 5, 7, 9, 10, 11, 1],
@@ -559,6 +547,7 @@
             squadFilterGroup: 'TODOS',
             squadSortCol: 'number',
             squadSortAsc: true,
+            selectedLineupIdx: 0,
             squad: [],
             lastFiveMatches: [],
             velezLast2: [],
@@ -566,6 +555,7 @@
             upcomingMatches: [],
             currentMatchData: null,
             lastLineup: null,
+            recentLineups: [],
             lastMatchStats: null,
             standingsClausura: [],
             standingsAnual: []
@@ -657,6 +647,11 @@
                     if (data.upcomingMatches) STATE.upcomingMatches = data.upcomingMatches;
                     if (data.squad) STATE.squad = data.squad;
                     if (data.lastLineup) STATE.lastLineup = data.lastLineup;
+                    if (Array.isArray(data.recentLineups) && data.recentLineups.length > 0) {
+                        STATE.recentLineups = data.recentLineups;
+                    } else if (data.lastLineup && data.lastLineup.starters?.length === 11) {
+                        STATE.recentLineups = [data.lastLineup];
+                    }
                     if (data.lastMatchStats) STATE.lastMatchStats = data.lastMatchStats;
                     if (data.standingsClausura) STATE.standingsClausura = data.standingsClausura;
                     if (data.standingsAnual) STATE.standingsAnual = data.standingsAnual;
@@ -1248,30 +1243,57 @@
             }
         }
 
-        function renderPitch(mode = 'LAST_MATCH') {
+        // Poblar el desplegable con las formaciones de los últimos 5 partidos disputados
+        function populateLineupSelector() {
+            const selector = document.getElementById('formation-selector');
+            if (!selector) return;
+
+            const lineups = STATE.recentLineups || [];
+            if (lineups.length === 0) {
+                selector.innerHTML = `<option value="0">Último XI Oficial</option>`;
+                return;
+            }
+
+            if (STATE.selectedLineupIdx >= lineups.length) {
+                STATE.selectedLineupIdx = 0;
+            }
+
+            selector.innerHTML = lineups.map((item, idx) => {
+                const tag = idx === 0 ? 'Último • ' : '';
+                const scorePart = item.score ? ` (${item.score})` : '';
+                return `<option value="${idx}" ${idx === STATE.selectedLineupIdx ? 'selected' : ''}>${tag}vs ${item.rival} • ${item.date}${scorePart}</option>`;
+            }).join('');
+        }
+
+        function renderPitch(selectedValue = null) {
             const layer = document.getElementById('pitch-players-layer');
             const subtitle = document.getElementById('lineup-match-subtitle');
             const badge = document.getElementById('tactical-formation-badge');
             if (!layer) return;
 
-            const lineup = STATE.lastLineup;
+            if (selectedValue !== null && !isNaN(Number(selectedValue))) {
+                STATE.selectedLineupIdx = Number(selectedValue);
+            }
+
+            const lineups = STATE.recentLineups || [];
+            const lineup = lineups[STATE.selectedLineupIdx] || STATE.lastLineup;
             const starters = (lineup && Array.isArray(lineup.starters) && lineup.starters.length === 11)
                 ? lineup.starters
                 : null;
 
-            const schemeKey = (mode === '4-3-3') ? '4-3-3' : '4-2-3-1';
+            const formName = lineup?.formation || '4-2-3-1';
+            const schemeKey = formName.includes('4-3-3') ? '4-3-3' : '4-2-3-1';
             const slotCoords = SLOTS_CANCHA[schemeKey];
 
             if (starters) {
-                const formName = lineup.formation || schemeKey;
                 if (badge) badge.textContent = formName;
                 if (subtitle) {
+                    const scoreStr = lineup.score ? ` [${lineup.score}]` : '';
                     subtitle.textContent = lineup.rival
-                        ? `XI Inicial vs ${lineup.rival} (${lineup.date}) • Esquema ${formName}`
-                        : `Último XI Titular Oficial • Esquema ${formName}`;
+                        ? `XI Inicial vs ${lineup.rival} (${lineup.date})${scoreStr} • Esquema ${formName}`
+                        : `XI Titular Oficial • Esquema ${formName}`;
                 }
 
-                // Ubicar a cada jugador según su número de puesto (1..11) definido en posiciones.js
                 const asignaciones = asignarSlotsEnCancha(starters);
 
                 layer.innerHTML = asignaciones.map(({ player: p, slot }) => {
@@ -1309,8 +1331,8 @@
             renderUpcomingMatches();
             renderStandingsTable();
             renderSquadTable();
-            const selector = document.getElementById('formation-selector');
-            renderPitch(selector ? selector.value : 'LAST_MATCH');
+            populateLineupSelector();
+            renderPitch(STATE.selectedLineupIdx);
         }
 
         window.addEventListener('DOMContentLoaded', () => {
