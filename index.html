@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LA V AZULADA | Pizarra Táctica & Estadísticas de Vélez Sarsfield</title>
-    <!-- Favicon optimizado para Chrome, Safari y dispositivos Apple -->
+    <title>LA V AZULADA | Estadísticas & Pizarra Táctica de Vélez Sarsfield</title>
+    <!-- Favicon & Ícono Pantalla de Inicio iPhone / Android -->
     <link rel="icon" href="/favicon.ico?v=3" sizes="any">
     <link rel="icon" type="image/png" sizes="32x32" href="/escudo-velez.png?v=3">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=3">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="La V Azulada">
@@ -67,6 +67,26 @@
 <body class="min-h-screen flex flex-col font-sans antialiased selection:bg-[#0055a5] selection:text-white">
 
     <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- BANNER FLOTANTE PARA AGREGAR ACCESO DIRECTO EN CELULARES (iOS / ANDROID) -->
+    <div id="pwa-install-banner" class="hidden fixed bottom-3 left-3 right-3 z-50 mx-auto max-w-md bg-[#121721]/95 backdrop-blur-md border-2 border-[#0055a5] rounded-2xl p-3.5 shadow-[0_12px_35px_rgba(0,0,0,0.85)] transition-all duration-300">
+        <div class="flex items-start gap-3">
+            <img src="./escudo-velez.png" alt="Vélez" class="w-11 h-11 object-contain flex-shrink-0 mt-0.5">
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-2">
+                    <span class="font-display text-base font-extrabold uppercase tracking-wide text-white">Instalá La V Azulada</span>
+                    <button onclick="dismissInstallBanner()" aria-label="Cerrar" class="text-slate-400 hover:text-white p-1 -mr-1 -mt-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <p id="pwa-install-instructions" class="text-xs text-slate-300 leading-snug mt-0.5"></p>
+            </div>
+        </div>
+        <!-- Flecha indicadora hacia abajo (apunta al ícono Compartir en Safari iOS) -->
+        <div id="pwa-ios-arrow" class="hidden flex justify-center mt-1.5 -mb-1 text-pizarra-electric animate-bounce">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+        </div>
+    </div>
 
     <!-- CABECERA 'LA V AZULADA' -->
     <header class="sticky top-0 z-40 bg-[#0b0e14]/95 backdrop-blur-md border-b border-pizarra-border">
@@ -567,6 +587,45 @@
             standingsClausura: [],
             standingsAnual: []
         };
+
+        // --- AVISO FLOTANTE DE INSTALACIÓN EN PANTALLA DE INICIO (MÓVIL) ---
+        function initMobileInstallPrompt() {
+            const banner = document.getElementById('pwa-install-banner');
+            const instructions = document.getElementById('pwa-install-instructions');
+            const iosArrow = document.getElementById('pwa-ios-arrow');
+            if (!banner || !instructions) return;
+
+            // Si ya está abierta como app instalada en pantalla de inicio, no mostrar
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+            if (isStandalone) return;
+
+            // Si el usuario ya lo cerró en los últimos 15 días, respetar su decisión
+            const dismissedAt = Number(localStorage.getItem('velez_pwa_dismissed') || 0);
+            if (dismissedAt && (Date.now() - dismissedAt) < 15 * 24 * 60 * 60 * 1000) return;
+
+            const ua = window.navigator.userAgent || '';
+            const isIOS = /iPhone|iPad|iPod/i.test(ua);
+            const isAndroid = /Android/i.test(ua);
+
+            if (!isIOS && !isAndroid) return;
+
+            if (isIOS) {
+                instructions.innerHTML = `Tocá el ícono <strong class="text-pizarra-electric">Compartir</strong> abajo y elegí <strong class="text-white">"Agregar a pantalla de inicio"</strong> para tener el escudo de Vélez en tu teléfono.`;
+                if (iosArrow) iosArrow.classList.remove('hidden');
+            } else {
+                instructions.innerHTML = `Tocá el menú <strong class="text-pizarra-electric">(⋮)</strong> arriba a la derecha y elegí <strong class="text-white">"Agregar a pantalla de inicio"</strong>.`;
+            }
+
+            setTimeout(() => {
+                banner.classList.remove('hidden');
+            }, 2500);
+        }
+
+        function dismissInstallBanner() {
+            const banner = document.getElementById('pwa-install-banner');
+            if (banner) banner.classList.add('hidden');
+            localStorage.setItem('velez_pwa_dismissed', String(Date.now()));
+        }
 
         function showToast(title, message) {
             const container = document.getElementById('toast-container');
@@ -1355,6 +1414,7 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             registrarMarcaDeTiempoActualizacion();
+            initMobileInstallPrompt();
             renderAll();
             fetchBackendData(false);
         });
