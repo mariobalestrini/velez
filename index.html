@@ -146,6 +146,12 @@
                     </div>
                 </div>
 
+                <!-- PASO A INTEGRADO: GOLEADORES EN VIVO (Se muestra automáticamente cuando hay goles en vivo) -->
+                <div id="live-scorers-box" class="hidden pt-3 border-t border-pizarra-border/60 grid grid-cols-2 gap-4 text-xs font-mono">
+                    <div id="live-scorers-home" class="text-right space-y-1 text-slate-300 pr-2 border-r border-pizarra-border/50"></div>
+                    <div id="live-scorers-away" class="text-left space-y-1 text-slate-300 pl-2"></div>
+                </div>
+
                 <!-- CÓMO LLEGAN AMBOS EQUIPOS (ÚLTIMOS 2 PARTIDOS) -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-5 border-t border-pizarra-border/80">
                     <div class="bg-[#0b0e14]/90 rounded-xl border border-pizarra-border p-4 space-y-3.5">
@@ -368,14 +374,13 @@
             'atletico tucuman': 'atletico-tucuman', 'barracas': 'barracas', 'independiente rivadavia': 'independiente-rivadavia'
         };
 
-        // Coordenadas tácticas en la cancha (de 1 a 11 Jugadores)
         const COORDENADAS_ESQUEMAS = {
             '4-2-3-1': [
-                { x: 50, y: 90 }, // 1 ARQ
-                { x: 84, y: 73 }, { x: 62, y: 76 }, { x: 38, y: 76 }, { x: 16, y: 73 }, // 4 DEF
-                { x: 38, y: 57 }, { x: 62, y: 57 }, // 2 MED
-                { x: 82, y: 38 }, { x: 50, y: 36 }, { x: 18, y: 38 }, // 3 MCO/EXT
-                { x: 50, y: 16 }  // 1 DEL
+                { x: 50, y: 90 },
+                { x: 84, y: 73 }, { x: 62, y: 76 }, { x: 38, y: 76 }, { x: 16, y: 73 },
+                { x: 38, y: 57 }, { x: 62, y: 57 },
+                { x: 82, y: 38 }, { x: 50, y: 36 }, { x: 18, y: 38 },
+                { x: 50, y: 16 }
             ],
             '4-3-3': [
                 { x: 50, y: 90 },
@@ -389,7 +394,6 @@
             return (texto || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').trim();
         }
 
-        // Prioriza el logo oficial de ESPN si está disponible, o usa la carpeta local ./escudos/
         function obtenerEscudoEquipo(item, explicitLogoUrl = '') {
             if (explicitLogoUrl && explicitLogoUrl.startsWith('http')) return explicitLogoUrl;
             if (!item) return ESCUDO_GENERICO_GRIS;
@@ -493,7 +497,6 @@
             fetchBackendData(true);
         }
 
-        // Cuenta regresiva en tiempo real hacia el próximo partido de Vélez
         function updateMatchCountdown() {
             const cdEl = document.getElementById('prev-countdown');
             if (!cdEl) return;
@@ -547,7 +550,6 @@
             updateMatchCountdown();
         }, 1000);
 
-        // Renderiza las tarjetas de últimos 2 partidos para "Cómo llega Vélez" y "Rival de Turno"
         function renderMiniFormList(containerId, matchesArray, teamLabel) {
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -583,6 +585,7 @@
             }).join('');
         }
 
+        // PASO B INTEGRADO: Renderizado de partido en vivo con goleadores minuto a minuto
         function renderMatchCenter() {
             const cm = STATE.currentMatchData;
             if (!cm || !cm.match) return;
@@ -597,6 +600,9 @@
             const leagueInfo = document.getElementById('match-league-info');
             const stadium = document.getElementById('match-stadium');
             const rivalFormTitle = document.getElementById('rival-form-title');
+            const scorersBox = document.getElementById('live-scorers-box');
+            const scorersHome = document.getElementById('live-scorers-home');
+            const scorersAway = document.getElementById('live-scorers-away');
 
             const m = cm.match;
             homeCrest.innerHTML = renderEscudoImg(m.teams.home, 'w-16 h-16 sm:w-20 sm:h-20', m.teams.home.logo);
@@ -609,14 +615,26 @@
             if (rivalFormTitle) rivalFormTitle.textContent = `Cómo llega ${rivalName}`;
 
             if (cm.type === 'LIVE') {
-                badge.textContent = `EN VIVO • ${m.fixture.status.long || 'EN JUEGO'}`;
+                const clockStr = m.fixture.status.elapsed || m.fixture.status.long || 'EN JUEGO';
+                badge.textContent = `🔴 EN VIVO • ${clockStr}`;
                 badge.className = "px-2 py-0.5 rounded bg-red-600 text-white font-bold uppercase tracking-wider text-[11px] animate-pulse";
-                statusTitle.textContent = 'PARTIDO EN CURSO';
+                statusTitle.textContent = `TIEMPO DE JUEGO: ${clockStr}`;
                 centerBox.innerHTML = `
                     <span class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">${m.goals.home ?? 0} - ${m.goals.away ?? 0}</span>
-                    <span class="block text-[10px] font-mono text-red-400 font-bold tracking-widest uppercase">EN VIVO AHORA</span>
+                    <span class="block text-[10px] font-mono text-red-400 font-bold tracking-widest uppercase">MARCADOR EN VIVO</span>
                 `;
+
+                const hScorers = m.scorers?.home || [];
+                const aScorers = m.scorers?.away || [];
+                if (scorersBox && (hScorers.length > 0 || aScorers.length > 0)) {
+                    scorersBox.classList.remove('hidden');
+                    scorersHome.innerHTML = hScorers.map(g => `<div><span class="text-white font-semibold">${g}</span> ⚽</div>`).join('');
+                    scorersAway.innerHTML = aScorers.map(g => `<div>⚽ <span class="text-white font-semibold">${g}</span></div>`).join('');
+                } else if (scorersBox) {
+                    scorersBox.classList.add('hidden');
+                }
             } else {
+                if (scorersBox) scorersBox.classList.add('hidden');
                 badge.textContent = "PRÓXIMO PARTIDO OFICIAL";
                 badge.className = "px-2 py-0.5 rounded bg-sky-500/20 text-pizarra-electric border border-sky-500/40 font-bold uppercase tracking-wider text-[11px]";
                 const matchDateObj = new Date(cm.isoDate || m.fixture.date);
@@ -635,7 +653,6 @@
 
             updateMatchCountdown();
 
-            // Renderizar los últimos 2 partidos de Vélez y del Rival
             const vLast2 = cm.velezForm || cm.velezLastMatches || STATE.velezLast2 || STATE.lastFiveMatches.slice(0, 2);
             const rLast2 = cm.rivalForm || cm.rivalLastMatches || STATE.rivalLast2 || [];
             renderMiniFormList('prev-velez-last2', vLast2, 'Vélez');
@@ -735,7 +752,6 @@
                 const pos = idx + 1;
                 const rowBg = t.isVelez ? 'bg-[#0055a5]/25 font-semibold text-white' : 'hover:bg-pizarra-cardHover/60 text-slate-300';
 
-                // Indicador lateral de clasificación a Copas en la Tabla Anual
                 let cupIndicator = '';
                 if (tab === 'ANUAL') {
                     if (pos <= 3) cupIndicator = 'border-l-4 border-l-emerald-500';
@@ -814,7 +830,6 @@
                 `;
             }).join('');
 
-            // Actualizar los 3 KPIs inferiores con los totales reales del plantel
             const totalGoals = STATE.squad.reduce((acc, p) => acc + (Number(p.goals) || 0), 0);
             const maxCleanSheets = STATE.squad.filter(p => p.group === 'ARQ').reduce((max, p) => Math.max(max, Number(p.cleanSheets) || 0), 0);
             const totalCards = STATE.squad.reduce((acc, p) => acc + (Number(p.yellowCards) || 0) + (Number(p.redCards) || 0), 0);
@@ -827,7 +842,6 @@
             if (kpiC) kpiC.textContent = totalCards;
         }
 
-        // Dibuja los últimos 11 titulares reales en la cancha
         function renderPitch(mode = 'LAST_MATCH') {
             const layer = document.getElementById('pitch-players-layer');
             const subtitle = document.getElementById('lineup-match-subtitle');
@@ -851,57 +865,10 @@
                         : `Último XI Titular Oficial • Esquema ${formName}`;
                 }
 
-                // Ordenar por línea táctica (ARQ -> DEF -> MED -> DEL) para ubicar cada jugador en su coordenada
                 const groupOrder = { 'ARQ': 1, 'DEF': 2, 'MED': 3, 'DEL': 4 };
                 const orderedStarters = [...starters].sort((a, b) => (groupOrder[a.group] || 3) - (groupOrder[b.group] || 3));
 
                 layer.innerHTML = orderedStarters.map((p, idx) => {
                     const pos = coords[idx] || { x: 50, y: 50 };
                     const shortLabel = (p.shortName || p.name || '').split(' ').pop();
-                    return `
-                        <div style="left: ${pos.x}%; top: ${pos.y}%;" class="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer">
-                            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#0055a5] border-2 border-white text-white font-display font-extrabold text-sm flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.75)]">${p.number || '-'}</div>
-                            <span class="mt-1 px-1.5 py-0.5 rounded bg-[#0b0e14]/95 border border-pizarra-border text-[10px] sm:text-[11px] font-semibold text-white whitespace-nowrap shadow">${shortLabel}</span>
-                        </div>
-                    `;
-                }).join('');
-            } else if (STATE.squad && STATE.squad.length >= 11) {
-                // Si aún no cargó el summary del último partido, armamos el XI con los 11 jugadores con más PJ del plantel actual
-                const top11 = [...STATE.squad].sort((a, b) => (b.pj || 0) - (a.pj || 0)).slice(0, 11);
-                const groupOrder = { 'ARQ': 1, 'DEF': 2, 'MED': 3, 'DEL': 4 };
-                top11.sort((a, b) => (groupOrder[a.group] || 3) - (groupOrder[b.group] || 3));
-
-                if (subtitle) subtitle.textContent = 'Once base con más presencias en la temporada';
-                layer.innerHTML = top11.map((p, idx) => {
-                    const pos = coords[idx] || { x: 50, y: 50 };
-                    const shortLabel = (p.name || '').split(' ').pop();
-                    return `
-                        <div style="left: ${pos.x}%; top: ${pos.y}%;" class="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer">
-                            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#0055a5] border-2 border-white text-white font-display font-extrabold text-sm flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.75)]">${p.number || '-'}</div>
-                            <span class="mt-1 px-1.5 py-0.5 rounded bg-[#0b0e14]/95 border border-pizarra-border text-[10px] sm:text-[11px] font-semibold text-white whitespace-nowrap shadow">${shortLabel}</span>
-                        </div>
-                    `;
-                }).join('');
-            }
-        }
-
-        function renderAll() {
-            const velezLogo = STATE.standingsClausura.find(t => t.isVelez)?.logo || '';
-            document.getElementById('header-velez-crest').innerHTML = renderEscudoImg('Vélez Sarsfield', 'w-10 h-10 sm:w-11 sm:h-11', velezLogo);
-            renderMatchCenter();
-            renderLastFiveMatches();
-            renderUpcomingMatches();
-            renderStandingsTable();
-            renderSquadTable();
-            const selector = document.getElementById('formation-selector');
-            renderPitch(selector ? selector.value : 'LAST_MATCH');
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            registrarMarcaDeTiempoActualizacion();
-            renderAll();
-            fetchBackendData(false);
-        });
-    </script>
-</body>
-</html>
+                    return
