@@ -73,7 +73,7 @@
                             C.A. Vélez Sarsfield • 1910
                         </span>
                     </div>
-                    <p class="text-xs text-slate-400 mt-0.5">Sitio Exclusivo • Pizarra Táctica & API-Football en Vivo</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Sitio Exclusivo • Pizarra Táctica & Estadísticas en Vivo</p>
                 </div>
             </div>
 
@@ -128,9 +128,9 @@
                     </div>
 
                     <div class="flex flex-col items-center justify-center">
-                        <span id="match-status-title" class="text-xs sm:text-sm font-display uppercase tracking-wider text-pizarra-electric font-bold mb-1">VIERNES 20 DE NOVIEMBRE</span>
+                        <span id="match-status-title" class="text-xs sm:text-sm font-display uppercase tracking-wider text-pizarra-electric font-bold mb-1">CARGANDO FECHA...</span>
                         <div id="match-center-box" class="bg-[#0b0e14]/95 px-4 sm:px-7 py-2.5 rounded-2xl border border-pizarra-border shadow-inner">
-                            <span class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">20:00</span>
+                            <span class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">--:--</span>
                             <span class="block text-[10px] font-mono text-pizarra-electric font-bold tracking-widest uppercase">HORA ART (UTC-3)</span>
                         </div>
                         <div class="mt-2.5 px-3 py-1 rounded-full bg-pizarra-accent/20 border border-pizarra-accent/40 flex items-center gap-1.5">
@@ -141,16 +141,17 @@
 
                     <div class="flex flex-col items-center">
                         <div id="match-away-crest" class="w-16 h-16 sm:w-20 sm:h-20 mb-2 flex items-center justify-center drop-shadow-[0_0_14px_rgba(56,189,248,0.35)]"></div>
-                        <h2 id="match-away-name" class="font-display text-xl sm:text-3xl font-extrabold uppercase tracking-wide text-slate-100">Belgrano</h2>
+                        <h2 id="match-away-name" class="font-display text-xl sm:text-3xl font-extrabold uppercase tracking-wide text-slate-100">Rival</h2>
                         <span class="mt-1 px-2.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-[11px] text-slate-300 font-mono font-bold">VISITANTE</span>
                     </div>
                 </div>
 
+                <!-- CÓMO LLEGAN AMBOS EQUIPOS (ÚLTIMOS 2 PARTIDOS) -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-5 border-t border-pizarra-border/80">
                     <div class="bg-[#0b0e14]/90 rounded-xl border border-pizarra-border p-4 space-y-3.5">
                         <div class="flex items-center justify-between border-b border-pizarra-border pb-2.5">
                             <h3 class="font-display text-base sm:text-lg font-bold uppercase text-white tracking-wide">Cómo llega Vélez Sarsfield</h3>
-                            <span class="font-mono text-[11px] text-emerald-400 font-bold">Últimos encuentros</span>
+                            <span class="font-mono text-[11px] text-emerald-400 font-bold">Últimos 2 encuentros</span>
                         </div>
                         <div>
                             <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-2">Últimos partidos disputados</div>
@@ -160,8 +161,8 @@
 
                     <div class="bg-[#0b0e14]/90 rounded-xl border border-pizarra-border p-4 space-y-3.5">
                         <div class="flex items-center justify-between border-b border-pizarra-border pb-2.5">
-                            <h3 class="font-display text-base sm:text-lg font-bold uppercase text-white tracking-wide">Rival de Turno</h3>
-                            <span class="font-mono text-[11px] text-slate-300 font-bold">Forma Reciente</span>
+                            <h3 id="rival-form-title" class="font-display text-base sm:text-lg font-bold uppercase text-white tracking-wide">Rival de Turno</h3>
+                            <span class="font-mono text-[11px] text-slate-300 font-bold">Últimos 2 encuentros</span>
                         </div>
                         <div>
                             <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-2">Últimos partidos disputados</div>
@@ -197,7 +198,7 @@
             </div>
         </section>
 
-        <!-- TABLAS DE POSICIONES -->
+        <!-- TABLAS DE POSICIONES (CLAUSURA Y ANUAL CLASIFICACIÓN A COPAS) -->
         <section class="bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden">
             <div class="p-4 border-b border-pizarra-border flex flex-wrap items-center justify-between gap-3 bg-[#0e131c]">
                 <div>
@@ -205,13 +206,12 @@
                         <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
                         Tablas Fútbol Argentino • Primera División
                     </h3>
-                    <p class="text-xs text-slate-400">Datos sincronizados con API-Football • Actualización automática</p>
+                    <p class="text-xs text-slate-400">Datos oficiales sincronizados en tiempo real • Clasificación a Copas</p>
                 </div>
 
                 <div class="flex bg-[#0b0e14] p-1 rounded-xl border border-pizarra-border text-xs font-semibold">
                     <button onclick="switchTableTab('TORNEO')" id="tab-TORNEO" class="px-3.5 py-1.5 rounded-lg bg-pizarra-accent text-white transition">Posiciones Clausura</button>
-                    <button onclick="switchTableTab('ANUAL')" id="tab-ANUAL" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Tabla Anual</button>
-                    <button onclick="switchTableTab('PROMEDIOS')" id="tab-PROMEDIOS" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Promedios</button>
+                    <button onclick="switchTableTab('ANUAL')" id="tab-ANUAL" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Tabla Anual (Copas)</button>
                 </div>
             </div>
 
@@ -225,8 +225,8 @@
             </div>
 
             <div class="px-4 py-2.5 bg-[#0e131c] border-t border-pizarra-border flex flex-wrap items-center gap-4 text-[11px] text-slate-400">
-                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span><span>Zona Copa Libertadores</span></div>
-                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-amber-500"></span><span>Zona Copa Sudamericana</span></div>
+                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span><span>Zona Copa Libertadores (Top 3 Anual)</span></div>
+                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-amber-500"></span><span>Zona Copa Sudamericana (4° al 9° Anual)</span></div>
                 <div class="flex items-center gap-1.5 ml-auto"><span class="w-2.5 h-2.5 rounded-sm bg-[#0055a5]"></span><span class="text-white font-semibold">Vélez Sarsfield</span></div>
             </div>
         </section>
@@ -239,7 +239,7 @@
                         <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
                         Plantilla Oficial & Estadísticas Temporada
                     </h3>
-                    <p class="text-xs text-slate-400">PJ, Goles, Tarjetas y Vallas Invictas (🧤) exclusivas para arqueros</p>
+                    <p class="text-xs text-slate-400">Dorsales oficiales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) para arqueros</p>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2">
@@ -262,7 +262,7 @@
                 <table class="w-full text-left border-collapse text-xs sm:text-sm">
                     <thead>
                         <tr class="bg-[#0b0e14]/85 text-slate-400 font-mono text-[11px] uppercase border-b border-pizarra-border select-none">
-                            <th onclick="sortSquadBy('num')" class="py-3 px-3 text-center cursor-pointer hover:text-white transition">Dorsal ↕</th>
+                            <th onclick="sortSquadBy('number')" class="py-3 px-3 text-center cursor-pointer hover:text-white transition">Dorsal ↕</th>
                             <th onclick="sortSquadBy('name')" class="py-3 px-3 cursor-pointer hover:text-white transition">Jugador ↕</th>
                             <th onclick="sortSquadBy('group')" class="py-3 px-2 text-center cursor-pointer hover:text-white transition">Puesto ↕</th>
                             <th onclick="sortSquadBy('age')" class="py-3 px-2 text-center cursor-pointer hover:text-white transition">Edad ↕</th>
@@ -278,17 +278,21 @@
             </div>
         </section>
 
-        <!-- PIZARRA TÁCTICA -->
+        <!-- PIZARRA TÁCTICA (ÚLTIMOS 11 TITULARES QUE FORMARON) -->
         <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div class="lg:col-span-7 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden">
                 <div class="p-4 border-b border-pizarra-border flex flex-wrap items-center justify-between gap-2 bg-[#0e131c]">
-                    <h3 class="font-display text-xl font-bold uppercase tracking-wide text-white flex items-center gap-2">
-                        <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
-                        La Pizarra Táctica • XI Titular
-                    </h3>
+                    <div>
+                        <h3 class="font-display text-xl font-bold uppercase tracking-wide text-white flex items-center gap-2">
+                            <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
+                            La Pizarra Táctica • Último XI Titular
+                        </h3>
+                        <p id="lineup-match-subtitle" class="text-[11px] font-mono text-pizarra-electric mt-0.5">Sincronizando formación del último partido...</p>
+                    </div>
                     <select id="formation-selector" onchange="renderPitch(this.value)" class="bg-[#0b0e14] border border-pizarra-border text-xs font-mono text-white rounded-lg px-3 py-1.5 focus:outline-none focus:border-pizarra-electric">
-                        <option value="4-2-3-1">Esquema 4-2-3-1 (Base)</option>
-                        <option value="4-3-3">Esquema 4-3-3 (Ofensivo)</option>
+                        <option value="LAST_MATCH">Último XI Oficial</option>
+                        <option value="4-2-3-1">Esquema 4-2-3-1</option>
+                        <option value="4-3-3">Esquema 4-3-3</option>
                     </select>
                 </div>
                 <div class="p-4 sm:p-6 bg-[#0b0e14] flex justify-center tactical-grid">
@@ -318,8 +322,8 @@
             <div class="lg:col-span-5 bg-pizarra-card rounded-2xl border border-pizarra-border p-5 flex flex-col justify-between space-y-5">
                 <div>
                     <div class="flex items-center justify-between border-b border-pizarra-border pb-3 mb-4">
-                        <h4 class="font-display text-xl font-bold uppercase text-white">Análisis Táctico</h4>
-                        <span class="px-2 py-0.5 rounded bg-pizarra-accent/20 text-pizarra-electric font-mono text-xs border border-pizarra-accent/40">C.A.V.S.</span>
+                        <h4 class="font-display text-xl font-bold uppercase text-white">Análisis Táctico & XI</h4>
+                        <span id="tactical-formation-badge" class="px-2 py-0.5 rounded bg-pizarra-accent/20 text-pizarra-electric font-mono text-xs border border-pizarra-accent/40">4-2-3-1</span>
                     </div>
                     <div class="space-y-3 text-xs text-slate-300 leading-relaxed">
                         <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
@@ -333,7 +337,7 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 pt-3 border-t border-pizarra-border text-center">
-                    <div class="p-2.5 rounded-xl bg-[#0b0e14] border border-pizarra-border"><span id="kpi-total-goals" class="block font-display text-2xl font-extrabold text-emerald-400">--</span><span class="text-[10px] font-mono uppercase text-slate-400">Goles</span></div>
+                    <div class="p-2.5 rounded-xl bg-[#0b0e14] border border-pizarra-border"><span id="kpi-total-goals" class="block font-display text-2xl font-extrabold text-emerald-400">--</span><span class="text-[10px] font-mono uppercase text-slate-400">Goles Plantel</span></div>
                     <div class="p-2.5 rounded-xl bg-[#0b0e14] border border-pizarra-border"><span id="kpi-clean-sheets" class="block font-display text-2xl font-extrabold text-pizarra-electric">--</span><span class="text-[10px] font-mono uppercase text-slate-400">Vallas Invictas</span></div>
                     <div class="p-2.5 rounded-xl bg-[#0b0e14] border border-pizarra-border"><span id="kpi-total-cards" class="block font-display text-2xl font-extrabold text-amber-400">--</span><span class="text-[10px] font-mono uppercase text-slate-400">Tarjetas</span></div>
                 </div>
@@ -344,13 +348,13 @@
     <footer class="mt-8 border-t border-pizarra-border bg-[#090c11] py-4 px-4 text-xs text-slate-500">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
             <span><strong class="text-slate-300">La V Azulada</strong> • Sitio Exclusivo del Club Atlético Vélez Sarsfield</span>
-            <span class="font-mono text-[11px] text-slate-400">Conectado a API-Football (Liga 128) • Escudos locales con fallback S/E</span>
+            <span class="font-mono text-[11px] text-slate-400">Datos en vivo ESPN Argentina & Web Oficial CAVS</span>
         </div>
     </footer>
 
     <!-- SCRIPT DE CONSUMO DE DATOS EN VIVO DESDE EL BACKEND -->
     <script>
-        const ESCUDO_GENERICO_GRIS = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 110'><path d='M10,8 H90 V60 C90,86 50,104 50,104 C50,104 10,86 10,60 Z' fill='%232a3240' stroke='%234a5568' stroke-width='5'/><path d='M24,26 H76 V56 C76,74 50,88 50,88 C50,88 24,74 24,56 Z' fill='%234a5568' opacity='0.55'/><text x='50' y='59' font-family='sans-serif' font-weight='bold' font-size='14' fill='%23cbd5e0' text-anchor='middle'>S/E</text></svg>";
+        const ESCUDO_GENERICO_GRIS = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 110'><path d='M10,8 H90 V60 C90,86 50,104 50,104 C50,104 10,86 10,60 Z' fill='%232a3240' stroke='%234a5568' stroke-width='5'/><path d='M24,26 H76 V56 C76,74 50,88 50,88 C50,88 24,74 24,56 Z' fill='%234a5568' opacity='0.55'/><text x='50' y='59' font-family='sans-serif' font-weight='bold' font-size='14' fill='%23cbd5e0' text-anchor='middle'>CAVS</text></svg>";
 
         const MAPA_SLUGS_ESCUDOS = {
             'velez': 'velez', 'belgrano': 'belgrano', 'river': 'river', 'boca': 'boca',
@@ -364,14 +368,39 @@
             'atletico tucuman': 'atletico-tucuman', 'barracas': 'barracas', 'independiente rivadavia': 'independiente-rivadavia'
         };
 
+        // Coordenadas tácticas en la cancha (de 1 a 11 Jugadores)
+        const COORDENADAS_ESQUEMAS = {
+            '4-2-3-1': [
+                { x: 50, y: 90 }, // 1 ARQ
+                { x: 84, y: 73 }, { x: 62, y: 76 }, { x: 38, y: 76 }, { x: 16, y: 73 }, // 4 DEF
+                { x: 38, y: 57 }, { x: 62, y: 57 }, // 2 MED
+                { x: 82, y: 38 }, { x: 50, y: 36 }, { x: 18, y: 38 }, // 3 MCO/EXT
+                { x: 50, y: 16 }  // 1 DEL
+            ],
+            '4-3-3': [
+                { x: 50, y: 90 },
+                { x: 84, y: 73 }, { x: 62, y: 76 }, { x: 38, y: 76 }, { x: 16, y: 73 },
+                { x: 50, y: 58 }, { x: 72, y: 46 }, { x: 28, y: 46 },
+                { x: 80, y: 22 }, { x: 50, y: 16 }, { x: 20, y: 22 }
+            ]
+        };
+
         function normalizarTexto(texto) {
             return (texto || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').trim();
         }
 
-        function obtenerEscudoEquipo(nombreOSlug) {
-            if (!nombreOSlug) return ESCUDO_GENERICO_GRIS;
-            if (typeof nombreOSlug === 'string' && nombreOSlug.startsWith('http')) return nombreOSlug;
-            const norm = normalizarTexto(typeof nombreOSlug === 'object' ? nombreOSlug.name : nombreOSlug);
+        // Prioriza el logo oficial de ESPN si está disponible, o usa la carpeta local ./escudos/
+        function obtenerEscudoEquipo(item, explicitLogoUrl = '') {
+            if (explicitLogoUrl && explicitLogoUrl.startsWith('http')) return explicitLogoUrl;
+            if (!item) return ESCUDO_GENERICO_GRIS;
+            if (typeof item === 'object') {
+                if (item.logo && item.logo.startsWith('http')) return item.logo;
+                if (item.rivalLogo && item.rivalLogo.startsWith('http')) return item.rivalLogo;
+            }
+            if (typeof item === 'string' && item.startsWith('http')) return item;
+
+            const nombre = typeof item === 'object' ? (item.name || item.rival || '') : item;
+            const norm = normalizarTexto(nombre);
             let slug = '';
             for (const [clave, s] of Object.entries(MAPA_SLUGS_ESCUDOS)) {
                 if (norm.includes(clave)) { slug = s; break; }
@@ -380,8 +409,8 @@
             return slug ? `./escudos/${slug}.png` : ESCUDO_GENERICO_GRIS;
         }
 
-        function renderEscudoImg(nombreEquipo, sizeClasses = 'w-16 h-16') {
-            const src = obtenerEscudoEquipo(nombreEquipo);
+        function renderEscudoImg(item, sizeClasses = 'w-16 h-16', explicitLogoUrl = '') {
+            const src = obtenerEscudoEquipo(item, explicitLogoUrl);
             return `<img src="${src}" onerror="this.onerror=null;this.src='${ESCUDO_GENERICO_GRIS}';" alt="Escudo" class="${sizeClasses} object-contain select-none">`;
         }
 
@@ -390,26 +419,17 @@
             countdown: 15,
             activeTableTab: 'TORNEO',
             squadFilterGroup: 'TODOS',
-            squadSortCol: 'num',
+            squadSortCol: 'number',
             squadSortAsc: true,
             squad: [],
             lastFiveMatches: [],
+            velezLast2: [],
+            rivalLast2: [],
             upcomingMatches: [],
             currentMatchData: null,
+            lastLineup: null,
             standingsClausura: [],
-            standingsAnual: [],
-            standingsPromedios: []
-        };
-
-        const FORMATIONS = {
-            '4-2-3-1': [
-                { num: 1, name: 'Marchiori', x: 50, y: 90 }, { num: 4, name: 'J. García', x: 84, y: 73 },
-                { num: 2, name: 'Mammana', x: 62, y: 76 }, { num: 31, name: 'V. Gómez', x: 38, y: 76 },
-                { num: 3, name: 'E. Gómez', x: 16, y: 73 }, { num: 32, name: 'Ordóñez', x: 38, y: 57 },
-                { num: 26, name: 'Bouzat', x: 62, y: 57 }, { num: 20, name: 'Pizzini', x: 82, y: 38 },
-                { num: 22, name: 'Aquino', x: 50, y: 36 }, { num: 11, name: 'T. Fernández', x: 18, y: 38 },
-                { num: 9, name: 'B. Romero', x: 50, y: 16 }
-            ]
+            standingsAnual: []
         };
 
         function showToast(title, message) {
@@ -432,8 +452,7 @@
             if (el) el.textContent = horaStr;
         }
 
-        // CONEXIÓN AUTOMÁTICA CON TU BACKEND EN RENDER (O LOCAL)
-        const BACKEND_URL = 'https://velez-backend.onrender.com'; // Si usas Render, coloca aquí tu URL completa (ej: 'https://velez-backend.onrender.com')
+        const BACKEND_URL = 'https://velez-backend.onrender.com';
 
         async function fetchBackendData(isManual = false) {
             const icon = document.getElementById('refresh-icon');
@@ -446,11 +465,17 @@
                     
                     if (data.currentMatch) STATE.currentMatchData = data.currentMatch;
                     if (data.lastMatches) STATE.lastFiveMatches = data.lastMatches;
+                    if (data.velezLast2) STATE.velezLast2 = data.velezLast2;
+                    else if (data.lastMatches) STATE.velezLast2 = data.lastMatches.slice(0, 2);
+
+                    if (data.rivalLast2) STATE.rivalLast2 = data.rivalLast2;
+                    else if (data.rivalLastMatches) STATE.rivalLast2 = data.rivalLastMatches.slice(0, 2);
+
                     if (data.upcomingMatches) STATE.upcomingMatches = data.upcomingMatches;
                     if (data.squad) STATE.squad = data.squad;
+                    if (data.lastLineup) STATE.lastLineup = data.lastLineup;
                     if (data.standingsClausura) STATE.standingsClausura = data.standingsClausura;
                     if (data.standingsAnual) STATE.standingsAnual = data.standingsAnual;
-                    if (data.standingsPromedios) STATE.standingsPromedios = data.standingsPromedios;
                 }
             } catch (err) {
                 console.error("Error sincronizando backend:", err);
@@ -468,6 +493,45 @@
             fetchBackendData(true);
         }
 
+        // Cuenta regresiva en tiempo real hacia el próximo partido de Vélez
+        function updateMatchCountdown() {
+            const cdEl = document.getElementById('prev-countdown');
+            if (!cdEl) return;
+
+            const cm = STATE.currentMatchData;
+            if (!cm || !cm.match) {
+                cdEl.textContent = 'Sincronizando...';
+                return;
+            }
+
+            if (cm.type === 'LIVE') {
+                cdEl.textContent = '🔴 EN JUEGO AHORA';
+                return;
+            }
+
+            const rawDate = cm.isoDate || cm.match.fixture?.date;
+            const targetMs = cm.timestamp || cm.match.fixture?.timestampMs || (rawDate ? new Date(rawDate).getTime() : NaN);
+
+            if (isNaN(targetMs)) {
+                cdEl.textContent = 'Horario a confirmar';
+                return;
+            }
+
+            const diff = targetMs - Date.now();
+            if (diff <= 0) {
+                cdEl.textContent = 'Partido en curso / Finalizado';
+                return;
+            }
+
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const m = Math.floor((diff / 1000 / 60) % 60);
+            const s = Math.floor((diff / 1000) % 60);
+
+            const pad = (n) => String(n).padStart(2, '0');
+            cdEl.textContent = `Faltan: ${pad(d)}d ${pad(h)}h ${pad(m)}m ${pad(s)}s`;
+        }
+
         setInterval(() => { fetchBackendData(false); }, 15000);
 
         setInterval(() => {
@@ -479,11 +543,49 @@
             STATE.countdown = STATE.countdown > 1 ? STATE.countdown - 1 : STATE.pollingIntervalSec;
             const cdEl = document.getElementById('polling-countdown');
             if (cdEl) cdEl.textContent = `${STATE.countdown}s`;
+
+            updateMatchCountdown();
         }, 1000);
+
+        // Renderiza las tarjetas de últimos 2 partidos para "Cómo llega Vélez" y "Rival de Turno"
+        function renderMiniFormList(containerId, matchesArray, teamLabel) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            if (!matchesArray || matchesArray.length === 0) {
+                container.innerHTML = `<div class="text-xs text-slate-500 font-mono py-2">Sin registros recientes disponibles</div>`;
+                return;
+            }
+
+            container.innerHTML = matchesArray.slice(0, 2).map(m => {
+                const badgeStyle = m.outcome === 'G'
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                    : (m.outcome === 'E' ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-rose-500/20 text-rose-300 border-rose-500/40');
+                const condLabel = m.cond === 'L' ? 'Local' : 'Visitante';
+                const gTeam = m.teamGoals ?? m.velezGoals ?? 0;
+                const gOpp = m.oppGoals ?? m.rivalGoals ?? 0;
+
+                return `
+                    <div class="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-[#121721] border border-pizarra-border">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            ${renderEscudoImg(m.rival, 'w-6 h-6 flex-shrink-0', m.rivalLogo)}
+                            <div class="truncate">
+                                <div class="text-xs font-bold text-white truncate">vs ${m.rival}</div>
+                                <div class="text-[10px] font-mono text-slate-400">${m.date} • ${condLabel}</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            <span class="px-2 py-0.5 rounded bg-[#0b0e14] border border-pizarra-border font-mono text-xs font-bold text-white">${gTeam} - ${gOpp}</span>
+                            <span class="w-6 h-6 rounded border font-mono font-bold text-xs flex items-center justify-center ${badgeStyle}">${m.outcome}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
 
         function renderMatchCenter() {
             const cm = STATE.currentMatchData;
-            if (!cm) return;
+            if (!cm || !cm.match) return;
 
             const badge = document.getElementById('match-badge-type');
             const homeCrest = document.getElementById('match-home-crest');
@@ -494,37 +596,50 @@
             const centerBox = document.getElementById('match-center-box');
             const leagueInfo = document.getElementById('match-league-info');
             const stadium = document.getElementById('match-stadium');
+            const rivalFormTitle = document.getElementById('rival-form-title');
+
+            const m = cm.match;
+            homeCrest.innerHTML = renderEscudoImg(m.teams.home, 'w-16 h-16 sm:w-20 sm:h-20', m.teams.home.logo);
+            awayCrest.innerHTML = renderEscudoImg(m.teams.away, 'w-16 h-16 sm:w-20 sm:h-20', m.teams.away.logo);
+            homeName.textContent = m.teams.home.name;
+            awayName.textContent = m.teams.away.name;
+
+            const isVelezHome = normalizarTexto(m.teams.home.name).includes('velez');
+            const rivalName = isVelezHome ? m.teams.away.name : m.teams.home.name;
+            if (rivalFormTitle) rivalFormTitle.textContent = `Cómo llega ${rivalName}`;
 
             if (cm.type === 'LIVE') {
-                badge.textContent = `EN VIVO • ${cm.match.fixture.status.elapsed || 0}'`;
+                badge.textContent = `EN VIVO • ${m.fixture.status.long || 'EN JUEGO'}`;
                 badge.className = "px-2 py-0.5 rounded bg-red-600 text-white font-bold uppercase tracking-wider text-[11px] animate-pulse";
-                homeCrest.innerHTML = renderEscudoImg(cm.match.teams.home, 'w-16 h-16 sm:w-20 sm:h-20');
-                awayCrest.innerHTML = renderEscudoImg(cm.match.teams.away, 'w-16 h-16 sm:w-20 sm:h-20');
-                homeName.textContent = cm.match.teams.home.name;
-                awayName.textContent = cm.match.teams.away.name;
-                statusTitle.textContent = cm.match.fixture.status.long || 'EN JUEGO';
+                statusTitle.textContent = 'PARTIDO EN CURSO';
                 centerBox.innerHTML = `
-                    <span class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">${cm.match.goals.home ?? 0} - ${cm.match.goals.away ?? 0}</span>
+                    <span class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">${m.goals.home ?? 0} - ${m.goals.away ?? 0}</span>
                     <span class="block text-[10px] font-mono text-red-400 font-bold tracking-widest uppercase">EN VIVO AHORA</span>
                 `;
-            } else if (cm.type === 'NEXT') {
+            } else {
                 badge.textContent = "PRÓXIMO PARTIDO OFICIAL";
                 badge.className = "px-2 py-0.5 rounded bg-sky-500/20 text-pizarra-electric border border-sky-500/40 font-bold uppercase tracking-wider text-[11px]";
-                const m = cm.match;
-                homeCrest.innerHTML = renderEscudoImg(m.teams.home, 'w-16 h-16 sm:w-20 sm:h-20');
-                awayCrest.innerHTML = renderEscudoImg(m.teams.away, 'w-16 h-16 sm:w-20 sm:h-20');
-                homeName.textContent = m.teams.home.name;
-                awayName.textContent = m.teams.away.name;
-                const matchDateObj = new Date(m.fixture.date);
-                statusTitle.textContent = matchDateObj.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
-                const horaStr = matchDateObj.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
-                centerBox.innerHTML = `
-                    <span class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">${horaStr}</span>
-                    <span class="block text-[10px] font-mono text-pizarra-electric font-bold tracking-widest uppercase">HORA ART (UTC-3)</span>
-                `;
-                if (m.fixture.venue && m.fixture.venue.name) stadium.textContent = m.fixture.venue.name;
-                if (m.league && m.league.name) leagueInfo.textContent = `${m.league.name} • ${m.league.round || ''}`;
+                const matchDateObj = new Date(cm.isoDate || m.fixture.date);
+                if (!isNaN(matchDateObj.getTime())) {
+                    statusTitle.textContent = matchDateObj.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Argentina/Buenos_Aires' }).toUpperCase();
+                    const horaStr = matchDateObj.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Argentina/Buenos_Aires' });
+                    centerBox.innerHTML = `
+                        <span class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">${horaStr}</span>
+                        <span class="block text-[10px] font-mono text-pizarra-electric font-bold tracking-widest uppercase">HORA ART (UTC-3)</span>
+                    `;
+                }
             }
+
+            if (m.fixture.venue && m.fixture.venue.name) stadium.textContent = m.fixture.venue.name;
+            if (m.league && m.league.name) leagueInfo.textContent = `${m.league.name} • ${m.league.round || ''}`;
+
+            updateMatchCountdown();
+
+            // Renderizar los últimos 2 partidos de Vélez y del Rival
+            const vLast2 = cm.velezForm || cm.velezLastMatches || STATE.velezLast2 || STATE.lastFiveMatches.slice(0, 2);
+            const rLast2 = cm.rivalForm || cm.rivalLastMatches || STATE.rivalLast2 || [];
+            renderMiniFormList('prev-velez-last2', vLast2, 'Vélez');
+            renderMiniFormList('prev-rival-last2', rLast2, rivalName);
         }
 
         function renderLastFiveMatches() {
@@ -547,7 +662,7 @@
                 return `
                     <div class="p-3.5 hover:bg-pizarra-cardHover/50 transition flex items-center justify-between gap-3">
                         <div class="flex items-center gap-3 min-w-0 flex-1">
-                            ${renderEscudoImg(m.rival, 'w-8 h-8 flex-shrink-0')}
+                            ${renderEscudoImg(m.rival, 'w-8 h-8 flex-shrink-0', m.rivalLogo)}
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-center gap-2 mb-0.5"><span class="font-mono text-[11px] font-bold text-slate-400">${m.fecha}</span><span class="text-[11px] text-slate-500">• ${m.date}</span>${condBadge}</div>
                                 <div class="font-display text-lg font-bold uppercase text-white truncate">Vélez Sarsfield <span class="text-slate-400 font-normal text-sm">vs</span> ${m.rival}</div>
@@ -565,7 +680,7 @@
         function renderUpcomingMatches() {
             const listEl = document.getElementById('upcoming-matches-list');
             if (!STATE.upcomingMatches || STATE.upcomingMatches.length === 0) {
-                listEl.innerHTML = `<div class="p-6 text-center text-slate-500 text-xs">Cargando próximos partidos...</div>`;
+                listEl.innerHTML = `<div class="p-6 text-center text-slate-500 text-xs">No hay partidos futuros programados en este momento.</div>`;
                 return;
             }
 
@@ -576,7 +691,7 @@
                 return `
                     <div class="p-3.5 transition flex items-center justify-between gap-3 ${highlightNext}">
                         <div class="flex items-center gap-3 min-w-0 flex-1">
-                            ${renderEscudoImg(m.rival, 'w-8 h-8 flex-shrink-0')}
+                            ${renderEscudoImg(m.rival, 'w-8 h-8 flex-shrink-0', m.rivalLogo)}
                             <div class="min-w-0 flex-1">
                                 <div class="flex flex-wrap items-center gap-2 mb-0.5"><span class="px-1.5 py-0.5 rounded bg-[#0b0e14] border border-pizarra-border font-mono text-[10px] font-bold text-pizarra-electric">${m.fecha}</span><span class="text-[11px] text-slate-400">${m.comp}</span><span class="px-1.5 py-0.2 rounded border text-[10px] font-mono ${condClass}">${condText}</span></div>
                                 <div class="font-display text-lg font-bold uppercase text-white truncate">vs ${m.rival}</div>
@@ -594,7 +709,7 @@
 
         function switchTableTab(tab) {
             STATE.activeTableTab = tab;
-            ['TORNEO', 'ANUAL', 'PROMEDIOS'].forEach(t => {
+            ['TORNEO', 'ANUAL'].forEach(t => {
                 const el = document.getElementById(`tab-${t}`);
                 if (el) el.className = t === tab ? 'px-3.5 py-1.5 rounded-lg bg-pizarra-accent text-white transition' : 'px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
             });
@@ -606,43 +721,40 @@
             const tbody = document.getElementById('standings-tbody');
             const tab = STATE.activeTableTab;
 
-            if (tab === 'TORNEO' && STATE.standingsClausura.length > 0) {
-                const teams = [...STATE.standingsClausura].sort((a, b) => b.pts - a.pts || b.dg - a.dg);
-                thead.innerHTML = `<th class="py-2.5 px-3 text-center w-10">#</th><th class="py-2.5 px-3">Equipo</th><th class="py-2.5 px-2 text-center font-bold text-white">Pts</th><th class="py-2.5 px-2 text-center">PJ</th><th class="py-2.5 px-2 text-center">PG</th><th class="py-2.5 px-2 text-center">PE</th><th class="py-2.5 px-2 text-center">PP</th><th class="py-2.5 px-3 text-center">DG</th>`;
-                tbody.innerHTML = teams.map((t, idx) => {
-                    const pos = idx + 1;
-                    const rowBg = t.isVelez ? 'bg-[#0055a5]/25 font-semibold text-white' : 'hover:bg-pizarra-cardHover/60 text-slate-300';
-                    return `
-                        <tr class="${rowBg} transition-colors">
-                            <td class="py-2.5 px-3 text-center font-mono text-xs ${t.isVelez ? 'text-pizarra-electric font-bold' : 'text-slate-400'}">${pos}</td>
-                            <td class="py-2.5 px-3 flex items-center gap-2.5">${renderEscudoImg(t.name, 'w-5 h-5 flex-shrink-0')}<span>${t.name}</span></td>
-                            <td class="py-2.5 px-2 text-center font-mono font-bold text-white bg-white/[0.03]">${t.pts}</td>
-                            <td class="py-2.5 px-2 text-center font-mono text-slate-400">${t.pj}</td>
-                            <td class="py-2.5 px-2 text-center font-mono text-slate-400">${t.pg}</td>
-                            <td class="py-2.5 px-2 text-center font-mono text-slate-400">${t.pe}</td>
-                            <td class="py-2.5 px-2 text-center font-mono text-slate-400">${t.pp}</td>
-                            <td class="py-2.5 px-3 text-center font-mono ${t.dg >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${t.dg > 0 ? '+' + t.dg : t.dg}</td>
-                        </tr>
-                    `;
-                }).join('');
-            } else if (tab === 'ANUAL' && STATE.standingsAnual.length > 0) {
-                const teams = [...STATE.standingsAnual].sort((a, b) => b.pts - a.pts || b.dg - a.dg);
-                thead.innerHTML = `<th class="py-2.5 px-3 text-center w-10">#</th><th class="py-2.5 px-3">Equipo (Tabla Anual)</th><th class="py-2.5 px-2 text-center font-bold text-white">Pts Anual</th><th class="py-2.5 px-2 text-center">DG</th>`;
-                tbody.innerHTML = teams.map((t, idx) => {
-                    const pos = idx + 1;
-                    const rowBg = t.isVelez ? 'bg-[#0055a5]/25 font-semibold text-white' : 'hover:bg-pizarra-cardHover/60 text-slate-300';
-                    return `
-                        <tr class="${rowBg} transition-colors">
-                            <td class="py-2.5 px-3 text-center font-mono text-xs text-slate-400">${pos}</td>
-                            <td class="py-2.5 px-3 flex items-center gap-2.5">${renderEscudoImg(t.name, 'w-5 h-5 flex-shrink-0')}<span>${t.name}</span></td>
-                            <td class="py-2.5 px-2 text-center font-mono font-bold text-white bg-white/[0.03]">${t.pts}</td>
-                            <td class="py-2.5 px-2 text-center font-mono text-slate-300">${t.dg > 0 ? '+' + t.dg : t.dg}</td>
-                        </tr>
-                    `;
-                }).join('');
-            } else {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-500 text-xs">Cargando tablas desde API-Football...</td></tr>`;
+            const sourceList = tab === 'TORNEO' ? STATE.standingsClausura : STATE.standingsAnual;
+            if (!sourceList || sourceList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-500 text-xs">Sincronizando tabla de posiciones...</td></tr>`;
+                return;
             }
+
+            const teams = [...sourceList].sort((a, b) => b.pts - a.pts || b.dg - a.dg);
+            const titleCol = tab === 'TORNEO' ? 'Equipo (Torneo Clausura)' : 'Equipo (Tabla Anual Copas)';
+            thead.innerHTML = `<th class="py-2.5 px-3 text-center w-12">#</th><th class="py-2.5 px-3">${titleCol}</th><th class="py-2.5 px-2 text-center font-bold text-white">Pts</th><th class="py-2.5 px-2 text-center">PJ</th><th class="py-2.5 px-2 text-center">PG</th><th class="py-2.5 px-2 text-center">PE</th><th class="py-2.5 px-2 text-center">PP</th><th class="py-2.5 px-3 text-center">DG</th>`;
+
+            tbody.innerHTML = teams.map((t, idx) => {
+                const pos = idx + 1;
+                const rowBg = t.isVelez ? 'bg-[#0055a5]/25 font-semibold text-white' : 'hover:bg-pizarra-cardHover/60 text-slate-300';
+
+                // Indicador lateral de clasificación a Copas en la Tabla Anual
+                let cupIndicator = '';
+                if (tab === 'ANUAL') {
+                    if (pos <= 3) cupIndicator = 'border-l-4 border-l-emerald-500';
+                    else if (pos <= 9) cupIndicator = 'border-l-4 border-l-amber-500';
+                }
+
+                return `
+                    <tr class="${rowBg} ${cupIndicator} transition-colors">
+                        <td class="py-2.5 px-3 text-center font-mono text-xs ${t.isVelez ? 'text-pizarra-electric font-bold' : 'text-slate-400'}">${pos}</td>
+                        <td class="py-2.5 px-3 flex items-center gap-2.5">${renderEscudoImg(t.name, 'w-5 h-5 flex-shrink-0', t.logo)}<span>${t.name}</span></td>
+                        <td class="py-2.5 px-2 text-center font-mono font-bold text-white bg-white/[0.03]">${t.pts}</td>
+                        <td class="py-2.5 px-2 text-center font-mono text-slate-400">${t.pj}</td>
+                        <td class="py-2.5 px-2 text-center font-mono text-slate-400">${t.pg}</td>
+                        <td class="py-2.5 px-2 text-center font-mono text-slate-400">${t.pe}</td>
+                        <td class="py-2.5 px-2 text-center font-mono text-slate-400">${t.pp}</td>
+                        <td class="py-2.5 px-3 text-center font-mono ${t.dg >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${t.dg > 0 ? '+' + t.dg : t.dg}</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         function filterSquadPos(group) {
@@ -656,7 +768,7 @@
 
         function sortSquadBy(col) {
             if (STATE.squadSortCol === col) STATE.squadSortAsc = !STATE.squadSortAsc;
-            else { STATE.squadSortCol = col; STATE.squadSortAsc = (col === 'num' || col === 'name' || col === 'group'); }
+            else { STATE.squadSortCol = col; STATE.squadSortAsc = (col === 'number' || col === 'name' || col === 'group'); }
             renderSquadTable();
         }
 
@@ -664,14 +776,14 @@
             const searchQuery = (document.getElementById('squad-search')?.value || '').toLowerCase().trim();
             let list = [...STATE.squad];
             if (STATE.squadFilterGroup !== 'TODOS') list = list.filter(p => p.group === STATE.squadFilterGroup);
-            if (searchQuery) list = list.filter(p => p.name.toLowerCase().includes(searchQuery) || p.posLabel.toLowerCase().includes(searchQuery));
+            if (searchQuery) list = list.filter(p => p.name.toLowerCase().includes(searchQuery) || (p.posLabel || '').toLowerCase().includes(searchQuery));
 
             const col = STATE.squadSortCol, dir = STATE.squadSortAsc ? 1 : -1;
             list.sort((a, b) => {
-                const valA = a[col] === null ? -1 : a[col];
-                const valB = b[col] === null ? -1 : b[col];
-                if (typeof valA === 'string') return valA.localeCompare(valB) * dir;
-                return (valA - valB) * dir;
+                const rawA = col === 'number' ? (a.number ?? a.dorsal ?? a.num ?? 999) : (a[col] ?? -1);
+                const rawB = col === 'number' ? (b.number ?? b.dorsal ?? b.num ?? 999) : (b[col] ?? -1);
+                if (typeof rawA === 'string') return rawA.localeCompare(String(rawB)) * dir;
+                return (Number(rawA) - Number(rawB)) * dir;
             });
 
             const tbody = document.getElementById('full-squad-tbody');
@@ -681,11 +793,12 @@
             }
 
             tbody.innerHTML = list.map(p => {
+                const dorsalVal = p.number || p.dorsal || p.num || '-';
                 const groupBadgeColors = { 'ARQ': 'bg-sky-500/20 text-pizarra-electric border-sky-500/40', 'DEF': 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40', 'MED': 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40', 'DEL': 'bg-amber-500/20 text-amber-300 border-amber-500/40' };
-                const cleanSheetCell = p.group === 'ARQ' ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-mono font-bold text-xs bg-sky-500/20 text-pizarra-electric border border-sky-500/40">🧤 ${p.cleanSheets || 0}</span>` : `<span class="font-mono text-slate-600">—</span>`;
+                const cleanSheetCell = p.group === 'ARQ' ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-mono font-bold text-xs bg-sky-500/20 text-pizarra-electric border border-sky-500/40">🧤 ${p.cleanSheets ?? 0}</span>` : `<span class="font-mono text-slate-600">—</span>`;
                 return `
                     <tr class="hover:bg-pizarra-cardHover/60 transition-colors">
-                        <td class="py-2.5 px-3 text-center"><span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#0055a5]/30 border border-[#0055a5] font-mono text-xs font-bold text-white">${p.num || '-'}</span></td>
+                        <td class="py-2.5 px-3 text-center"><span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#0055a5]/30 border border-[#0055a5] font-mono text-xs font-bold text-white">${dorsalVal}</span></td>
                         <td class="py-2.5 px-3 flex items-center gap-2.5">
                             <img src="${p.photo || ''}" onerror="this.src='https://placehold.co/40x40/1f293a/cbd5e0?text=V'" class="w-8 h-8 rounded-full object-cover bg-slate-800 border border-slate-700">
                             <div><div class="font-semibold text-white">${p.name}</div><div class="text-[11px] text-slate-400 sm:hidden">${p.posLabel}</div></div>
@@ -700,31 +813,92 @@
                     </tr>
                 `;
             }).join('');
+
+            // Actualizar los 3 KPIs inferiores con los totales reales del plantel
+            const totalGoals = STATE.squad.reduce((acc, p) => acc + (Number(p.goals) || 0), 0);
+            const maxCleanSheets = STATE.squad.filter(p => p.group === 'ARQ').reduce((max, p) => Math.max(max, Number(p.cleanSheets) || 0), 0);
+            const totalCards = STATE.squad.reduce((acc, p) => acc + (Number(p.yellowCards) || 0) + (Number(p.redCards) || 0), 0);
+
+            const kpiG = document.getElementById('kpi-total-goals');
+            const kpiCS = document.getElementById('kpi-clean-sheets');
+            const kpiC = document.getElementById('kpi-total-cards');
+            if (kpiG) kpiG.textContent = totalGoals;
+            if (kpiCS) kpiCS.textContent = maxCleanSheets;
+            if (kpiC) kpiC.textContent = totalCards;
         }
 
-        function renderPitch(formationKey = '4-2-3-1') {
+        // Dibuja los últimos 11 titulares reales en la cancha
+        function renderPitch(mode = 'LAST_MATCH') {
             const layer = document.getElementById('pitch-players-layer');
-            const players = FORMATIONS[formationKey] || FORMATIONS['4-2-3-1'];
-            layer.innerHTML = players.map(p => `
-                <div style="left: ${p.x}%; top: ${p.y}%;" class="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer">
-                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#0055a5] border-2 border-white text-white font-display font-extrabold text-sm flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.75)]">${p.num}</div>
-                    <span class="mt-1 px-1.5 py-0.5 rounded bg-[#0b0e14]/95 border border-pizarra-border text-[10px] sm:text-[11px] font-semibold text-white whitespace-nowrap shadow">${p.name}</span>
-                </div>
-            `).join('');
+            const subtitle = document.getElementById('lineup-match-subtitle');
+            const badge = document.getElementById('tactical-formation-badge');
+            if (!layer) return;
+
+            const lineup = STATE.lastLineup;
+            const starters = (lineup && Array.isArray(lineup.starters) && lineup.starters.length === 11)
+                ? lineup.starters
+                : null;
+
+            const schemeKey = (mode === '4-3-3') ? '4-3-3' : '4-2-3-1';
+            const coords = COORDENADAS_ESQUEMAS[schemeKey];
+
+            if (starters) {
+                const formName = lineup.formation || schemeKey;
+                if (badge) badge.textContent = formName;
+                if (subtitle) {
+                    subtitle.textContent = lineup.rival
+                        ? `XI Inicial vs ${lineup.rival} (${lineup.date}) • Esquema ${formName}`
+                        : `Último XI Titular Oficial • Esquema ${formName}`;
+                }
+
+                // Ordenar por línea táctica (ARQ -> DEF -> MED -> DEL) para ubicar cada jugador en su coordenada
+                const groupOrder = { 'ARQ': 1, 'DEF': 2, 'MED': 3, 'DEL': 4 };
+                const orderedStarters = [...starters].sort((a, b) => (groupOrder[a.group] || 3) - (groupOrder[b.group] || 3));
+
+                layer.innerHTML = orderedStarters.map((p, idx) => {
+                    const pos = coords[idx] || { x: 50, y: 50 };
+                    const shortLabel = (p.shortName || p.name || '').split(' ').pop();
+                    return `
+                        <div style="left: ${pos.x}%; top: ${pos.y}%;" class="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer">
+                            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#0055a5] border-2 border-white text-white font-display font-extrabold text-sm flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.75)]">${p.number || '-'}</div>
+                            <span class="mt-1 px-1.5 py-0.5 rounded bg-[#0b0e14]/95 border border-pizarra-border text-[10px] sm:text-[11px] font-semibold text-white whitespace-nowrap shadow">${shortLabel}</span>
+                        </div>
+                    `;
+                }).join('');
+            } else if (STATE.squad && STATE.squad.length >= 11) {
+                // Si aún no cargó el summary del último partido, armamos el XI con los 11 jugadores con más PJ del plantel actual
+                const top11 = [...STATE.squad].sort((a, b) => (b.pj || 0) - (a.pj || 0)).slice(0, 11);
+                const groupOrder = { 'ARQ': 1, 'DEF': 2, 'MED': 3, 'DEL': 4 };
+                top11.sort((a, b) => (groupOrder[a.group] || 3) - (groupOrder[b.group] || 3));
+
+                if (subtitle) subtitle.textContent = 'Once base con más presencias en la temporada';
+                layer.innerHTML = top11.map((p, idx) => {
+                    const pos = coords[idx] || { x: 50, y: 50 };
+                    const shortLabel = (p.name || '').split(' ').pop();
+                    return `
+                        <div style="left: ${pos.x}%; top: ${pos.y}%;" class="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer">
+                            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#0055a5] border-2 border-white text-white font-display font-extrabold text-sm flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.75)]">${p.number || '-'}</div>
+                            <span class="mt-1 px-1.5 py-0.5 rounded bg-[#0b0e14]/95 border border-pizarra-border text-[10px] sm:text-[11px] font-semibold text-white whitespace-nowrap shadow">${shortLabel}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
         }
 
         function renderAll() {
-            document.getElementById('header-velez-crest').innerHTML = renderEscudoImg('Vélez Sarsfield', 'w-10 h-10 sm:w-11 sm:h-11');
+            const velezLogo = STATE.standingsClausura.find(t => t.isVelez)?.logo || '';
+            document.getElementById('header-velez-crest').innerHTML = renderEscudoImg('Vélez Sarsfield', 'w-10 h-10 sm:w-11 sm:h-11', velezLogo);
             renderMatchCenter();
             renderLastFiveMatches();
             renderUpcomingMatches();
             renderStandingsTable();
             renderSquadTable();
+            const selector = document.getElementById('formation-selector');
+            renderPitch(selector ? selector.value : 'LAST_MATCH');
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             registrarMarcaDeTiempoActualizacion();
-            renderPitch('4-2-3-1');
             renderAll();
             fetchBackendData(false);
         });
