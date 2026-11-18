@@ -396,21 +396,80 @@
             'atletico tucuman': 'atletico-tucuman', 'barracas': 'barracas', 'independiente rivadavia': 'independiente-rivadavia'
         };
 
+        // Coordenadas en cancha (Orden táctico de 1 a 11: Arquero -> Derecha a Izquierda en cada línea)
         const COORDENADAS_ESQUEMAS = {
             '4-2-3-1': [
-                { x: 50, y: 90 },
-                { x: 84, y: 73 }, { x: 62, y: 76 }, { x: 38, y: 76 }, { x: 16, y: 73 },
-                { x: 38, y: 57 }, { x: 62, y: 57 },
-                { x: 82, y: 38 }, { x: 50, y: 36 }, { x: 18, y: 38 },
-                { x: 50, y: 16 }
+                { x: 50, y: 90 },                                   // 1: ARQ
+                { x: 84, y: 73 }, { x: 62, y: 76 }, { x: 38, y: 76 }, { x: 16, y: 73 }, // 2..5: LD, DCD, DCI, LI
+                { x: 62, y: 57 }, { x: 38, y: 57 },                 // 6..7: Volante central der, Volante central izq
+                { x: 82, y: 38 }, { x: 50, y: 36 }, { x: 18, y: 38 }, // 8..10: Extremo der, Enganche, Extremo izq
+                { x: 50, y: 16 }                                    // 11: Delantero centro
             ],
             '4-3-3': [
-                { x: 50, y: 90 },
-                { x: 84, y: 73 }, { x: 62, y: 76 }, { x: 38, y: 76 }, { x: 16, y: 73 },
-                { x: 50, y: 58 }, { x: 72, y: 46 }, { x: 28, y: 46 },
-                { x: 80, y: 22 }, { x: 50, y: 16 }, { x: 20, y: 22 }
+                { x: 50, y: 90 },                                   // 1: ARQ
+                { x: 84, y: 73 }, { x: 62, y: 76 }, { x: 38, y: 76 }, { x: 16, y: 73 }, // 2..5: LD, DCD, DCI, LI
+                { x: 72, y: 46 }, { x: 50, y: 58 }, { x: 28, y: 46 }, // 6..8: Interior der, Volante tapón, Interior izq
+                { x: 80, y: 22 }, { x: 50, y: 16 }, { x: 20, y: 22 }  // 9..11: Extremo der, 9, Extremo izq
             ]
         };
+
+        // Perfiles naturales de respaldo por si ESPN devuelve formationPlace = 0
+        const PERFIL_LATERAL_DERECHO = ['garcia', 'andrada', 'guidara', 'jara', 'lopez'];
+        const PERFIL_LATERAL_IZQUIERDO = ['elias gomez', 'e. gomez', 'cavanagh', 'ortega'];
+        const PERFIL_EXTREMO_DERECHO = ['pizzini', 'carrizo', 'maher', 'machuca', 'bouzat'];
+        const PERFIL_EXTREMO_IZQUIERDO = ['fernandez', 'pellegrini', 'aquino', 'montoro', 'santos'];
+
+        function getLateralRank(player) {
+            const pos = (player.position || '').toUpperCase();
+            const normName = normalizarTexto(player.name || player.shortName || '');
+
+            // 1. Si ESPN especifica lateral derecho/izquierdo en la abreviatura
+            if (pos === 'RB' || pos === 'RWB' || pos === 'LD' || pos === 'RW' || pos === 'RM') return 1;
+            if (pos === 'LB' || pos === 'LWB' || pos === 'LI' || pos === 'LW' || pos === 'LM') return 4;
+
+            // 2. Si es defensa
+            if (player.group === 'DEF') {
+                if (PERFIL_LATERAL_DERECHO.some(k => normName.includes(k))) return 1;
+                if (PERFIL_LATERAL_IZQUIERDO.some(k => normName.includes(k))) return 4;
+                if (normName.includes('mammana') || normName.includes('pernía') || normName.includes('pernia')) return 2;
+                if (normName.includes('valentin gomez') || normName.includes('v. gomez') || normName.includes('quiros') || normName.includes('d. gomez')) return 3;
+                return 2.5;
+            }
+
+            // 3. Si es mediocampista o extremo
+            if (player.group === 'MED' || player.group === 'DEL') {
+                if (PERFIL_EXTREMO_DERECHO.some(k => normName.includes(k))) return 1;
+                if (PERFIL_EXTREMO_IZQUIERDO.some(k => normName.includes(k))) return 4;
+                return 2.5;
+            }
+
+            return 2;
+        }
+
+        function sortPlayersTactically(startersList) {
+            const hasOfficialPlaces = startersList.every(p => Number(p.formationPlace) >= 1 && Number(p.formationPlace) <= 11);
+            const uniquePlaces = new Set(startersList.map(p => Number(p.formationPlace)));
+
+            // Si ESPN envió los 11 puestos tácticos únicos (del 1 al 11), los respetamos al 100%
+            if (hasOfficialPlaces && uniquePlaces.size === 11) {
+                return [...startersList].sort((a, b) => Number(a.formationPlace) - Number(b.formationPlace));
+            }
+
+            // Si no, ordenamos por línea (ARQ -> DEF -> MED -> DEL) y dentro de cada línea de derecha (1) a izquierda (4)
+            const groupOrder = { 'ARQ': 1, 'DEF': 2, 'MED': 3, 'DEL': 4 };
+            return [...startersList].sort((a, b) => {
+                const gDiff = (groupOrder[a.group] || 3) - (groupOrder[b.group] || 3);
+                if (gDiff !== 0) return gDiff;
+
+                const placeA = Number(a.formationPlace) || 0;
+                const placeB = Number(b.formationPlace) || 0;
+                if (placeA > 0 && placeB > 0 && placeA !== placeB) {
+                    return placeA - placeB;
+                }
+
+                return getLateralRank(a) - getLateralRank(b);
+            });
+        }
 
         function normalizarTexto(texto) {
             return (texto || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').trim();
@@ -1169,8 +1228,8 @@
                         : `Último XI Titular Oficial • Esquema ${formName}`;
                 }
 
-                const groupOrder = { 'ARQ': 1, 'DEF': 2, 'MED': 3, 'DEL': 4 };
-                const orderedStarters = [...starters].sort((a, b) => (groupOrder[a.group] || 3) - (groupOrder[b.group] || 3));
+                // Ordenar tácticamente usando formationPlace oficial de ESPN y perfil de banda
+                const orderedStarters = sortPlayersTactically(starters);
 
                 layer.innerHTML = orderedStarters.map((p, idx) => {
                     const pos = coords[idx] || { x: 50, y: 50 };
@@ -1183,9 +1242,9 @@
                     `;
                 }).join('');
             } else if (STATE.squad && STATE.squad.length >= 11) {
-                const top11 = [...STATE.squad].sort((a, b) => (b.pj || 0) - (a.pj || 0)).slice(0, 11);
-                const groupOrder = { 'ARQ': 1, 'DEF': 2, 'MED': 3, 'DEL': 4 };
-                top11.sort((a, b) => (groupOrder[a.group] || 3) - (groupOrder[b.group] || 3));
+                const top11 = sortPlayersTactically(
+                    [...STATE.squad].sort((a, b) => (b.pj || 0) - (a.pj || 0)).slice(0, 11)
+                );
 
                 if (subtitle) subtitle.textContent = `Once base con más presencias • ${STATE.activeTournamentName}`;
                 layer.innerHTML = top11.map((p, idx) => {
