@@ -287,15 +287,15 @@
         <!-- PIZARRA TÁCTICA (SELECTOR DE FORMACIONES DE LOS ÚLTIMOS 5 PARTIDOS + RENDIMIENTO Y XI) -->
         <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div class="lg:col-span-7 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden flex flex-col">
-                <div class="p-4 border-b border-pizarra-border flex flex-wrap items-center justify-between gap-2 bg-[#0e131c]">
-                    <div>
+                <div class="p-4 border-b border-pizarra-border flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 bg-[#0e131c]">
+                    <div class="min-w-0">
                         <h3 class="font-display text-xl font-bold uppercase tracking-wide text-white flex items-center gap-2">
                             <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
                             La Pizarra Táctica • Formaciones
                         </h3>
-                        <p id="lineup-match-subtitle" class="text-[11px] font-mono text-pizarra-electric mt-0.5">Sincronizando formaciones de los últimos 5 partidos...</p>
+                        <p id="lineup-match-subtitle" class="text-[11px] font-mono text-pizarra-electric mt-0.5 truncate">Sincronizando formaciones de los últimos 5 partidos...</p>
                     </div>
-                    <select id="formation-selector" onchange="renderPitch(this.value)" class="bg-[#0b0e14] border border-pizarra-border text-xs font-mono text-white rounded-lg px-3 py-1.5 focus:outline-none focus:border-pizarra-electric max-w-[230px] sm:max-w-xs truncate">
+                    <select id="formation-selector" onchange="renderPitch(this.value)" class="bg-[#0b0e14] border border-pizarra-border text-xs font-mono text-white rounded-lg px-3 py-1.5 focus:outline-none focus:border-pizarra-electric flex-shrink-0 max-w-[230px] sm:max-w-[260px] truncate">
                         <option value="0">Último XI Oficial</option>
                     </select>
                 </div>
@@ -922,12 +922,10 @@
                     ? '<span class="px-1.5 py-0.2 rounded bg-pizarra-accent/30 text-pizarra-electric border border-pizarra-accent/50 text-[10px] font-mono">LOCAL</span>'
                     : '<span class="px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700 text-[10px] font-mono">VISITANTE</span>';
 
-                // Local siempre primero: "Vélez vs Rival" cuando es Local, "Rival vs Vélez" cuando es Visitante
                 const matchTitleHtml = isHome
                     ? `Vélez <span class="text-slate-400 font-normal text-sm">vs</span> ${m.rival}`
                     : `${m.rival} <span class="text-slate-400 font-normal text-sm">vs</span> Vélez`;
 
-                // Marcador alineado con el orden Local - Visitante
                 const scoreText = isHome
                     ? `${m.velezGoals} - ${m.rivalGoals}`
                     : `${m.rivalGoals} - ${m.velezGoals}`;
@@ -1274,9 +1272,8 @@
             }
 
             selector.innerHTML = lineups.map((item, idx) => {
-                const tag = idx === 0 ? 'Último • ' : '';
-                const scorePart = item.score ? ` (${item.score})` : '';
-                return `<option value="${idx}" ${idx === STATE.selectedLineupIdx ? 'selected' : ''}>${tag}vs ${item.rival} • ${item.date}${scorePart}</option>`;
+                const scorePart = item.score ? ` [${item.score}]` : '';
+                return `<option value="${idx}" ${idx === STATE.selectedLineupIdx ? 'selected' : ''}>vs ${item.rival} • ${item.date}${scorePart}</option>`;
             }).join('');
         }
 
@@ -1303,10 +1300,9 @@
             if (starters) {
                 if (badge) badge.textContent = formName;
                 if (subtitle) {
-                    const scoreStr = lineup.score ? ` [${lineup.score}]` : '';
-                    subtitle.textContent = lineup.rival
-                        ? `XI Inicial vs ${lineup.rival} (${lineup.date})${scoreStr} • Esquema ${formName}`
-                        : `XI Titular Oficial • Esquema ${formName}`;
+                    const condText = lineup.cond === 'V' ? 'Visitante' : 'Local';
+                    const compText = lineup.comp ? ` • ${lineup.comp}` : '';
+                    subtitle.textContent = `XI Inicial • ${condText}${compText} • Esquema ${formName}`;
                 }
 
                 const asignaciones = asignarSlotsEnCancha(starters);
