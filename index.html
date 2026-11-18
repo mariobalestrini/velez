@@ -282,9 +282,9 @@
             </div>
         </section>
 
-        <!-- PIZARRA TÁCTICA (ÚLTIMOS 11 TITULARES QUE FORMARON + RENDIMIENTO Y ESTADÍSTICAS DEL ÚLTIMO PARTIDO) -->
+        <!-- PIZARRA TÁCTICA (ÚLTIMOS 11 TITULARES QUE FORMARON + RENDIMIENTO Y ESTADÍSTICAS) -->
         <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-7 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden">
+            <div class="lg:col-span-7 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden flex flex-col">
                 <div class="p-4 border-b border-pizarra-border flex flex-wrap items-center justify-between gap-2 bg-[#0e131c]">
                     <div>
                         <h3 class="font-display text-xl font-bold uppercase tracking-wide text-white flex items-center gap-2">
@@ -299,7 +299,7 @@
                         <option value="4-3-3">Esquema 4-3-3</option>
                     </select>
                 </div>
-                <div class="p-4 sm:p-6 bg-[#0b0e14] flex justify-center tactical-grid">
+                <div class="p-4 sm:p-6 bg-[#0b0e14] flex-1 flex items-center justify-center tactical-grid">
                     <div class="relative w-full max-w-md aspect-[3/4] rounded-xl overflow-hidden border-2 border-[#1f293a] bg-[#0d1520] shadow-2xl">
                         <svg viewBox="0 0 300 400" class="w-full h-full stroke-slate-700/80 fill-none" stroke-width="1.5">
                             <rect x="0" y="0" width="300" height="400" fill="#0c131d" stroke="none"/>
@@ -329,21 +329,31 @@
                         <h4 class="font-display text-xl font-bold uppercase text-white">Rendimiento & XI</h4>
                         <span id="tactical-formation-badge" class="px-2 py-0.5 rounded bg-pizarra-accent/20 text-pizarra-electric font-mono text-xs border border-pizarra-accent/40">4-2-3-1</span>
                     </div>
-                    <div class="space-y-3 text-xs text-slate-300 leading-relaxed">
-                        <!-- TARJETA 1: BALANCE DE GOLES -->
+                    <div class="space-y-2.5 text-xs text-slate-300 leading-relaxed">
+                        <!-- 1. BALANCE DE GOLES -->
                         <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
-                            <div class="font-display uppercase text-sm font-bold text-pizarra-electric mb-1">1. Balance de Goles (Torneo)</div>
+                            <div class="font-display uppercase text-sm font-bold text-pizarra-electric mb-0.5">1. Balance de Goles (Torneo)</div>
                             <p id="tactical-card-1">Sincronizando goles a favor y en contra oficiales del certamen...</p>
                         </div>
-                        <!-- TARJETA 2: JUGADOR CON MÁS AMARILLAS EN EL TORNEO -->
+                        <!-- 2. GOLEADOR DEL TORNEO -->
                         <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
-                            <div class="font-display uppercase text-sm font-bold text-amber-400 mb-1">2. Disciplina • Más Amarillas</div>
+                            <div class="font-display uppercase text-sm font-bold text-emerald-400 mb-0.5">2. Goleador del Torneo</div>
+                            <p id="tactical-card-scorers">Calculando máximo artillero del plantel...</p>
+                        </div>
+                        <!-- 3. DISCIPLINA • MÁS AMARILLAS -->
+                        <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
+                            <div class="font-display uppercase text-sm font-bold text-amber-400 mb-0.5">3. Disciplina • Más Amarillas</div>
                             <p id="tactical-card-yellows">Calculando jugador con más tarjetas amarillas en el plantel...</p>
                         </div>
-                        <!-- TARJETA 3: POSESIÓN Y TIROS EN EL ÚLTIMO ENCUENTRO -->
-                        <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border space-y-2.5">
+                        <!-- 4. DISCIPLINA • MÁS ROJAS -->
+                        <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
+                            <div class="font-display uppercase text-sm font-bold text-rose-400 mb-0.5">4. Disciplina • Más Rojas</div>
+                            <p id="tactical-card-reds">Calculando expulsiones registradas en el plantel...</p>
+                        </div>
+                        <!-- 5. ÚLTIMO PARTIDO -->
+                        <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border space-y-2">
                             <div class="flex items-center justify-between gap-2">
-                                <span class="font-display uppercase text-sm font-bold text-emerald-400">3. Último Partido</span>
+                                <span class="font-display uppercase text-sm font-bold text-sky-300">5. Último Partido</span>
                                 <span id="last-match-stats-rival" class="font-mono text-[11px] text-slate-400">vs Rival</span>
                             </div>
                             <div id="last-match-stats-body" class="space-y-2">
@@ -1015,7 +1025,7 @@
             if (kpiCS) kpiCS.textContent = totalCleanSheets;
             if (kpiC) kpiC.textContent = totalCards;
 
-            // TARJETA 1: Balance de goles
+            // 1. BALANCE DE GOLES EN EL TORNEO
             const card1 = document.getElementById('tactical-card-1');
             if (card1 && velezStanding) {
                 const pj = velezStanding.pj || 0;
@@ -1026,7 +1036,24 @@
                 card1.innerHTML = `En <strong class="text-white">${pj} fechas</strong> del ${STATE.activeTournamentName}, Vélez convirtió <strong class="text-emerald-400">${gf} goles</strong> (${avgGf} p/p) y recibió <strong class="text-slate-200">${gc}</strong> (${avgGc} p/p).`;
             }
 
-            // TARJETA 2: Jugador con más amarillas en el torneo
+            // 2. GOLEADOR DEL TORNEO
+            const cardScorers = document.getElementById('tactical-card-scorers');
+            if (cardScorers) {
+                const withGoals = [...STATE.squad]
+                    .filter(p => (Number(p.goals) || 0) > 0)
+                    .sort((a, b) => (Number(b.goals) || 0) - (Number(a.goals) || 0));
+
+                if (withGoals.length > 0) {
+                    const maxG = Number(withGoals[0].goals);
+                    const leaders = withGoals.filter(p => Number(p.goals) === maxG);
+                    const namesStr = leaders.map(p => `<strong class="text-white">${p.name}</strong>`).join(', ');
+                    cardScorers.innerHTML = `${leaders.length > 1 ? 'Máximos artilleros' : 'Máximo artillero'} en el ${STATE.activeTournamentName}: ${namesStr} con <strong class="text-emerald-400">${maxG} ${maxG === 1 ? 'gol' : 'goles'}</strong>.`;
+                } else {
+                    cardScorers.innerHTML = `Aún no se registran goleadores individuales en el ${STATE.activeTournamentName}.`;
+                }
+            }
+
+            // 3. DISCIPLINA • MÁS AMARILLAS
             const cardYellows = document.getElementById('tactical-card-yellows');
             if (cardYellows) {
                 const withYellows = [...STATE.squad]
@@ -1043,7 +1070,24 @@
                 }
             }
 
-            // TARJETA 3: Posesión y Tiros (al arco y desviados) del último encuentro
+            // 4. DISCIPLINA • MÁS ROJAS
+            const cardReds = document.getElementById('tactical-card-reds');
+            if (cardReds) {
+                const withReds = [...STATE.squad]
+                    .filter(p => (Number(p.redCards) || 0) > 0)
+                    .sort((a, b) => (Number(b.redCards) || 0) - (Number(a.redCards) || 0));
+
+                if (withReds.length > 0) {
+                    const maxR = Number(withReds[0].redCards);
+                    const leaders = withReds.filter(p => Number(p.redCards) === maxR);
+                    const namesStr = leaders.map(p => `<strong class="text-white">${p.name}</strong>`).join(', ');
+                    cardReds.innerHTML = `${leaders.length > 1 ? 'Jugadores' : 'Jugador'} con más expulsiones: ${namesStr} con <strong class="text-rose-400">${maxR} ${maxR === 1 ? 'roja' : 'rojas'}</strong>.`;
+                } else {
+                    cardReds.innerHTML = `El plantel no registra expulsiones en el ${STATE.activeTournamentName}.`;
+                }
+            }
+
+            // 5. ÚLTIMO PARTIDO (POSESIÓN Y TIROS)
             const statsRivalEl = document.getElementById('last-match-stats-rival');
             const statsBodyEl = document.getElementById('last-match-stats-body');
             const lms = STATE.lastMatchStats;
