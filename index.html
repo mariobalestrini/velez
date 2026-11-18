@@ -282,7 +282,7 @@
             </div>
         </section>
 
-        <!-- PIZARRA TÁCTICA (ÚLTIMOS 11 TITULARES QUE FORMARON) -->
+        <!-- PIZARRA TÁCTICA (ÚLTIMOS 11 TITULARES QUE FORMARON + RENDIMIENTO Y ESTADÍSTICAS DEL ÚLTIMO PARTIDO) -->
         <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div class="lg:col-span-7 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden">
                 <div class="p-4 border-b border-pizarra-border flex flex-wrap items-center justify-between gap-2 bg-[#0e131c]">
@@ -323,20 +323,32 @@
                 </div>
             </div>
 
-            <div class="lg:col-span-5 bg-pizarra-card rounded-2xl border border-pizarra-border p-5 flex flex-col justify-between space-y-5">
+            <div class="lg:col-span-5 bg-pizarra-card rounded-2xl border border-pizarra-border p-5 flex flex-col justify-between space-y-4">
                 <div>
-                    <div class="flex items-center justify-between border-b border-pizarra-border pb-3 mb-4">
+                    <div class="flex items-center justify-between border-b border-pizarra-border pb-3 mb-3.5">
                         <h4 class="font-display text-xl font-bold uppercase text-white">Rendimiento & XI</h4>
                         <span id="tactical-formation-badge" class="px-2 py-0.5 rounded bg-pizarra-accent/20 text-pizarra-electric font-mono text-xs border border-pizarra-accent/40">4-2-3-1</span>
                     </div>
                     <div class="space-y-3 text-xs text-slate-300 leading-relaxed">
-                        <div class="p-3.5 rounded-xl bg-[#0b0e14] border border-pizarra-border">
+                        <!-- TARJETA 1: BALANCE DE GOLES -->
+                        <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
                             <div class="font-display uppercase text-sm font-bold text-pizarra-electric mb-1">1. Balance de Goles (Torneo)</div>
                             <p id="tactical-card-1">Sincronizando goles a favor y en contra oficiales del certamen...</p>
                         </div>
-                        <div class="p-3.5 rounded-xl bg-[#0b0e14] border border-pizarra-border">
-                            <div class="font-display uppercase text-sm font-bold text-emerald-400 mb-1">2. Máximo Artillero & Efectividad</div>
-                            <p id="tactical-card-2">Calculando efectividad de puntos y goleador en el plantel...</p>
+                        <!-- TARJETA 2: JUGADOR CON MÁS AMARILLAS EN EL TORNEO -->
+                        <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
+                            <div class="font-display uppercase text-sm font-bold text-amber-400 mb-1">2. Disciplina • Más Amarillas</div>
+                            <p id="tactical-card-yellows">Calculando jugador con más tarjetas amarillas en el plantel...</p>
+                        </div>
+                        <!-- TARJETA 3: POSESIÓN Y TIROS EN EL ÚLTIMO ENCUENTRO -->
+                        <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border space-y-2.5">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="font-display uppercase text-sm font-bold text-emerald-400">3. Último Partido</span>
+                                <span id="last-match-stats-rival" class="font-mono text-[11px] text-slate-400">vs Rival</span>
+                            </div>
+                            <div id="last-match-stats-body" class="space-y-2">
+                                <p class="text-slate-400">Sincronizando posesión y remates...</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -435,6 +447,7 @@
             upcomingMatches: [],
             currentMatchData: null,
             lastLineup: null,
+            lastMatchStats: null,
             standingsClausura: [],
             standingsAnual: []
         };
@@ -525,6 +538,7 @@
                     if (data.upcomingMatches) STATE.upcomingMatches = data.upcomingMatches;
                     if (data.squad) STATE.squad = data.squad;
                     if (data.lastLineup) STATE.lastLineup = data.lastLineup;
+                    if (data.lastMatchStats) STATE.lastMatchStats = data.lastMatchStats;
                     if (data.standingsClausura) STATE.standingsClausura = data.standingsClausura;
                     if (data.standingsAnual) STATE.standingsAnual = data.standingsAnual;
 
@@ -985,7 +999,7 @@
                 `;
             }).join('');
 
-            // Goles oficiales de Vélez en el torneo (desde la tabla de posiciones, sin arrastrar goles de otros clubes)
+            // KPIs inferiores
             const velezStanding = STATE.standingsClausura.find(t => t.isVelez);
             const velezGoalsFor = velezStanding && typeof velezStanding.gf === 'number'
                 ? velezStanding.gf
@@ -1001,30 +1015,79 @@
             if (kpiCS) kpiCS.textContent = totalCleanSheets;
             if (kpiC) kpiC.textContent = totalCards;
 
-            // Actualizar las 2 tarjetas de rendimiento táctico con datos reales del certamen
+            // TARJETA 1: Balance de goles
             const card1 = document.getElementById('tactical-card-1');
-            const card2 = document.getElementById('tactical-card-2');
-
             if (card1 && velezStanding) {
                 const pj = velezStanding.pj || 0;
                 const gf = velezStanding.gf || 0;
                 const gc = velezStanding.gc || 0;
                 const avgGf = pj > 0 ? (gf / pj).toFixed(2) : '0.00';
                 const avgGc = pj > 0 ? (gc / pj).toFixed(2) : '0.00';
-                card1.innerHTML = `En <strong class="text-white">${pj} fechas</strong> disputadas del ${STATE.activeTournamentName}, Vélez convirtió <strong class="text-emerald-400">${gf} goles</strong> (${avgGf} por partido) y recibió <strong class="text-slate-200">${gc}</strong> (${avgGc} por encuentro).`;
+                card1.innerHTML = `En <strong class="text-white">${pj} fechas</strong> del ${STATE.activeTournamentName}, Vélez convirtió <strong class="text-emerald-400">${gf} goles</strong> (${avgGf} p/p) y recibió <strong class="text-slate-200">${gc}</strong> (${avgGc} p/p).`;
             }
 
-            if (card2) {
-                const topScorers = [...STATE.squad].filter(p => (p.goals || 0) > 0).sort((a, b) => b.goals - a.goals);
-                const effPct = velezStanding && velezStanding.pj > 0
-                    ? Math.round((velezStanding.pts / (velezStanding.pj * 3)) * 100)
-                    : 0;
+            // TARJETA 2: Jugador con más amarillas en el torneo
+            const cardYellows = document.getElementById('tactical-card-yellows');
+            if (cardYellows) {
+                const withYellows = [...STATE.squad]
+                    .filter(p => (Number(p.yellowCards) || 0) > 0)
+                    .sort((a, b) => (Number(b.yellowCards) || 0) - (Number(a.yellowCards) || 0));
 
-                if (topScorers.length > 0) {
-                    const leader = topScorers[0];
-                    card2.innerHTML = `Referente ofensivo: <strong class="text-white">${leader.name}</strong> (${leader.goals} tantos en temporada). Efectividad de puntos en el torneo: <strong class="text-pizarra-electric">${effPct}%</strong> (${velezStanding?.pts || 0} pts).`;
-                } else if (velezStanding) {
-                    card2.innerHTML = `Efectividad de puntos en el ${STATE.activeTournamentName}: <strong class="text-pizarra-electric">${effPct}%</strong> (${velezStanding.pts} pts sobre ${velezStanding.pj * 3} posibles).`;
+                if (withYellows.length > 0) {
+                    const maxY = Number(withYellows[0].yellowCards);
+                    const leaders = withYellows.filter(p => Number(p.yellowCards) === maxY);
+                    const namesStr = leaders.map(p => `<strong class="text-white">${p.name}</strong>`).join(', ');
+                    cardYellows.innerHTML = `${leaders.length > 1 ? 'Jugadores' : 'Jugador'} con más amonestaciones: ${namesStr} con <strong class="text-amber-400">${maxY} ${maxY === 1 ? 'amarilla' : 'amarillas'}</strong>.`;
+                } else {
+                    cardYellows.innerHTML = `Sin jugadores amonestados registrados en el certamen.`;
+                }
+            }
+
+            // TARJETA 3: Posesión y Tiros (al arco y desviados) del último encuentro
+            const statsRivalEl = document.getElementById('last-match-stats-rival');
+            const statsBodyEl = document.getElementById('last-match-stats-body');
+            const lms = STATE.lastMatchStats;
+
+            if (statsRivalEl && statsBodyEl) {
+                if (lms && (lms.possession !== null || lms.totalShots !== null)) {
+                    statsRivalEl.textContent = `vs ${lms.rival} (${lms.date})`;
+
+                    const possVelez = lms.possession !== null ? Math.round(lms.possession) : 50;
+                    const possRival = lms.oppPossession !== null ? Math.round(lms.oppPossession) : (100 - possVelez);
+
+                    const onTarget = lms.shotsOnTarget ?? 0;
+                    const offTarget = lms.shotsOffTarget ?? 0;
+                    const totalS = lms.totalShots ?? (onTarget + offTarget);
+
+                    statsBodyEl.innerHTML = `
+                        <div>
+                            <div class="flex justify-between text-[11px] font-mono mb-1">
+                                <span class="text-pizarra-electric font-bold">Posesión Vélez: ${possVelez}%</span>
+                                <span class="text-slate-400">${lms.rival}: ${possRival}%</span>
+                            </div>
+                            <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden flex">
+                                <div style="width: ${possVelez}%" class="bg-[#0055a5] h-full"></div>
+                                <div style="width: ${possRival}%" class="bg-slate-600 h-full"></div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1.5 pt-1 text-center font-mono">
+                            <div class="p-1.5 rounded-lg bg-[#121721] border border-pizarra-border">
+                                <span class="block text-sm font-bold text-white">${totalS}</span>
+                                <span class="text-[9px] text-slate-400 uppercase">Tiros Tot.</span>
+                            </div>
+                            <div class="p-1.5 rounded-lg bg-[#121721] border border-pizarra-border">
+                                <span class="block text-sm font-bold text-emerald-400">${onTarget}</span>
+                                <span class="text-[9px] text-slate-400 uppercase">Al Arco</span>
+                            </div>
+                            <div class="p-1.5 rounded-lg bg-[#121721] border border-pizarra-border">
+                                <span class="block text-sm font-bold text-rose-400">${offTarget}</span>
+                                <span class="text-[9px] text-slate-400 uppercase">Afuera</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    statsRivalEl.textContent = STATE.lastLineup?.rival ? `vs ${STATE.lastLineup.rival}` : '';
+                    statsBodyEl.innerHTML = `<p class="text-slate-400">Estadísticas detalladas de posesión y tiros no disponibles para este encuentro.</p>`;
                 }
             }
         }
