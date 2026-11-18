@@ -146,7 +146,7 @@
                     </div>
                 </div>
 
-                <!-- PASO A INTEGRADO: GOLEADORES EN VIVO (Se muestra automáticamente cuando hay goles en vivo) -->
+                <!-- GOLEADORES EN VIVO -->
                 <div id="live-scorers-box" class="hidden pt-3 border-t border-pizarra-border/60 grid grid-cols-2 gap-4 text-xs font-mono">
                     <div id="live-scorers-home" class="text-right space-y-1 text-slate-300 pr-2 border-r border-pizarra-border/50"></div>
                     <div id="live-scorers-away" class="text-left space-y-1 text-slate-300 pl-2"></div>
@@ -231,8 +231,8 @@
             </div>
 
             <div class="px-4 py-2.5 bg-[#0e131c] border-t border-pizarra-border flex flex-wrap items-center gap-4 text-[11px] text-slate-400">
-                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span><span>Zona Copa Libertadores (Top 3 Anual)</span></div>
-                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-amber-500"></span><span>Zona Copa Sudamericana (4° al 9° Anual)</span></div>
+                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span><span>Clasificación a Copa Libertadores</span></div>
+                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-amber-400"></span><span>Clasificación a Copa Sudamericana</span></div>
                 <div class="flex items-center gap-1.5 ml-auto"><span class="w-2.5 h-2.5 rounded-sm bg-[#0055a5]"></span><span class="text-white font-semibold">Vélez Sarsfield</span></div>
             </div>
         </section>
@@ -585,7 +585,6 @@
             }).join('');
         }
 
-        // PASO B INTEGRADO: Renderizado de partido en vivo con goleadores minuto a minuto
         function renderMatchCenter() {
             const cm = STATE.currentMatchData;
             if (!cm || !cm.match) return;
@@ -748,26 +747,59 @@
             const titleCol = tab === 'TORNEO' ? 'Equipo (Torneo Clausura)' : 'Equipo (Tabla Anual Copas)';
             thead.innerHTML = `<th class="py-2.5 px-3 text-center w-12">#</th><th class="py-2.5 px-3">${titleCol}</th><th class="py-2.5 px-2 text-center font-bold text-white">Pts</th><th class="py-2.5 px-2 text-center">PJ</th><th class="py-2.5 px-2 text-center">PG</th><th class="py-2.5 px-2 text-center">PE</th><th class="py-2.5 px-2 text-center">PP</th><th class="py-2.5 px-3 text-center">DG</th>`;
 
+            const hasNativeNotes = teams.some(t => t.cupType === 'LIBERTADORES' || t.cupType === 'SUDAMERICANA');
+
             tbody.innerHTML = teams.map((t, idx) => {
                 const pos = idx + 1;
-                const rowBg = t.isVelez ? 'bg-[#0055a5]/25 font-semibold text-white' : 'hover:bg-pizarra-cardHover/60 text-slate-300';
+                let rowStyle = 'hover:bg-pizarra-cardHover/60 text-slate-300';
+                let posBadge = `<span class="font-mono text-xs text-slate-400">${pos}</span>`;
+                let cupTag = '';
 
-                let cupIndicator = '';
-                if (tab === 'ANUAL') {
-                    if (pos <= 3) cupIndicator = 'border-l-4 border-l-emerald-500';
-                    else if (pos <= 9) cupIndicator = 'border-l-4 border-l-amber-500';
+                let effectiveCup = t.cupType;
+                if (tab === 'ANUAL' && !hasNativeNotes) {
+                    if (pos <= 3) effectiveCup = 'LIBERTADORES';
+                    else if (pos <= 9) effectiveCup = 'SUDAMERICANA';
+                }
+
+                if (tab === 'ANUAL' || t.cupType) {
+                    if (effectiveCup === 'LIBERTADORES') {
+                        const labelText = t.cupNote || 'Libertadores';
+                        rowStyle = 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-100 border-l-4 border-l-emerald-500';
+                        posBadge = `<span class="inline-flex items-center justify-center w-6 h-6 rounded bg-emerald-500 text-slate-950 font-mono font-extrabold text-xs shadow">${pos}</span>`;
+                        cupTag = `<span class="ml-auto px-1.5 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-mono text-[9px] uppercase tracking-wider hidden sm:inline-block">${labelText}</span>`;
+                    } else if (effectiveCup === 'SUDAMERICANA') {
+                        const labelText = t.cupNote || 'Sudamericana';
+                        rowStyle = 'bg-amber-400/15 hover:bg-amber-400/25 text-amber-100 border-l-4 border-l-amber-400';
+                        posBadge = `<span class="inline-flex items-center justify-center w-6 h-6 rounded bg-amber-400 text-slate-950 font-mono font-extrabold text-xs shadow">${pos}</span>`;
+                        cupTag = `<span class="ml-auto px-1.5 py-0.5 rounded bg-amber-400/20 border border-amber-400/40 text-amber-300 font-mono text-[9px] uppercase tracking-wider hidden sm:inline-block">${labelText}</span>`;
+                    }
+                }
+
+                if (t.isVelez) {
+                    if ((tab === 'ANUAL' || t.cupType) && effectiveCup === 'LIBERTADORES') {
+                        rowStyle = 'bg-emerald-500/30 hover:bg-emerald-500/35 text-white font-bold border-l-4 border-l-emerald-400 ring-1 ring-inset ring-emerald-400/50';
+                    } else if ((tab === 'ANUAL' || t.cupType) && effectiveCup === 'SUDAMERICANA') {
+                        rowStyle = 'bg-amber-400/30 hover:bg-amber-400/35 text-white font-bold border-l-4 border-l-amber-300 ring-1 ring-inset ring-amber-300/50';
+                    } else {
+                        rowStyle = 'bg-[#0055a5]/30 font-bold text-white border-l-4 border-l-pizarra-electric';
+                        posBadge = `<span class="inline-flex items-center justify-center w-6 h-6 rounded bg-pizarra-accent text-white font-mono font-extrabold text-xs">${pos}</span>`;
+                    }
                 }
 
                 return `
-                    <tr class="${rowBg} ${cupIndicator} transition-colors">
-                        <td class="py-2.5 px-3 text-center font-mono text-xs ${t.isVelez ? 'text-pizarra-electric font-bold' : 'text-slate-400'}">${pos}</td>
-                        <td class="py-2.5 px-3 flex items-center gap-2.5">${renderEscudoImg(t.name, 'w-5 h-5 flex-shrink-0', t.logo)}<span>${t.name}</span></td>
-                        <td class="py-2.5 px-2 text-center font-mono font-bold text-white bg-white/[0.03]">${t.pts}</td>
-                        <td class="py-2.5 px-2 text-center font-mono text-slate-400">${t.pj}</td>
-                        <td class="py-2.5 px-2 text-center font-mono text-slate-400">${t.pg}</td>
-                        <td class="py-2.5 px-2 text-center font-mono text-slate-400">${t.pe}</td>
-                        <td class="py-2.5 px-2 text-center font-mono text-slate-400">${t.pp}</td>
-                        <td class="py-2.5 px-3 text-center font-mono ${t.dg >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${t.dg > 0 ? '+' + t.dg : t.dg}</td>
+                    <tr class="${rowStyle} transition-colors">
+                        <td class="py-2.5 px-3 text-center">${posBadge}</td>
+                        <td class="py-2.5 px-3 flex items-center gap-2.5">
+                            ${renderEscudoImg(t.name, 'w-5 h-5 flex-shrink-0', t.logo)}
+                            <span class="${t.isVelez ? 'text-white font-bold' : ''}">${t.name}</span>
+                            ${cupTag}
+                        </td>
+                        <td class="py-2.5 px-2 text-center font-mono font-bold text-white bg-white/[0.04]">${t.pts}</td>
+                        <td class="py-2.5 px-2 text-center font-mono opacity-85">${t.pj}</td>
+                        <td class="py-2.5 px-2 text-center font-mono opacity-85">${t.pg}</td>
+                        <td class="py-2.5 px-2 text-center font-mono opacity-85">${t.pe}</td>
+                        <td class="py-2.5 px-2 text-center font-mono opacity-85">${t.pp}</td>
+                        <td class="py-2.5 px-3 text-center font-mono font-semibold ${t.dg >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${t.dg > 0 ? '+' + t.dg : t.dg}</td>
                     </tr>
                 `;
             }).join('');
