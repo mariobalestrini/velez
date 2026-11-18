@@ -380,6 +380,9 @@
 
     <!-- SCRIPT DE CONSUMO DE DATOS EN VIVO DESDE EL BACKEND -->
     <script>
+        // Escudo propio de Vélez Sarsfield (subir como escudo-velez.png en la misma carpeta que index.html)
+        const MI_ESCUDO_VELEZ = './escudo-velez.png';
+
         const ESCUDO_GENERICO_GRIS = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 110'><path d='M10,8 H90 V60 C90,86 50,104 50,104 C50,104 10,86 10,60 Z' fill='%232a3240' stroke='%234a5568' stroke-width='5'/><path d='M24,26 H76 V56 C76,74 50,88 50,88 C50,88 24,74 24,56 Z' fill='%234a5568' opacity='0.55'/><text x='50' y='59' font-family='sans-serif' font-weight='bold' font-size='16' fill='%2394a3b8' text-anchor='middle'>?</text></svg>";
 
         const MAPA_SLUGS_ESCUDOS = {
@@ -415,6 +418,14 @@
         }
 
         function obtenerEscudoEquipo(item, explicitLogoUrl = '') {
+            const nombre = typeof item === 'object' ? (item?.name || item?.rival || '') : (item || '');
+            const norm = normalizarTexto(nombre);
+
+            // Forzar SIEMPRE tu escudo propio cuando el equipo es Vélez
+            if (norm.includes('velez')) {
+                return MI_ESCUDO_VELEZ;
+            }
+
             if (explicitLogoUrl && explicitLogoUrl.startsWith('http')) return explicitLogoUrl;
             if (!item) return ESCUDO_GENERICO_GRIS;
             if (typeof item === 'object') {
@@ -423,8 +434,6 @@
             }
             if (typeof item === 'string' && item.startsWith('http')) return item;
 
-            const nombre = typeof item === 'object' ? (item.name || item.rival || '') : item;
-            const norm = normalizarTexto(nombre);
             if (!norm || norm.includes('confirmar') || norm === 'tbd') return ESCUDO_GENERICO_GRIS;
 
             let slug = '';
@@ -991,11 +1000,13 @@
                 const dorsalVal = p.number || p.dorsal || p.num || '-';
                 const groupBadgeColors = { 'ARQ': 'bg-sky-500/20 text-pizarra-electric border-sky-500/40', 'DEF': 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40', 'MED': 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40', 'DEL': 'bg-amber-500/20 text-amber-300 border-amber-500/40' };
                 const cleanSheetCell = p.group === 'ARQ' ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-mono font-bold text-xs bg-sky-500/20 text-pizarra-electric border border-sky-500/40">🧤 ${p.cleanSheets ?? 0}</span>` : `<span class="font-mono text-slate-600">—</span>`;
+                const playerImgSrc = (p.photo && !p.photo.includes('teamlogos')) ? p.photo : MI_ESCUDO_VELEZ;
+
                 return `
                     <tr class="hover:bg-pizarra-cardHover/60 transition-colors">
                         <td class="py-2.5 px-3 text-center"><span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#0055a5]/30 border border-[#0055a5] font-mono text-xs font-bold text-white">${dorsalVal}</span></td>
                         <td class="py-2.5 px-3 flex items-center gap-2.5">
-                            <img src="${p.photo || ''}" onerror="this.src='https://placehold.co/40x40/1f293a/cbd5e0?text=V'" class="w-8 h-8 rounded-full object-cover bg-slate-800 border border-slate-700 flex-shrink-0">
+                            <img src="${playerImgSrc}" onerror="this.onerror=null;this.src=MI_ESCUDO_VELEZ;" class="w-8 h-8 rounded-full object-contain bg-slate-800 border border-slate-700 flex-shrink-0">
                             <div class="font-semibold text-white">${p.name}</div>
                         </td>
                         <td class="py-2.5 px-2 text-center"><span class="px-2 py-0.5 rounded border font-mono text-[11px] font-bold ${groupBadgeColors[p.group] || 'bg-slate-800 text-slate-300'}">${p.group}</span></td>
@@ -1192,8 +1203,7 @@
         }
 
         function renderAll() {
-            const velezLogo = STATE.standingsClausura.find(t => t.isVelez)?.logo || '';
-            document.getElementById('header-velez-crest').innerHTML = renderEscudoImg('Vélez Sarsfield', 'w-10 h-10 sm:w-11 sm:h-11', velezLogo);
+            document.getElementById('header-velez-crest').innerHTML = renderEscudoImg('Vélez Sarsfield', 'w-10 h-10 sm:w-11 sm:h-11', MI_ESCUDO_VELEZ);
             renderMatchCenter();
             renderLastFiveMatches();
             renderUpcomingMatches();
