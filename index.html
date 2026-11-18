@@ -456,7 +456,6 @@
             if (el) el.textContent = horaStr;
         }
 
-        // Activa o desactiva la actualización cada 15s exclusivamente si hay partido en vivo
         function syncLivePollingMode(isLive) {
             const pill = document.getElementById('polling-status-pill');
             const dot = document.getElementById('polling-status-dot');
@@ -574,7 +573,6 @@
             const diff = targetMs - Date.now();
             if (diff <= 0) {
                 cdEl.textContent = 'Partido próximo a iniciar';
-                // Si llegó la hora exacta de inicio, hacemos una verificación única por si arrancó
                 if (!STATE.isLiveMatch && diff > -60000) {
                     fetchBackendData(false);
                 }
@@ -590,7 +588,6 @@
             cdEl.textContent = `Faltan: ${pad(d)}d ${pad(h)}h ${pad(m)}m ${pad(s)}s`;
         }
 
-        // Reloj en vivo de hora ART y contador (solo descuenta 15s cuando hay partido en vivo)
         setInterval(() => {
             const now = new Date();
             const artStr = now.toLocaleTimeString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', hour12: false });
@@ -904,8 +901,8 @@
                     <tr class="hover:bg-pizarra-cardHover/60 transition-colors">
                         <td class="py-2.5 px-3 text-center"><span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#0055a5]/30 border border-[#0055a5] font-mono text-xs font-bold text-white">${dorsalVal}</span></td>
                         <td class="py-2.5 px-3 flex items-center gap-2.5">
-                            <img src="${p.photo || ''}" onerror="this.src='https://placehold.co/40x40/1f293a/cbd5e0?text=V'" class="w-8 h-8 rounded-full object-cover bg-slate-800 border border-slate-700">
-                            <div><div class="font-semibold text-white">${p.name}</div><div class="text-[11px] text-slate-400 sm:hidden">${p.posLabel}</div></div>
+                            <img src="${p.photo || ''}" onerror="this.src='https://placehold.co/40x40/1f293a/cbd5e0?text=V'" class="w-8 h-8 rounded-full object-cover bg-slate-800 border border-slate-700 flex-shrink-0">
+                            <div class="font-semibold text-white">${p.name}</div>
                         </td>
                         <td class="py-2.5 px-2 text-center"><span class="px-2 py-0.5 rounded border font-mono text-[11px] font-bold ${groupBadgeColors[p.group] || 'bg-slate-800 text-slate-300'}">${p.group}</span></td>
                         <td class="py-2.5 px-2 text-center font-mono text-slate-400">${p.age || '-'}</td>
@@ -919,14 +916,14 @@
             }).join('');
 
             const totalGoals = STATE.squad.reduce((acc, p) => acc + (Number(p.goals) || 0), 0);
-            const maxCleanSheets = STATE.squad.filter(p => p.group === 'ARQ').reduce((max, p) => Math.max(max, Number(p.cleanSheets) || 0), 0);
+            const totalCleanSheets = STATE.squad.filter(p => p.group === 'ARQ').reduce((acc, p) => acc + (Number(p.cleanSheets) || 0), 0);
             const totalCards = STATE.squad.reduce((acc, p) => acc + (Number(p.yellowCards) || 0) + (Number(p.redCards) || 0), 0);
 
             const kpiG = document.getElementById('kpi-total-goals');
             const kpiCS = document.getElementById('kpi-clean-sheets');
             const kpiC = document.getElementById('kpi-total-cards');
             if (kpiG) kpiG.textContent = totalGoals;
-            if (kpiCS) kpiCS.textContent = maxCleanSheets;
+            if (kpiCS) kpiCS.textContent = totalCleanSheets;
             if (kpiC) kpiC.textContent = totalCards;
         }
 
