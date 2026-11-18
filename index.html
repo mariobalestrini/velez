@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LA V AZULADA | Estadísticas & Pizarra Táctica de Vélez Sarsfield</title>
+    <title>LA V AZULADA | Pizarra Táctica & Estadísticas de Vélez Sarsfield</title>
     <!-- Favicon & Ícono Pantalla de Inicio iPhone / Android -->
     <link rel="icon" href="/favicon.ico?v=3" sizes="any">
     <link rel="icon" type="image/png" sizes="32x32" href="/escudo-velez.png?v=3">
@@ -183,7 +183,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-5 border-t border-pizarra-border/80">
                     <div class="bg-[#0b0e14]/90 rounded-xl border border-pizarra-border p-4 space-y-3.5">
                         <div class="flex items-center justify-between border-b border-pizarra-border pb-2.5">
-                            <h3 class="font-display text-base sm:text-lg font-bold uppercase text-white tracking-wide">Cómo llega El Fortín</h3>
+                            <h3 class="font-display text-base sm:text-lg font-bold uppercase text-white tracking-wide">Cómo llega Vélez Sarsfield</h3>
                             <span class="font-mono text-[11px] text-emerald-400 font-bold">Últimos 2 encuentros</span>
                         </div>
                         <div>
@@ -595,11 +595,9 @@
             const iosArrow = document.getElementById('pwa-ios-arrow');
             if (!banner || !instructions) return;
 
-            // Si ya está abierta como app instalada en pantalla de inicio, no mostrar
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
             if (isStandalone) return;
 
-            // Si el usuario ya lo cerró en los últimos 15 días, respetar su decisión
             const dismissedAt = Number(localStorage.getItem('velez_pwa_dismissed') || 0);
             if (dismissedAt && (Date.now() - dismissedAt) < 15 * 24 * 60 * 60 * 1000) return;
 
@@ -1069,11 +1067,11 @@
                 return;
             }
 
-            const teams = [...sourceList].sort((a, b) => b.pts - a.pts || b.dg - a.dg);
-            const titleCol = tab === 'TORNEO' ? `Equipo (${STATE.activeTournamentName})` : 'Equipo (Tabla Anual Copas)';
+            const teams = [...sourceList].sort((a, b) => b.pts - a.pts || b.dg - a.dg || (b.gf || 0) - (a.gf || 0));
+            const titleCol = tab === 'TORNEO' ? `Equipo (${STATE.activeTournamentName})` : 'Equipo (Tabla Anual Apertura + Clausura)';
             thead.innerHTML = `<th class="py-2.5 px-3 text-center w-12">#</th><th class="py-2.5 px-3">${titleCol}</th><th class="py-2.5 px-2 text-center font-bold text-white">Pts</th><th class="py-2.5 px-2 text-center">PJ</th><th class="py-2.5 px-2 text-center">PG</th><th class="py-2.5 px-2 text-center">PE</th><th class="py-2.5 px-2 text-center">PP</th><th class="py-2.5 px-3 text-center">DG</th>`;
 
-            const hasNativeNotes = teams.some(t => t.cupType === 'LIBERTADORES' || t.cupType === 'SUDAMERICANA');
+            const hasOfficialCupNotes = teams.some(t => t.cupType === 'LIBERTADORES' || t.cupType === 'SUDAMERICANA');
 
             tbody.innerHTML = teams.map((t, idx) => {
                 const pos = idx + 1;
@@ -1082,19 +1080,19 @@
                 let cupTag = '';
 
                 let effectiveCup = t.cupType;
-                if (tab === 'ANUAL' && !hasNativeNotes) {
+                if (tab === 'ANUAL' && !hasOfficialCupNotes) {
                     if (pos <= 3) effectiveCup = 'LIBERTADORES';
                     else if (pos <= 9) effectiveCup = 'SUDAMERICANA';
                 }
 
                 if (tab === 'ANUAL' || t.cupType) {
                     if (effectiveCup === 'LIBERTADORES') {
-                        const labelText = t.cupNote || 'Libertadores';
+                        const labelText = t.cupNote || 'Copa Libertadores';
                         rowStyle = 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-100 border-l-4 border-l-emerald-500';
                         posBadge = `<span class="inline-flex items-center justify-center w-6 h-6 rounded bg-emerald-500 text-slate-950 font-mono font-extrabold text-xs shadow">${pos}</span>`;
                         cupTag = `<span class="ml-auto px-1.5 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-mono text-[9px] uppercase tracking-wider hidden sm:inline-block">${labelText}</span>`;
                     } else if (effectiveCup === 'SUDAMERICANA') {
-                        const labelText = t.cupNote || 'Sudamericana';
+                        const labelText = t.cupNote || 'Copa Sudamericana';
                         rowStyle = 'bg-amber-400/15 hover:bg-amber-400/25 text-amber-100 border-l-4 border-l-amber-400';
                         posBadge = `<span class="inline-flex items-center justify-center w-6 h-6 rounded bg-amber-400 text-slate-950 font-mono font-extrabold text-xs shadow">${pos}</span>`;
                         cupTag = `<span class="ml-auto px-1.5 py-0.5 rounded bg-amber-400/20 border border-amber-400/40 text-amber-300 font-mono text-[9px] uppercase tracking-wider hidden sm:inline-block">${labelText}</span>`;
