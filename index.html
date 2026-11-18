@@ -88,7 +88,7 @@
                 </div>
                 <div id="polling-status-pill" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700 text-xs font-mono">
                     <span id="polling-status-dot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
-                    <span id="polling-status-label" class="font-bold text-slate-300 tracking-wide">MODO REPOSO</span>
+                    <span id="polling-status-label" class="font-bold text-slate-300 tracking-wide">SIN PARTIDO EN VIVO</span>
                     <span class="text-slate-600">|</span>
                     <span id="polling-countdown" class="text-slate-400 font-bold">MANUAL</span>
                 </div>
@@ -103,7 +103,7 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-5 space-y-6">
 
-        <!-- PREVIA OFICIAL / PARTIDO EN VIVO -->
+        <!-- PREVIA OFICIAL / PARTIDO EN VIVO / RESULTADO 24HS / A CONFIRMAR -->
         <section class="relative overflow-hidden rounded-2xl bg-pizarra-card border border-pizarra-border tactical-grid shadow-2xl">
             <div class="px-4 py-2.5 bg-[#0e131c] border-b border-pizarra-border flex flex-wrap items-center justify-between gap-2 text-xs">
                 <div class="flex flex-wrap items-center gap-2">
@@ -122,7 +122,7 @@
                     <div class="flex flex-col items-center">
                         <div id="match-home-crest" class="w-16 h-16 sm:w-20 sm:h-20 mb-2 flex items-center justify-center drop-shadow-[0_0_16px_rgba(0,85,165,0.55)]"></div>
                         <h2 id="match-home-name" class="font-display text-xl sm:text-3xl font-extrabold uppercase tracking-wide text-white">Vélez Sarsfield</h2>
-                        <span class="mt-1 px-2.5 py-0.5 rounded bg-pizarra-accent/25 border border-pizarra-accent/50 text-[11px] text-pizarra-electric font-mono font-bold">LOCAL</span>
+                        <span id="match-home-role" class="mt-1 px-2.5 py-0.5 rounded bg-pizarra-accent/25 border border-pizarra-accent/50 text-[11px] text-pizarra-electric font-mono font-bold">LOCAL</span>
                     </div>
 
                     <div class="flex flex-col items-center justify-center">
@@ -131,20 +131,20 @@
                             <span class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">--:--</span>
                             <span class="block text-[10px] font-mono text-pizarra-electric font-bold tracking-widest uppercase">HORA ART (UTC-3)</span>
                         </div>
-                        <div class="mt-2.5 px-3 py-1 rounded-full bg-pizarra-accent/20 border border-pizarra-accent/40 flex items-center gap-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-pizarra-electric animate-pulse"></span>
+                        <div id="prev-countdown-pill" class="mt-2.5 px-3 py-1 rounded-full bg-pizarra-accent/20 border border-pizarra-accent/40 flex items-center gap-1.5">
+                            <span id="prev-countdown-dot" class="w-1.5 h-1.5 rounded-full bg-pizarra-electric animate-pulse"></span>
                             <span id="prev-countdown" class="font-mono text-[11px] sm:text-xs font-bold text-sky-200">Faltan: --d --h --m --s</span>
                         </div>
                     </div>
 
                     <div class="flex flex-col items-center">
                         <div id="match-away-crest" class="w-16 h-16 sm:w-20 sm:h-20 mb-2 flex items-center justify-center drop-shadow-[0_0_14px_rgba(56,189,248,0.35)]"></div>
-                        <h2 id="match-away-name" class="font-display text-xl sm:text-3xl font-extrabold uppercase tracking-wide text-slate-100">Rival</h2>
-                        <span class="mt-1 px-2.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-[11px] text-slate-300 font-mono font-bold">VISITANTE</span>
+                        <h2 id="match-away-name" class="font-display text-xl sm:text-3xl font-extrabold uppercase tracking-wide text-slate-100">A confirmar</h2>
+                        <span id="match-away-role" class="mt-1 px-2.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-[11px] text-slate-300 font-mono font-bold">VISITANTE</span>
                     </div>
                 </div>
 
-                <!-- GOLEADORES EN VIVO -->
+                <!-- GOLEADORES EN VIVO / RESULTADO 24HS -->
                 <div id="live-scorers-box" class="hidden pt-3 border-t border-pizarra-border/60 grid grid-cols-2 gap-4 text-xs font-mono">
                     <div id="live-scorers-home" class="text-right space-y-1 text-slate-300 pr-2 border-r border-pizarra-border/50"></div>
                     <div id="live-scorers-away" class="text-left space-y-1 text-slate-300 pl-2"></div>
@@ -202,7 +202,7 @@
             </div>
         </section>
 
-        <!-- TABLAS DE POSICIONES (CLAUSURA Y ANUAL CLASIFICACIÓN A COPAS) -->
+        <!-- TABLAS DE POSICIONES (TORNEO ACTUAL Y ANUAL CLASIFICACIÓN A COPAS) -->
         <section class="bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden">
             <div class="p-4 border-b border-pizarra-border flex flex-wrap items-center justify-between gap-3 bg-[#0e131c]">
                 <div>
@@ -210,11 +210,11 @@
                         <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
                         Tablas Fútbol Argentino • Primera División
                     </h3>
-                    <p class="text-xs text-slate-400">Datos oficiales sincronizados en tiempo real • Clasificación a Copas</p>
+                    <p id="standings-subtitle" class="text-xs text-slate-400">Datos oficiales sincronizados en tiempo real • Clasificación a Copas</p>
                 </div>
 
                 <div class="flex bg-[#0b0e14] p-1 rounded-xl border border-pizarra-border text-xs font-semibold">
-                    <button onclick="switchTableTab('TORNEO')" id="tab-TORNEO" class="px-3.5 py-1.5 rounded-lg bg-pizarra-accent text-white transition">Posiciones Clausura</button>
+                    <button onclick="switchTableTab('TORNEO')" id="tab-TORNEO" class="px-3.5 py-1.5 rounded-lg bg-pizarra-accent text-white transition">Posiciones Torneo</button>
                     <button onclick="switchTableTab('ANUAL')" id="tab-ANUAL" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Tabla Anual (Copas)</button>
                 </div>
             </div>
@@ -243,7 +243,7 @@
                         <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
                         Plantilla Oficial & Estadísticas Temporada
                     </h3>
-                    <p class="text-xs text-slate-400">Dorsales oficiales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) para arqueros</p>
+                    <p id="squad-tournament-caption" class="text-xs text-slate-400">Dorsales oficiales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Datos exclusivos del Torneo Clausura</p>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2">
@@ -341,7 +341,7 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 pt-3 border-t border-pizarra-border text-center">
-                    <div class="p-2.5 rounded-xl bg-[#0b0e14] border border-pizarra-border"><span id="kpi-total-goals" class="block font-display text-2xl font-extrabold text-emerald-400">--</span><span class="text-[10px] font-mono uppercase text-slate-400">Goles Plantel</span></div>
+                    <div class="p-2.5 rounded-xl bg-[#0b0e14] border border-pizarra-border"><span id="kpi-total-goals" class="block font-display text-2xl font-extrabold text-emerald-400">--</span><span class="text-[10px] font-mono uppercase text-slate-400">Goles Torneo</span></div>
                     <div class="p-2.5 rounded-xl bg-[#0b0e14] border border-pizarra-border"><span id="kpi-clean-sheets" class="block font-display text-2xl font-extrabold text-pizarra-electric">--</span><span class="text-[10px] font-mono uppercase text-slate-400">Vallas Invictas</span></div>
                     <div class="p-2.5 rounded-xl bg-[#0b0e14] border border-pizarra-border"><span id="kpi-total-cards" class="block font-display text-2xl font-extrabold text-amber-400">--</span><span class="text-[10px] font-mono uppercase text-slate-400">Tarjetas</span></div>
                 </div>
@@ -358,7 +358,8 @@
 
     <!-- SCRIPT DE CONSUMO DE DATOS EN VIVO DESDE EL BACKEND -->
     <script>
-        const ESCUDO_GENERICO_GRIS = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 110'><path d='M10,8 H90 V60 C90,86 50,104 50,104 C50,104 10,86 10,60 Z' fill='%232a3240' stroke='%234a5568' stroke-width='5'/><path d='M24,26 H76 V56 C76,74 50,88 50,88 C50,88 24,74 24,56 Z' fill='%234a5568' opacity='0.55'/><text x='50' y='59' font-family='sans-serif' font-weight='bold' font-size='14' fill='%23cbd5e0' text-anchor='middle'>CAVS</text></svg>";
+        // Escudo genérico gris para rivales "A confirmar" o sin logo disponible
+        const ESCUDO_GENERICO_GRIS = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 110'><path d='M10,8 H90 V60 C90,86 50,104 50,104 C50,104 10,86 10,60 Z' fill='%232a3240' stroke='%234a5568' stroke-width='5'/><path d='M24,26 H76 V56 C76,74 50,88 50,88 C50,88 24,74 24,56 Z' fill='%234a5568' opacity='0.55'/><text x='50' y='59' font-family='sans-serif' font-weight='bold' font-size='16' fill='%2394a3b8' text-anchor='middle'>?</text></svg>";
 
         const MAPA_SLUGS_ESCUDOS = {
             'velez': 'velez', 'belgrano': 'belgrano', 'river': 'river', 'boca': 'boca',
@@ -403,6 +404,8 @@
 
             const nombre = typeof item === 'object' ? (item.name || item.rival || '') : item;
             const norm = normalizarTexto(nombre);
+            if (!norm || norm.includes('confirmar') || norm === 'tbd') return ESCUDO_GENERICO_GRIS;
+
             let slug = '';
             for (const [clave, s] of Object.entries(MAPA_SLUGS_ESCUDOS)) {
                 if (norm.includes(clave)) { slug = s; break; }
@@ -421,6 +424,7 @@
             countdown: 15,
             isLiveMatch: false,
             livePollingTimer: null,
+            activeTournamentName: 'Torneo Clausura',
             activeTableTab: 'TORNEO',
             squadFilterGroup: 'TODOS',
             squadSortCol: 'number',
@@ -510,6 +514,7 @@
                 if (res.ok) {
                     const data = await res.json();
                     
+                    if (data.activeTournamentName) STATE.activeTournamentName = data.activeTournamentName;
                     if (data.currentMatch) STATE.currentMatchData = data.currentMatch;
                     if (data.lastMatches) STATE.lastFiveMatches = data.lastMatches;
                     if (data.velezLast2) STATE.velezLast2 = data.velezLast2;
@@ -549,6 +554,7 @@
 
         function updateMatchCountdown() {
             const cdEl = document.getElementById('prev-countdown');
+            const dotEl = document.getElementById('prev-countdown-dot');
             if (!cdEl) return;
 
             const cm = STATE.currentMatchData;
@@ -558,9 +564,24 @@
             }
 
             if (cm.type === 'LIVE') {
+                if (dotEl) dotEl.className = 'w-1.5 h-1.5 rounded-full bg-red-500 animate-ping';
                 cdEl.textContent = '🔴 EN JUEGO AHORA';
                 return;
             }
+
+            if (cm.type === 'FINISHED_24H') {
+                if (dotEl) dotEl.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400';
+                cdEl.textContent = 'PARTIDO FINALIZADO (ÚLTIMAS 24HS)';
+                return;
+            }
+
+            if (cm.type === 'TBD') {
+                if (dotEl) dotEl.className = 'w-1.5 h-1.5 rounded-full bg-slate-400';
+                cdEl.textContent = 'FECHA Y HORARIO A CONFIRMAR';
+                return;
+            }
+
+            if (dotEl) dotEl.className = 'w-1.5 h-1.5 rounded-full bg-pizarra-electric animate-pulse';
 
             const rawDate = cm.isoDate || cm.match.fixture?.date;
             const targetMs = cm.timestamp || cm.match.fixture?.timestampMs || (rawDate ? new Date(rawDate).getTime() : NaN);
@@ -603,12 +624,12 @@
             updateMatchCountdown();
         }, 1000);
 
-        function renderMiniFormList(containerId, matchesArray, teamLabel) {
+        function renderMiniFormList(containerId, matchesArray, emptyMsg = 'Sin registros recientes disponibles') {
             const container = document.getElementById(containerId);
             if (!container) return;
 
             if (!matchesArray || matchesArray.length === 0) {
-                container.innerHTML = `<div class="text-xs text-slate-500 font-mono py-2">Sin registros recientes disponibles</div>`;
+                container.innerHTML = `<div class="text-xs text-slate-500 font-mono py-2">${emptyMsg}</div>`;
                 return;
             }
 
@@ -647,6 +668,8 @@
             const awayCrest = document.getElementById('match-away-crest');
             const homeName = document.getElementById('match-home-name');
             const awayName = document.getElementById('match-away-name');
+            const homeRole = document.getElementById('match-home-role');
+            const awayRole = document.getElementById('match-away-role');
             const statusTitle = document.getElementById('match-status-title');
             const centerBox = document.getElementById('match-center-box');
             const leagueInfo = document.getElementById('match-league-info');
@@ -662,19 +685,57 @@
             homeName.textContent = m.teams.home.name;
             awayName.textContent = m.teams.away.name;
 
+            if (cm.type === 'TBD') {
+                if (scorersBox) scorersBox.classList.add('hidden');
+                badge.textContent = "PRÓXIMO ENCUENTRO";
+                badge.className = "px-2 py-0.5 rounded bg-slate-700/60 text-slate-300 border border-slate-600 font-bold uppercase tracking-wider text-[11px]";
+                if (homeRole) homeRole.textContent = "C.A.V.S.";
+                if (awayRole) awayRole.textContent = "RIVAL";
+                statusTitle.textContent = "FECHA A CONFIRMAR";
+                centerBox.innerHTML = `
+                    <span class="font-display text-2xl sm:text-4xl font-extrabold text-slate-300 tracking-tight uppercase">A CONFIRMAR</span>
+                    <span class="block text-[10px] font-mono text-slate-400 font-bold tracking-widest uppercase mt-0.5">HORARIO PENDIENTE</span>
+                `;
+                stadium.textContent = 'A confirmar';
+                leagueInfo.textContent = `${STATE.activeTournamentName} • Próxima instancia`;
+                if (rivalFormTitle) rivalFormTitle.textContent = 'Rival a confirmar';
+
+                updateMatchCountdown();
+                const vLast2 = cm.velezForm || STATE.velezLast2 || STATE.lastFiveMatches.slice(0, 2);
+                renderMiniFormList('prev-velez-last2', vLast2);
+                renderMiniFormList('prev-rival-last2', [], 'Rival a confirmar');
+                return;
+            }
+
+            if (homeRole) homeRole.textContent = "LOCAL";
+            if (awayRole) awayRole.textContent = "VISITANTE";
+
             const isVelezHome = normalizarTexto(m.teams.home.name).includes('velez');
             const rivalName = isVelezHome ? m.teams.away.name : m.teams.home.name;
             if (rivalFormTitle) rivalFormTitle.textContent = `Cómo llega ${rivalName}`;
 
-            if (cm.type === 'LIVE') {
-                const clockStr = m.fixture.status.elapsed || m.fixture.status.long || 'EN JUEGO';
-                badge.textContent = `🔴 EN VIVO • ${clockStr}`;
-                badge.className = "px-2 py-0.5 rounded bg-red-600 text-white font-bold uppercase tracking-wider text-[11px] animate-pulse";
-                statusTitle.textContent = `TIEMPO DE JUEGO: ${clockStr}`;
-                centerBox.innerHTML = `
-                    <span class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">${m.goals.home ?? 0} - ${m.goals.away ?? 0}</span>
-                    <span class="block text-[10px] font-mono text-red-400 font-bold tracking-widest uppercase">MARCADOR EN VIVO</span>
-                `;
+            if (cm.type === 'LIVE' || cm.type === 'FINISHED_24H') {
+                if (cm.type === 'LIVE') {
+                    const clockStr = m.fixture.status.elapsed || m.fixture.status.long || 'EN JUEGO';
+                    badge.textContent = `🔴 EN VIVO • ${clockStr}`;
+                    badge.className = "px-2 py-0.5 rounded bg-red-600 text-white font-bold uppercase tracking-wider text-[11px] animate-pulse";
+                    statusTitle.textContent = `TIEMPO DE JUEGO: ${clockStr}`;
+                    centerBox.innerHTML = `
+                        <span class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">${m.goals.home ?? 0} - ${m.goals.away ?? 0}</span>
+                        <span class="block text-[10px] font-mono text-red-400 font-bold tracking-widest uppercase">MARCADOR EN VIVO</span>
+                    `;
+                } else {
+                    badge.textContent = "ÚLTIMO PARTIDO • FINALIZADO";
+                    badge.className = "px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold uppercase tracking-wider text-[11px]";
+                    const matchDateObj = new Date(cm.isoDate || m.fixture.date);
+                    statusTitle.textContent = !isNaN(matchDateObj.getTime())
+                        ? matchDateObj.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Argentina/Buenos_Aires' }).toUpperCase()
+                        : 'RESULTADO FINAL';
+                    centerBox.innerHTML = `
+                        <span class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">${m.goals.home ?? 0} - ${m.goals.away ?? 0}</span>
+                        <span class="block text-[10px] font-mono text-emerald-400 font-bold tracking-widest uppercase">RESULTADO FINAL</span>
+                    `;
+                }
 
                 const hScorers = m.scorers?.home || [];
                 const aScorers = m.scorers?.away || [];
@@ -707,8 +768,8 @@
 
             const vLast2 = cm.velezForm || cm.velezLastMatches || STATE.velezLast2 || STATE.lastFiveMatches.slice(0, 2);
             const rLast2 = cm.rivalForm || cm.rivalLastMatches || STATE.rivalLast2 || [];
-            renderMiniFormList('prev-velez-last2', vLast2, 'Vélez');
-            renderMiniFormList('prev-rival-last2', rLast2, rivalName);
+            renderMiniFormList('prev-velez-last2', vLast2);
+            renderMiniFormList('prev-rival-last2', rLast2);
         }
 
         function renderLastFiveMatches() {
@@ -749,7 +810,7 @@
         function renderUpcomingMatches() {
             const listEl = document.getElementById('upcoming-matches-list');
             if (!STATE.upcomingMatches || STATE.upcomingMatches.length === 0) {
-                listEl.innerHTML = `<div class="p-6 text-center text-slate-500 text-xs">No hay partidos futuros programados en este momento.</div>`;
+                listEl.innerHTML = `<div class="p-6 text-center text-slate-500 text-xs">No hay partidos futuros confirmados en el calendario oficial.</div>`;
                 return;
             }
 
@@ -788,7 +849,12 @@
         function renderStandingsTable() {
             const thead = document.getElementById('standings-thead');
             const tbody = document.getElementById('standings-tbody');
+            const tabBtnTorneo = document.getElementById('tab-TORNEO');
             const tab = STATE.activeTableTab;
+
+            if (tabBtnTorneo) {
+                tabBtnTorneo.textContent = `Posiciones ${STATE.activeTournamentName}`;
+            }
 
             const sourceList = tab === 'TORNEO' ? STATE.standingsClausura : STATE.standingsAnual;
             if (!sourceList || sourceList.length === 0) {
@@ -797,7 +863,7 @@
             }
 
             const teams = [...sourceList].sort((a, b) => b.pts - a.pts || b.dg - a.dg);
-            const titleCol = tab === 'TORNEO' ? 'Equipo (Torneo Clausura)' : 'Equipo (Tabla Anual Copas)';
+            const titleCol = tab === 'TORNEO' ? `Equipo (${STATE.activeTournamentName})` : 'Equipo (Tabla Anual Copas)';
             thead.innerHTML = `<th class="py-2.5 px-3 text-center w-12">#</th><th class="py-2.5 px-3">${titleCol}</th><th class="py-2.5 px-2 text-center font-bold text-white">Pts</th><th class="py-2.5 px-2 text-center">PJ</th><th class="py-2.5 px-2 text-center">PG</th><th class="py-2.5 px-2 text-center">PE</th><th class="py-2.5 px-2 text-center">PP</th><th class="py-2.5 px-3 text-center">DG</th>`;
 
             const hasNativeNotes = teams.some(t => t.cupType === 'LIBERTADORES' || t.cupType === 'SUDAMERICANA');
@@ -874,6 +940,11 @@
         }
 
         function renderSquadTable() {
+            const captionEl = document.getElementById('squad-tournament-caption');
+            if (captionEl) {
+                captionEl.textContent = `Dorsales oficiales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas exclusivas del ${STATE.activeTournamentName}`;
+            }
+
             const searchQuery = (document.getElementById('squad-search')?.value || '').toLowerCase().trim();
             let list = [...STATE.squad];
             if (STATE.squadFilterGroup !== 'TODOS') list = list.filter(p => p.group === STATE.squadFilterGroup);
@@ -968,7 +1039,7 @@
                 const groupOrder = { 'ARQ': 1, 'DEF': 2, 'MED': 3, 'DEL': 4 };
                 top11.sort((a, b) => (groupOrder[a.group] || 3) - (groupOrder[b.group] || 3));
 
-                if (subtitle) subtitle.textContent = 'Once base con más presencias en la temporada';
+                if (subtitle) subtitle.textContent = `Once base con más presencias • ${STATE.activeTournamentName}`;
                 layer.innerHTML = top11.map((p, idx) => {
                     const pos = coords[idx] || { x: 50, y: 50 };
                     const shortLabel = (p.name || '').split(' ').pop();
