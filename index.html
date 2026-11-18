@@ -243,7 +243,7 @@
                         <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
                         Plantilla Oficial & Estadísticas Temporada
                     </h3>
-                    <p id="squad-tournament-caption" class="text-xs text-slate-400">Dorsales oficiales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Datos exclusivos del Torneo Clausura</p>
+                    <p id="squad-tournament-caption" class="text-xs text-slate-400">Dorsales oficiales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas exclusivas del Torneo Clausura</p>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2">
@@ -326,17 +326,17 @@
             <div class="lg:col-span-5 bg-pizarra-card rounded-2xl border border-pizarra-border p-5 flex flex-col justify-between space-y-5">
                 <div>
                     <div class="flex items-center justify-between border-b border-pizarra-border pb-3 mb-4">
-                        <h4 class="font-display text-xl font-bold uppercase text-white">Análisis Táctico & XI</h4>
+                        <h4 class="font-display text-xl font-bold uppercase text-white">Rendimiento & XI</h4>
                         <span id="tactical-formation-badge" class="px-2 py-0.5 rounded bg-pizarra-accent/20 text-pizarra-electric font-mono text-xs border border-pizarra-accent/40">4-2-3-1</span>
                     </div>
                     <div class="space-y-3 text-xs text-slate-300 leading-relaxed">
-                        <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
-                            <div class="font-display uppercase text-sm font-bold text-pizarra-electric mb-1">1. Doble Pivote & Salida</div>
-                            <p>Equilibrio en la mitad de cancha permitiendo la proyección de los laterales en ofensiva.</p>
+                        <div class="p-3.5 rounded-xl bg-[#0b0e14] border border-pizarra-border">
+                            <div class="font-display uppercase text-sm font-bold text-pizarra-electric mb-1">1. Balance de Goles (Torneo)</div>
+                            <p id="tactical-card-1">Sincronizando goles a favor y en contra oficiales del certamen...</p>
                         </div>
-                        <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
-                            <div class="font-display uppercase text-sm font-bold text-emerald-400 mb-1">2. Circulación y Ataque</div>
-                            <p>Generación de juego asociada y presión alta para recuperar en campo rival.</p>
+                        <div class="p-3.5 rounded-xl bg-[#0b0e14] border border-pizarra-border">
+                            <div class="font-display uppercase text-sm font-bold text-emerald-400 mb-1">2. Máximo Artillero & Efectividad</div>
+                            <p id="tactical-card-2">Calculando efectividad de puntos y goleador en el plantel...</p>
                         </div>
                     </div>
                 </div>
@@ -358,7 +358,6 @@
 
     <!-- SCRIPT DE CONSUMO DE DATOS EN VIVO DESDE EL BACKEND -->
     <script>
-        // Escudo genérico gris para rivales "A confirmar" o sin logo disponible
         const ESCUDO_GENERICO_GRIS = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 110'><path d='M10,8 H90 V60 C90,86 50,104 50,104 C50,104 10,86 10,60 Z' fill='%232a3240' stroke='%234a5568' stroke-width='5'/><path d='M24,26 H76 V56 C76,74 50,88 50,88 C50,88 24,74 24,56 Z' fill='%234a5568' opacity='0.55'/><text x='50' y='59' font-family='sans-serif' font-weight='bold' font-size='16' fill='%2394a3b8' text-anchor='middle'>?</text></svg>";
 
         const MAPA_SLUGS_ESCUDOS = {
@@ -942,7 +941,7 @@
         function renderSquadTable() {
             const captionEl = document.getElementById('squad-tournament-caption');
             if (captionEl) {
-                captionEl.textContent = `Dorsales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas del ${STATE.activeTournamentName}`;
+                captionEl.textContent = `Dorsales oficiales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas exclusivas del ${STATE.activeTournamentName}`;
             }
 
             const searchQuery = (document.getElementById('squad-search')?.value || '').toLowerCase().trim();
@@ -986,16 +985,48 @@
                 `;
             }).join('');
 
-            const totalGoals = STATE.squad.reduce((acc, p) => acc + (Number(p.goals) || 0), 0);
+            // Goles oficiales de Vélez en el torneo (desde la tabla de posiciones, sin arrastrar goles de otros clubes)
+            const velezStanding = STATE.standingsClausura.find(t => t.isVelez);
+            const velezGoalsFor = velezStanding && typeof velezStanding.gf === 'number'
+                ? velezStanding.gf
+                : STATE.squad.reduce((acc, p) => acc + (Number(p.goals) || 0), 0);
+
             const totalCleanSheets = STATE.squad.filter(p => p.group === 'ARQ').reduce((acc, p) => acc + (Number(p.cleanSheets) || 0), 0);
             const totalCards = STATE.squad.reduce((acc, p) => acc + (Number(p.yellowCards) || 0) + (Number(p.redCards) || 0), 0);
 
             const kpiG = document.getElementById('kpi-total-goals');
             const kpiCS = document.getElementById('kpi-clean-sheets');
             const kpiC = document.getElementById('kpi-total-cards');
-            if (kpiG) kpiG.textContent = totalGoals;
+            if (kpiG) kpiG.textContent = velezGoalsFor;
             if (kpiCS) kpiCS.textContent = totalCleanSheets;
             if (kpiC) kpiC.textContent = totalCards;
+
+            // Actualizar las 2 tarjetas de rendimiento táctico con datos reales del certamen
+            const card1 = document.getElementById('tactical-card-1');
+            const card2 = document.getElementById('tactical-card-2');
+
+            if (card1 && velezStanding) {
+                const pj = velezStanding.pj || 0;
+                const gf = velezStanding.gf || 0;
+                const gc = velezStanding.gc || 0;
+                const avgGf = pj > 0 ? (gf / pj).toFixed(2) : '0.00';
+                const avgGc = pj > 0 ? (gc / pj).toFixed(2) : '0.00';
+                card1.innerHTML = `En <strong class="text-white">${pj} fechas</strong> disputadas del ${STATE.activeTournamentName}, Vélez convirtió <strong class="text-emerald-400">${gf} goles</strong> (${avgGf} por partido) y recibió <strong class="text-slate-200">${gc}</strong> (${avgGc} por encuentro).`;
+            }
+
+            if (card2) {
+                const topScorers = [...STATE.squad].filter(p => (p.goals || 0) > 0).sort((a, b) => b.goals - a.goals);
+                const effPct = velezStanding && velezStanding.pj > 0
+                    ? Math.round((velezStanding.pts / (velezStanding.pj * 3)) * 100)
+                    : 0;
+
+                if (topScorers.length > 0) {
+                    const leader = topScorers[0];
+                    card2.innerHTML = `Referente ofensivo: <strong class="text-white">${leader.name}</strong> (${leader.goals} tantos en temporada). Efectividad de puntos en el torneo: <strong class="text-pizarra-electric">${effPct}%</strong> (${velezStanding?.pts || 0} pts).`;
+                } else if (velezStanding) {
+                    card2.innerHTML = `Efectividad de puntos en el ${STATE.activeTournamentName}: <strong class="text-pizarra-electric">${effPct}%</strong> (${velezStanding.pts} pts sobre ${velezStanding.pj * 3} posibles).`;
+                }
+            }
         }
 
         function renderPitch(mode = 'LAST_MATCH') {
