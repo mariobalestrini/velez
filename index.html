@@ -335,10 +335,10 @@
                             <div class="font-display uppercase text-sm font-bold text-pizarra-electric mb-0.5">1. Balance de Goles (Torneo)</div>
                             <p id="tactical-card-1">Sincronizando goles a favor y en contra oficiales del certamen...</p>
                         </div>
-                        <!-- 2. GOLEADOR DEL TORNEO -->
+                        <!-- 2. GOLEADOR DE VÉLEZ EN EL TORNEO -->
                         <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
-                            <div class="font-display uppercase text-sm font-bold text-emerald-400 mb-0.5">2. Goleador del Torneo</div>
-                            <p id="tactical-card-scorers">Calculando máximo artillero del plantel...</p>
+                            <div class="font-display uppercase text-sm font-bold text-emerald-400 mb-0.5">2. Goleador de Vélez en el Torneo</div>
+                            <p id="tactical-card-scorers">Calculando máximo artillero de Vélez en el certamen...</p>
                         </div>
                         <!-- 3. DISCIPLINA • MÁS AMARILLAS -->
                         <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
@@ -1046,7 +1046,7 @@
                 card1.innerHTML = `En <strong class="text-white">${pj} fechas</strong> del ${STATE.activeTournamentName}, Vélez convirtió <strong class="text-emerald-400">${gf} goles</strong> (${avgGf} p/p) y recibió <strong class="text-slate-200">${gc}</strong> (${avgGc} p/p).`;
             }
 
-            // 2. GOLEADOR DEL TORNEO
+            // 2. GOLEADOR DE VÉLEZ EN EL TORNEO
             const cardScorers = document.getElementById('tactical-card-scorers');
             if (cardScorers) {
                 const withGoals = [...STATE.squad]
@@ -1057,9 +1057,9 @@
                     const maxG = Number(withGoals[0].goals);
                     const leaders = withGoals.filter(p => Number(p.goals) === maxG);
                     const namesStr = leaders.map(p => `<strong class="text-white">${p.name}</strong>`).join(', ');
-                    cardScorers.innerHTML = `${leaders.length > 1 ? 'Máximos artilleros' : 'Máximo artillero'} en el ${STATE.activeTournamentName}: ${namesStr} con <strong class="text-emerald-400">${maxG} ${maxG === 1 ? 'gol' : 'goles'}</strong>.`;
+                    cardScorers.innerHTML = `${leaders.length > 1 ? 'Máximos goleadores de Vélez' : 'Máximo goleador de Vélez'} en el ${STATE.activeTournamentName}: ${namesStr} con <strong class="text-emerald-400">${maxG} ${maxG === 1 ? 'gol' : 'goles'}</strong>.`;
                 } else {
-                    cardScorers.innerHTML = `Aún no se registran goleadores individuales en el ${STATE.activeTournamentName}.`;
+                    cardScorers.innerHTML = `Vélez aún no registra goleadores individuales en el ${STATE.activeTournamentName}.`;
                 }
             }
 
@@ -1074,9 +1074,9 @@
                     const maxY = Number(withYellows[0].yellowCards);
                     const leaders = withYellows.filter(p => Number(p.yellowCards) === maxY);
                     const namesStr = leaders.map(p => `<strong class="text-white">${p.name}</strong>`).join(', ');
-                    cardYellows.innerHTML = `${leaders.length > 1 ? 'Jugadores' : 'Jugador'} con más amonestaciones: ${namesStr} con <strong class="text-amber-400">${maxY} ${maxY === 1 ? 'amarilla' : 'amarillas'}</strong>.`;
+                    cardYellows.innerHTML = `${leaders.length > 1 ? 'Jugadores' : 'Jugador'} de Vélez con más amonestaciones: ${namesStr} con <strong class="text-amber-400">${maxY} ${maxY === 1 ? 'amarilla' : 'amarillas'}</strong>.`;
                 } else {
-                    cardYellows.innerHTML = `Sin jugadores amonestados registrados en el certamen.`;
+                    cardYellows.innerHTML = `Sin jugadores de Vélez amonestados en el certamen.`;
                 }
             }
 
@@ -1091,9 +1091,9 @@
                     const maxR = Number(withReds[0].redCards);
                     const leaders = withReds.filter(p => Number(p.redCards) === maxR);
                     const namesStr = leaders.map(p => `<strong class="text-white">${p.name}</strong>`).join(', ');
-                    cardReds.innerHTML = `${leaders.length > 1 ? 'Jugadores' : 'Jugador'} con más expulsiones: ${namesStr} con <strong class="text-rose-400">${maxR} ${maxR === 1 ? 'roja' : 'rojas'}</strong>.`;
+                    cardReds.innerHTML = `${leaders.length > 1 ? 'Jugadores' : 'Jugador'} de Vélez con más expulsiones: ${namesStr} con <strong class="text-rose-400">${maxR} ${maxR === 1 ? 'roja' : 'rojas'}</strong>.`;
                 } else {
-                    cardReds.innerHTML = `El plantel no registra expulsiones en el ${STATE.activeTournamentName}.`;
+                    cardReds.innerHTML = `Vélez no registra jugadores expulsados en el ${STATE.activeTournamentName}.`;
                 }
             }
 
