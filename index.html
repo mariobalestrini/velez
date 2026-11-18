@@ -871,4 +871,49 @@
                 layer.innerHTML = orderedStarters.map((p, idx) => {
                     const pos = coords[idx] || { x: 50, y: 50 };
                     const shortLabel = (p.shortName || p.name || '').split(' ').pop();
-                    return
+                    return `
+                        <div style="left: ${pos.x}%; top: ${pos.y}%;" class="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer">
+                            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#0055a5] border-2 border-white text-white font-display font-extrabold text-sm flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.75)]">${p.number || '-'}</div>
+                            <span class="mt-1 px-1.5 py-0.5 rounded bg-[#0b0e14]/95 border border-pizarra-border text-[10px] sm:text-[11px] font-semibold text-white whitespace-nowrap shadow">${shortLabel}</span>
+                        </div>
+                    `;
+                }).join('');
+            } else if (STATE.squad && STATE.squad.length >= 11) {
+                const top11 = [...STATE.squad].sort((a, b) => (b.pj || 0) - (a.pj || 0)).slice(0, 11);
+                const groupOrder = { 'ARQ': 1, 'DEF': 2, 'MED': 3, 'DEL': 4 };
+                top11.sort((a, b) => (groupOrder[a.group] || 3) - (groupOrder[b.group] || 3));
+
+                if (subtitle) subtitle.textContent = 'Once base con más presencias en la temporada';
+                layer.innerHTML = top11.map((p, idx) => {
+                    const pos = coords[idx] || { x: 50, y: 50 };
+                    const shortLabel = (p.name || '').split(' ').pop();
+                    return `
+                        <div style="left: ${pos.x}%; top: ${pos.y}%;" class="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer">
+                            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#0055a5] border-2 border-white text-white font-display font-extrabold text-sm flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.75)]">${p.number || '-'}</div>
+                            <span class="mt-1 px-1.5 py-0.5 rounded bg-[#0b0e14]/95 border border-pizarra-border text-[10px] sm:text-[11px] font-semibold text-white whitespace-nowrap shadow">${shortLabel}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function renderAll() {
+            const velezLogo = STATE.standingsClausura.find(t => t.isVelez)?.logo || '';
+            document.getElementById('header-velez-crest').innerHTML = renderEscudoImg('Vélez Sarsfield', 'w-10 h-10 sm:w-11 sm:h-11', velezLogo);
+            renderMatchCenter();
+            renderLastFiveMatches();
+            renderUpcomingMatches();
+            renderStandingsTable();
+            renderSquadTable();
+            const selector = document.getElementById('formation-selector');
+            renderPitch(selector ? selector.value : 'LAST_MATCH');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            registrarMarcaDeTiempoActualizacion();
+            renderAll();
+            fetchBackendData(false);
+        });
+    </script>
+</body>
+</html>
