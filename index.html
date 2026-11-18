@@ -914,19 +914,35 @@
             }).join('');
 
             listEl.innerHTML = STATE.lastFiveMatches.map(m => {
-                const badgeStyle = m.outcome === 'G' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : (m.outcome === 'E' ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-rose-500/20 text-rose-300 border-rose-500/40');
-                const condBadge = m.cond === 'L' ? '<span class="px-1.5 py-0.2 rounded bg-pizarra-accent/30 text-pizarra-electric border border-pizarra-accent/50 text-[10px] font-mono">LOCAL</span>' : '<span class="px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700 text-[10px] font-mono">VISITANTE</span>';
+                const isHome = m.cond === 'L';
+                const badgeStyle = m.outcome === 'G'
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                    : (m.outcome === 'E' ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-rose-500/20 text-rose-300 border-rose-500/40');
+                const condBadge = isHome
+                    ? '<span class="px-1.5 py-0.2 rounded bg-pizarra-accent/30 text-pizarra-electric border border-pizarra-accent/50 text-[10px] font-mono">LOCAL</span>'
+                    : '<span class="px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700 text-[10px] font-mono">VISITANTE</span>';
+
+                // Local siempre primero: "Vélez vs Rival" cuando es Local, "Rival vs Vélez" cuando es Visitante
+                const matchTitleHtml = isHome
+                    ? `Vélez <span class="text-slate-400 font-normal text-sm">vs</span> ${m.rival}`
+                    : `${m.rival} <span class="text-slate-400 font-normal text-sm">vs</span> Vélez`;
+
+                // Marcador alineado con el orden Local - Visitante
+                const scoreText = isHome
+                    ? `${m.velezGoals} - ${m.rivalGoals}`
+                    : `${m.rivalGoals} - ${m.velezGoals}`;
+
                 return `
                     <div class="p-3.5 hover:bg-pizarra-cardHover/50 transition flex items-center justify-between gap-3">
                         <div class="flex items-center gap-3 min-w-0 flex-1">
                             ${renderEscudoImg(m.rival, 'w-8 h-8 flex-shrink-0', m.rivalLogo)}
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-center gap-2 mb-0.5"><span class="font-mono text-[11px] font-bold text-slate-400">${m.fecha}</span><span class="text-[11px] text-slate-500">• ${m.date}</span>${condBadge}</div>
-                                <div class="font-display text-lg font-bold uppercase text-white truncate">Vélez Sarsfield <span class="text-slate-400 font-normal text-sm">vs</span> ${m.rival}</div>
+                                <div class="font-display text-lg font-bold uppercase text-white truncate">${matchTitleHtml}</div>
                             </div>
                         </div>
                         <div class="flex items-center gap-2 flex-shrink-0">
-                            <div class="px-3 py-1.5 rounded-lg bg-[#0b0e14] border border-pizarra-border font-mono font-bold text-sm text-white">${m.velezGoals} - ${m.rivalGoals}</div>
+                            <div class="px-3 py-1.5 rounded-lg bg-[#0b0e14] border border-pizarra-border font-mono font-bold text-sm text-white">${scoreText}</div>
                             <span class="w-7 h-7 rounded-lg border font-mono font-bold text-xs flex items-center justify-center ${badgeStyle}">${m.outcome}</span>
                         </div>
                     </div>
@@ -1243,7 +1259,6 @@
             }
         }
 
-        // Poblar el desplegable con las formaciones de los últimos 5 partidos disputados
         function populateLineupSelector() {
             const selector = document.getElementById('formation-selector');
             if (!selector) return;
