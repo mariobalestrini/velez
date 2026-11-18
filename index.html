@@ -6,6 +6,8 @@
     <title>LA V AZULADA | Pizarra Táctica & Estadísticas de Vélez Sarsfield</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Diccionario propio de posiciones tácticas del plantel -->
+    <script src="./posiciones.js"></script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -396,83 +398,124 @@
             'atletico tucuman': 'atletico-tucuman', 'barracas': 'barracas', 'independiente rivadavia': 'independiente-rivadavia'
         };
 
-        // Coordenadas en cancha (Orden táctico de 1 a 11: Arquero -> Derecha a Izquierda en cada línea)
-        const COORDENADAS_ESQUEMAS = {
-            '4-2-3-1': [
-                { x: 50, y: 90 },                                   // 1: ARQ
-                { x: 84, y: 73 }, { x: 62, y: 76 }, { x: 38, y: 76 }, { x: 16, y: 73 }, // 2..5: LD, DCD, DCI, LI
-                { x: 62, y: 57 }, { x: 38, y: 57 },                 // 6..7: Volante central der, Volante central izq
-                { x: 82, y: 38 }, { x: 50, y: 36 }, { x: 18, y: 38 }, // 8..10: Extremo der, Enganche, Extremo izq
-                { x: 50, y: 16 }                                    // 11: Delantero centro
-            ],
-            '4-3-3': [
-                { x: 50, y: 90 },                                   // 1: ARQ
-                { x: 84, y: 73 }, { x: 62, y: 76 }, { x: 38, y: 76 }, { x: 16, y: 73 }, // 2..5: LD, DCD, DCI, LI
-                { x: 72, y: 46 }, { x: 50, y: 58 }, { x: 28, y: 46 }, // 6..8: Interior der, Volante tapón, Interior izq
-                { x: 80, y: 22 }, { x: 50, y: 16 }, { x: 20, y: 22 }  // 9..11: Extremo der, 9, Extremo izq
-            ]
+        // Coordenadas en la cancha por puesto táctico (1 al 11)
+        const SLOTS_CANCHA = {
+            '4-2-3-1': {
+                1:  { x: 50, y: 90 }, // Arquero
+                2:  { x: 84, y: 73 }, // Lateral derecho
+                3:  { x: 62, y: 76 }, // Central derecho
+                4:  { x: 38, y: 76 }, // Central izquierdo
+                5:  { x: 16, y: 73 }, // Lateral izquierdo
+                6:  { x: 62, y: 57 }, // Volante central derecho
+                7:  { x: 38, y: 57 }, // Volante central izquierdo
+                8:  { x: 82, y: 38 }, // Volante / Extremo derecho
+                9:  { x: 50, y: 36 }, // Enganche / MCO
+                10: { x: 18, y: 38 }, // Volante / Extremo izquierdo
+                11: { x: 50, y: 16 }  // Delantero centro
+            },
+            '4-3-3': {
+                1:  { x: 50, y: 90 },
+                2:  { x: 84, y: 73 },
+                3:  { x: 62, y: 76 },
+                4:  { x: 38, y: 76 },
+                5:  { x: 16, y: 73 },
+                6:  { x: 72, y: 48 },
+                7:  { x: 28, y: 48 },
+                8:  { x: 80, y: 24 },
+                9:  { x: 50, y: 58 },
+                10: { x: 20, y: 24 },
+                11: { x: 50, y: 16 }
+            }
         };
-
-        // Perfiles naturales de respaldo por si ESPN devuelve formationPlace = 0
-        const PERFIL_LATERAL_DERECHO = ['garcia', 'andrada', 'guidara', 'jara', 'lopez'];
-        const PERFIL_LATERAL_IZQUIERDO = ['elias gomez', 'e. gomez', 'cavanagh', 'ortega'];
-        const PERFIL_EXTREMO_DERECHO = ['pizzini', 'carrizo', 'maher', 'machuca', 'bouzat'];
-        const PERFIL_EXTREMO_IZQUIERDO = ['fernandez', 'pellegrini', 'aquino', 'montoro', 'santos'];
-
-        function getLateralRank(player) {
-            const pos = (player.position || '').toUpperCase();
-            const normName = normalizarTexto(player.name || player.shortName || '');
-
-            // 1. Si ESPN especifica lateral derecho/izquierdo en la abreviatura
-            if (pos === 'RB' || pos === 'RWB' || pos === 'LD' || pos === 'RW' || pos === 'RM') return 1;
-            if (pos === 'LB' || pos === 'LWB' || pos === 'LI' || pos === 'LW' || pos === 'LM') return 4;
-
-            // 2. Si es defensa
-            if (player.group === 'DEF') {
-                if (PERFIL_LATERAL_DERECHO.some(k => normName.includes(k))) return 1;
-                if (PERFIL_LATERAL_IZQUIERDO.some(k => normName.includes(k))) return 4;
-                if (normName.includes('mammana') || normName.includes('pernía') || normName.includes('pernia')) return 2;
-                if (normName.includes('valentin gomez') || normName.includes('v. gomez') || normName.includes('quiros') || normName.includes('d. gomez')) return 3;
-                return 2.5;
-            }
-
-            // 3. Si es mediocampista o extremo
-            if (player.group === 'MED' || player.group === 'DEL') {
-                if (PERFIL_EXTREMO_DERECHO.some(k => normName.includes(k))) return 1;
-                if (PERFIL_EXTREMO_IZQUIERDO.some(k => normName.includes(k))) return 4;
-                return 2.5;
-            }
-
-            return 2;
-        }
-
-        function sortPlayersTactically(startersList) {
-            const hasOfficialPlaces = startersList.every(p => Number(p.formationPlace) >= 1 && Number(p.formationPlace) <= 11);
-            const uniquePlaces = new Set(startersList.map(p => Number(p.formationPlace)));
-
-            // Si ESPN envió los 11 puestos tácticos únicos (del 1 al 11), los respetamos al 100%
-            if (hasOfficialPlaces && uniquePlaces.size === 11) {
-                return [...startersList].sort((a, b) => Number(a.formationPlace) - Number(b.formationPlace));
-            }
-
-            // Si no, ordenamos por línea (ARQ -> DEF -> MED -> DEL) y dentro de cada línea de derecha (1) a izquierda (4)
-            const groupOrder = { 'ARQ': 1, 'DEF': 2, 'MED': 3, 'DEL': 4 };
-            return [...startersList].sort((a, b) => {
-                const gDiff = (groupOrder[a.group] || 3) - (groupOrder[b.group] || 3);
-                if (gDiff !== 0) return gDiff;
-
-                const placeA = Number(a.formationPlace) || 0;
-                const placeB = Number(b.formationPlace) || 0;
-                if (placeA > 0 && placeB > 0 && placeA !== placeB) {
-                    return placeA - placeB;
-                }
-
-                return getLateralRank(a) - getLateralRank(b);
-            });
-        }
 
         function normalizarTexto(texto) {
             return (texto || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').trim();
+        }
+
+        // Busca el puesto (1 al 11) del jugador en el archivo posiciones.js
+        function obtenerPuestoDeMapa(player) {
+            const mapa = window.POSICIONES_VELEZ || {};
+            const fullName = normalizarTexto(player.name || '');
+            const shortName = normalizarTexto(player.shortName || '');
+
+            // 1. Coincidencia exacta por nombre completo o nombre corto
+            if (mapa[fullName]) return Number(mapa[fullName]);
+            if (mapa[shortName]) return Number(mapa[shortName]);
+
+            // 2. Coincidencia por apellido / clave incluida (priorizando claves más largas como "elias gomez" antes que "gomez")
+            const sortedKeys = Object.keys(mapa).sort((a, b) => b.length - a.length);
+            for (const key of sortedKeys) {
+                const normKey = normalizarTexto(key);
+                if (normKey && (fullName.includes(normKey) || shortName.includes(normKey))) {
+                    return Number(mapa[key]);
+                }
+            }
+
+            // 3. Respaldo por línea general si llega un juvenil nuevo que aún no cargaste en posiciones.js
+            if (player.group === 'ARQ') return 1;
+            if (player.group === 'DEF') return 3;
+            if (player.group === 'DEL') return 11;
+            return 7;
+        }
+
+        // Asigna a cada titular su slot (1 al 11) sin que nunca se encimen dos jugadores en la misma coordenada
+        function asignarSlotsEnCancha(startersList) {
+            const ocupados = new Set();
+            const asignados = [];
+
+            // Orden de prioridad para resolver empates cuando dos jugadores tienen el mismo número en posiciones.js
+            // (ej: Elías Gómez tiene 4, si juega junto a Magallón que también tiene 4, Elías va al 5 [lateral izq] y Magallón al 4 [central izq])
+            const jugadoresConSlot = startersList.map(p => ({
+                player: p,
+                desiredSlot: obtenerPuestoDeMapa(p),
+                normName: normalizarTexto(p.name || p.shortName || '')
+            }));
+
+            // Si juegan juntos Elías Gómez (4) y Magallón (4), Elías Gómez ocupa el lateral izquierdo (5)
+            const hasMagallon = jugadoresConSlot.some(j => j.normName.includes('magallon'));
+            if (hasMagallon) {
+                jugadoresConSlot.forEach(j => {
+                    if (j.normName.includes('elias gomez') || j.normName.includes('e. gomez')) {
+                        j.desiredSlot = 5;
+                    }
+                });
+            }
+
+            // Primer paso: ubicar a los que tienen su slot libre
+            const pendientes = [];
+            jugadoresConSlot.forEach(item => {
+                const slot = item.desiredSlot;
+                if (slot >= 1 && slot <= 11 && !ocupados.has(slot)) {
+                    ocupados.add(slot);
+                    asignados.push({ player: item.player, slot });
+                } else {
+                    pendientes.push(item);
+                }
+            });
+
+            // Segundo paso: si algún slot quedó duplicado (ej. dos jugadores con 10), ubicarlo en el hueco libre más cercano
+            const ordenAlternativo = {
+                1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+                2: [2, 3, 8, 6, 4, 5, 7, 9, 10, 11, 1],
+                3: [3, 4, 2, 5, 6, 7, 8, 9, 10, 11, 1],
+                4: [4, 5, 3, 2, 7, 6, 10, 9, 8, 11, 1],
+                5: [5, 4, 10, 7, 3, 2, 6, 9, 8, 11, 1],
+                6: [6, 7, 8, 9, 3, 2, 10, 4, 5, 11, 1],
+                7: [7, 6, 10, 9, 4, 5, 8, 3, 2, 11, 1],
+                8: [8, 9, 10, 6, 7, 11, 2, 3, 4, 5, 1],
+                9: [9, 8, 10, 7, 6, 11, 3, 4, 2, 5, 1],
+                10: [10, 9, 8, 7, 6, 11, 5, 4, 3, 2, 1],
+                11: [11, 9, 8, 10, 6, 7, 3, 4, 2, 5, 1]
+            };
+
+            pendientes.forEach(item => {
+                const candidatos = ordenAlternativo[item.desiredSlot] || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+                const libre = candidatos.find(s => !ocupados.has(s)) || 1;
+                ocupados.add(libre);
+                asignados.push({ player: item.player, slot: libre });
+            });
+
+            return asignados;
         }
 
         function obtenerEscudoEquipo(item, explicitLogoUrl = '') {
@@ -1217,7 +1260,7 @@
                 : null;
 
             const schemeKey = (mode === '4-3-3') ? '4-3-3' : '4-2-3-1';
-            const coords = COORDENADAS_ESQUEMAS[schemeKey];
+            const slotCoords = SLOTS_CANCHA[schemeKey];
 
             if (starters) {
                 const formName = lineup.formation || schemeKey;
@@ -1228,11 +1271,11 @@
                         : `Último XI Titular Oficial • Esquema ${formName}`;
                 }
 
-                // Ordenar tácticamente usando formationPlace oficial de ESPN y perfil de banda
-                const orderedStarters = sortPlayersTactically(starters);
+                // Ubicar a cada jugador según su número de puesto (1..11) definido en posiciones.js
+                const asignaciones = asignarSlotsEnCancha(starters);
 
-                layer.innerHTML = orderedStarters.map((p, idx) => {
-                    const pos = coords[idx] || { x: 50, y: 50 };
+                layer.innerHTML = asignaciones.map(({ player: p, slot }) => {
+                    const pos = slotCoords[slot] || { x: 50, y: 50 };
                     const shortLabel = (p.shortName || p.name || '').split(' ').pop();
                     return `
                         <div style="left: ${pos.x}%; top: ${pos.y}%;" class="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer">
@@ -1242,13 +1285,12 @@
                     `;
                 }).join('');
             } else if (STATE.squad && STATE.squad.length >= 11) {
-                const top11 = sortPlayersTactically(
-                    [...STATE.squad].sort((a, b) => (b.pj || 0) - (a.pj || 0)).slice(0, 11)
-                );
+                const top11 = [...STATE.squad].sort((a, b) => (b.pj || 0) - (a.pj || 0)).slice(0, 11);
+                const asignaciones = asignarSlotsEnCancha(top11);
 
                 if (subtitle) subtitle.textContent = `Once base con más presencias • ${STATE.activeTournamentName}`;
-                layer.innerHTML = top11.map((p, idx) => {
-                    const pos = coords[idx] || { x: 50, y: 50 };
+                layer.innerHTML = asignaciones.map(({ player: p, slot }) => {
+                    const pos = slotCoords[slot] || { x: 50, y: 50 };
                     const shortLabel = (p.name || '').split(' ').pop();
                     return `
                         <div style="left: ${pos.x}%; top: ${pos.y}%;" class="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer">
