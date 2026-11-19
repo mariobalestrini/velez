@@ -173,16 +173,18 @@
                     </div>
                 </div>
 
-                <!-- GOLEADORES EN VIVO / RESULTADO 24HS -->
-                <div id="live-scorers-box" class="hidden pt-3 border-t border-pizarra-border/60 grid grid-cols-2 gap-4 text-xs font-mono">
-                    <div id="live-scorers-home" class="text-right space-y-1 text-slate-300 pr-2 border-r border-pizarra-border/50"></div>
-                    <div id="live-scorers-away" class="text-left space-y-1 text-slate-300 pl-2"></div>
-                </div>
+                <!-- GOLEADORES Y TARJETAS EN VIVO -->
+                <div class="space-y-2">
+                    <div id="live-scorers-box" class="hidden pt-3 border-t border-pizarra-border/60 grid grid-cols-2 gap-4 text-xs font-mono leading-relaxed">
+                        <div id="live-scorers-home" class="text-right space-y-1 text-slate-300 pr-2 border-r border-pizarra-border/50 min-w-0"></div>
+                        <div id="live-scorers-away" class="text-left space-y-1 text-slate-300 pl-2 min-w-0"></div>
+                    </div>
 
-                <!-- TARJETAS AMARILLAS Y ROJAS EN VIVO DEL PARTIDO EN CURSO -->
-                <div id="live-cards-box" class="hidden pt-3 border-t border-pizarra-border/60 grid grid-cols-2 gap-4 text-xs font-mono">
-                    <div id="live-cards-home" class="text-right space-y-1 text-slate-300 pr-2 border-r border-pizarra-border/50"></div>
-                    <div id="live-cards-away" class="text-left space-y-1 text-slate-300 pl-2"></div>
+                    <!-- TARJETAS AMARILLAS Y ROJAS EN VIVO DEL PARTIDO EN CURSO -->
+                    <div id="live-cards-box" class="hidden mt-2 pt-2.5 border-t border-pizarra-border/40 grid grid-cols-2 gap-4 text-xs font-mono leading-relaxed">
+                        <div id="live-cards-home" class="text-right space-y-1 text-slate-300 pr-2 border-r border-pizarra-border/50 min-w-0"></div>
+                        <div id="live-cards-away" class="text-left space-y-1 text-slate-300 pl-2 min-w-0"></div>
+                    </div>
                 </div>
 
                 <!-- CÓMO LLEGAN AMBOS EQUIPOS (ÚLTIMOS 2 PARTIDOS) -->
@@ -960,7 +962,6 @@
                     scorersBox.classList.add('hidden');
                 }
 
-                // Tarjetas amarillas y rojas solo durante el partido en vivo
                 if (cm.type === 'LIVE' && cardsBox && cardsHome && cardsAway) {
                     const hy = m.cards?.home?.yellow || [];
                     const hr = m.cards?.home?.red || [];
@@ -1216,7 +1217,7 @@
         function renderSquadTable() {
             const captionEl = document.getElementById('squad-tournament-caption');
             if (captionEl) {
-                captionEl.textContent = `Dorsales oficiales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas exclusivas del ${STATE.activeTournamentName}`;
+                captionEl.textContent = `Dorsales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas del ${STATE.activeTournamentName}`;
             }
 
             const searchQuery = (document.getElementById('squad-search')?.value || '').toLowerCase().trim();
