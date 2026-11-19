@@ -179,6 +179,12 @@
                     <div id="live-scorers-away" class="text-left space-y-1 text-slate-300 pl-2"></div>
                 </div>
 
+                <!-- TARJETAS AMARILLAS Y ROJAS EN VIVO DEL PARTIDO EN CURSO -->
+                <div id="live-cards-box" class="hidden pt-3 border-t border-pizarra-border/60 grid grid-cols-2 gap-4 text-xs font-mono">
+                    <div id="live-cards-home" class="text-right space-y-1 text-slate-300 pr-2 border-r border-pizarra-border/50"></div>
+                    <div id="live-cards-away" class="text-left space-y-1 text-slate-300 pl-2"></div>
+                </div>
+
                 <!-- CÓMO LLEGAN AMBOS EQUIPOS (ÚLTIMOS 2 PARTIDOS) -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-5 border-t border-pizarra-border/80">
                     <div class="bg-[#0b0e14]/90 rounded-xl border border-pizarra-border p-4 space-y-3.5">
@@ -424,26 +430,23 @@
             'atletico tucuman': 'atletico-tucuman', 'barracas': 'barracas', 'independiente rivadavia': 'independiente-rivadavia'
         };
 
-        // Clasificaciones manuales a Copas en la Tabla Anual
-        // Valores posibles de cupType: 'LIBERTADORES' o 'SUDAMERICANA'
         const CLASIFICADOS_MANUALES_ANUAL = {
             'belgrano': { cupType: 'LIBERTADORES', cupNote: 'Campeón Apertura' }
         };
 
-        // Coordenadas en la cancha por puesto táctico (1 al 11)
         const SLOTS_CANCHA = {
             '4-2-3-1': {
-                1:  { x: 50, y: 90 }, // Arquero
-                2:  { x: 84, y: 73 }, // Lateral derecho
-                3:  { x: 62, y: 76 }, // Central derecho
-                4:  { x: 38, y: 76 }, // Central izquierdo
-                5:  { x: 16, y: 73 }, // Lateral izquierdo
-                6:  { x: 62, y: 57 }, // Volante central derecho
-                7:  { x: 38, y: 57 }, // Volante central izquierdo
-                8:  { x: 82, y: 38 }, // Volante / Extremo derecho
-                9:  { x: 50, y: 36 }, // Enganche / MCO
-                10: { x: 18, y: 38 }, // Volante / Extremo izquierdo
-                11: { x: 50, y: 16 }  // Delantero centro
+                1:  { x: 50, y: 90 },
+                2:  { x: 84, y: 73 },
+                3:  { x: 62, y: 76 },
+                4:  { x: 38, y: 76 },
+                5:  { x: 16, y: 73 },
+                6:  { x: 62, y: 57 },
+                7:  { x: 38, y: 57 },
+                8:  { x: 82, y: 38 },
+                9:  { x: 50, y: 36 },
+                10: { x: 18, y: 38 },
+                11: { x: 50, y: 16 }
             },
             '4-3-3': {
                 1:  { x: 50, y: 90 },
@@ -599,7 +602,6 @@
             standingsAnual: []
         };
 
-        // --- AVISO FLOTANTE DE INSTALACIÓN EN PANTALLA DE INICIO (MÓVIL) ---
         function initMobileInstallPrompt() {
             const banner = document.getElementById('pwa-install-banner');
             const instructions = document.getElementById('pwa-install-instructions');
@@ -885,6 +887,9 @@
             const scorersBox = document.getElementById('live-scorers-box');
             const scorersHome = document.getElementById('live-scorers-home');
             const scorersAway = document.getElementById('live-scorers-away');
+            const cardsBox = document.getElementById('live-cards-box');
+            const cardsHome = document.getElementById('live-cards-home');
+            const cardsAway = document.getElementById('live-cards-away');
 
             const m = cm.match;
             homeCrest.innerHTML = renderEscudoImg(m.teams.home, 'w-16 h-16 sm:w-20 sm:h-20', m.teams.home.logo);
@@ -894,6 +899,7 @@
 
             if (cm.type === 'TBD') {
                 if (scorersBox) scorersBox.classList.add('hidden');
+                if (cardsBox) cardsBox.classList.add('hidden');
                 badge.textContent = "PRÓXIMO ENCUENTRO";
                 badge.className = "px-2 py-0.5 rounded bg-slate-700/60 text-slate-300 border border-slate-600 font-bold uppercase tracking-wider text-[11px]";
                 if (homeRole) homeRole.textContent = "C.A.V.S.";
@@ -953,8 +959,33 @@
                 } else if (scorersBox) {
                     scorersBox.classList.add('hidden');
                 }
+
+                // Tarjetas amarillas y rojas solo durante el partido en vivo
+                if (cm.type === 'LIVE' && cardsBox && cardsHome && cardsAway) {
+                    const hy = m.cards?.home?.yellow || [];
+                    const hr = m.cards?.home?.red || [];
+                    const ay = m.cards?.away?.yellow || [];
+                    const ar = m.cards?.away?.red || [];
+
+                    if (hy.length > 0 || hr.length > 0 || ay.length > 0 || ar.length > 0) {
+                        cardsBox.classList.remove('hidden');
+                        cardsHome.innerHTML = [
+                            ...hr.map(c => `<div><span class="text-rose-300 font-semibold">${c}</span> 🟥</div>`),
+                            ...hy.map(c => `<div><span class="text-amber-300 font-semibold">${c}</span> 🟨</div>`)
+                        ].join('');
+                        cardsAway.innerHTML = [
+                            ...ar.map(c => `<div>🟥 <span class="text-rose-300 font-semibold">${c}</span></div>`),
+                            ...ay.map(c => `<div>🟨 <span class="text-amber-300 font-semibold">${c}</span></div>`)
+                        ].join('');
+                    } else {
+                        cardsBox.classList.add('hidden');
+                    }
+                } else if (cardsBox) {
+                    cardsBox.classList.add('hidden');
+                }
             } else {
                 if (scorersBox) scorersBox.classList.add('hidden');
+                if (cardsBox) cardsBox.classList.add('hidden');
                 badge.textContent = "PRÓXIMO PARTIDO OFICIAL";
                 badge.className = "px-2 py-0.5 rounded bg-sky-500/20 text-pizarra-electric border border-sky-500/40 font-bold uppercase tracking-wider text-[11px]";
                 const matchDateObj = new Date(cm.isoDate || m.fixture.date);
@@ -1106,7 +1137,6 @@
                 let posBadge = `<span class="font-mono text-xs text-slate-400">${pos}</span>`;
                 let cupTag = '';
 
-                // Revisar si el equipo está cargado en CLASIFICADOS_MANUALES_ANUAL
                 const normTeam = normalizarTexto(t.name);
                 let manualCup = null;
                 if (tab === 'ANUAL') {
@@ -1233,7 +1263,6 @@
                 `;
             }).join('');
 
-            // KPIs inferiores
             const velezStanding = STATE.standingsClausura.find(t => t.isVelez);
             const velezGoalsFor = velezStanding && typeof velezStanding.gf === 'number'
                 ? velezStanding.gf
@@ -1249,7 +1278,6 @@
             if (kpiCS) kpiCS.textContent = totalCleanSheets;
             if (kpiC) kpiC.textContent = totalCards;
 
-            // 1. BALANCE DE GOLES EN EL TORNEO
             const card1 = document.getElementById('tactical-card-1');
             if (card1 && velezStanding) {
                 const pj = velezStanding.pj || 0;
@@ -1260,7 +1288,6 @@
                 card1.innerHTML = `En <strong class="text-white">${pj} fechas</strong> del ${STATE.activeTournamentName}, Vélez convirtió <strong class="text-emerald-400">${gf} goles</strong> (${avgGf} p/p) y recibió <strong class="text-slate-200">${gc}</strong> (${avgGc} p/p).`;
             }
 
-            // 2. GOLEADOR DE VÉLEZ EN EL TORNEO
             const cardScorers = document.getElementById('tactical-card-scorers');
             if (cardScorers) {
                 const withGoals = [...STATE.squad]
@@ -1277,7 +1304,6 @@
                 }
             }
 
-            // 3. DISCIPLINA • MÁS AMARILLAS
             const cardYellows = document.getElementById('tactical-card-yellows');
             if (cardYellows) {
                 const withYellows = [...STATE.squad]
@@ -1294,7 +1320,6 @@
                 }
             }
 
-            // 4. DISCIPLINA • MÁS ROJAS
             const cardReds = document.getElementById('tactical-card-reds');
             if (cardReds) {
                 const withReds = [...STATE.squad]
@@ -1311,7 +1336,6 @@
                 }
             }
 
-            // 5. ÚLTIMO PARTIDO (POSESIÓN Y TIROS)
             const statsRivalEl = document.getElementById('last-match-stats-rival');
             const statsBodyEl = document.getElementById('last-match-stats-body');
             const lms = STATE.lastMatchStats;
