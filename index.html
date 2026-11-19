@@ -112,7 +112,7 @@
                     <span id="last-updated-time" class="text-white font-bold">--:--:--</span>
                 </div>
                 <div class="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-pizarra-card border border-pizarra-border text-xs font-mono text-slate-300">
-                    <span class="text-pizarra-electric font-bold">ART</span>
+                    <span id="header-tz-label" class="text-pizarra-electric font-bold">HORA</span>
                     <span id="header-art-clock">--:--:--</span>
                 </div>
                 <div id="polling-status-pill" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700 text-xs font-mono">
@@ -143,9 +143,9 @@
                     <span>📍 <span id="match-stadium" class="text-white">Estadio José Amalfitani (Liniers)</span></span>
                     <span class="hidden sm:inline text-slate-600">|</span>
                     <span>📺 <span class="text-pizarra-electric font-bold">ESPN Premium / TNT Sports</span></span>
-                    <button id="share-live-match-btn" onclick="shareSectionAsPng('LIVE_MATCH')" title="Generar imagen PNG para compartir" class="hidden items-center gap-1 px-2 py-1 rounded-md bg-[#121721] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
+                    <button id="share-live-match-btn" onclick="shareSectionAsPng('LIVE_MATCH')" title="Compartir imagen" class="hidden items-center gap-1 px-2.5 py-1 rounded-md bg-[#121721] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                        <span class="text-[10px] font-bold uppercase">PNG</span>
+                        <span class="text-[10px] font-bold uppercase">Compartir</span>
                     </button>
                 </div>
             </div>
@@ -162,7 +162,7 @@
                         <span id="match-status-title" class="text-xs sm:text-sm font-display uppercase tracking-wider text-pizarra-electric font-bold mb-1">CARGANDO FECHA...</span>
                         <div id="match-center-box" class="bg-[#0b0e14]/95 px-4 sm:px-7 py-2.5 rounded-2xl border border-pizarra-border shadow-inner">
                             <span class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">--:--</span>
-                            <span class="block text-[10px] font-mono text-pizarra-electric font-bold tracking-widest uppercase">HORA ART (UTC-3)</span>
+                            <span id="match-center-tz-label" class="block text-[10px] font-mono text-pizarra-electric font-bold tracking-widest uppercase">HORA LOCAL</span>
                         </div>
                         <div id="prev-countdown-pill" class="mt-2.5 px-3 py-1 rounded-full bg-pizarra-accent/20 border border-pizarra-accent/40 flex items-center gap-1.5">
                             <span id="prev-countdown-dot" class="w-1.5 h-1.5 rounded-full bg-pizarra-electric animate-pulse"></span>
@@ -228,9 +228,9 @@
                     </h3>
                     <div class="flex items-center gap-2">
                         <div id="form-streak-badges" class="flex items-center gap-1 font-mono text-xs font-bold"></div>
-                        <button onclick="shareSectionAsPng('LAST_FIVE')" title="Compartir imagen PNG" class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
+                        <button onclick="shareSectionAsPng('LAST_FIVE')" title="Compartir imagen" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                            <span class="text-[10px] font-mono font-bold uppercase">PNG</span>
+                            <span class="text-[10px] font-mono font-bold uppercase">Compartir</span>
                         </button>
                     </div>
                 </div>
@@ -244,10 +244,10 @@
                         Próximos Partidos de Vélez
                     </h3>
                     <div class="flex items-center gap-2">
-                        <span class="px-2.5 py-1 rounded bg-[#0b0e14] border border-pizarra-border text-[11px] font-mono text-pizarra-electric">ART (UTC-3)</span>
-                        <button onclick="shareSectionAsPng('UPCOMING')" title="Compartir imagen PNG" class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
+                        <span id="upcoming-tz-badge" class="px-2.5 py-1 rounded bg-[#0b0e14] border border-pizarra-border text-[11px] font-mono text-pizarra-electric">HORA LOCAL</span>
+                        <button onclick="shareSectionAsPng('UPCOMING')" title="Compartir imagen" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                            <span class="text-[10px] font-mono font-bold uppercase">PNG</span>
+                            <span class="text-[10px] font-mono font-bold uppercase">Compartir</span>
                         </button>
                     </div>
                 </div>
@@ -297,7 +297,7 @@
                         <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
                         Plantilla Oficial & Estadísticas Temporada
                     </h3>
-                    <p id="squad-tournament-caption" class="text-xs text-slate-400">Dorsales oficiales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas exclusivas del Torneo Clausura</p>
+                    <p id="squad-tournament-caption" class="text-xs text-slate-400">Dorsales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas del Grupo A</p>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2">
@@ -381,9 +381,9 @@
                         <h4 class="font-display text-xl font-bold uppercase text-white">Rendimiento & XI</h4>
                         <div class="flex items-center gap-2">
                             <span id="tactical-formation-badge" class="px-2 py-0.5 rounded bg-pizarra-accent/20 text-pizarra-electric font-mono text-xs border border-pizarra-accent/40">4-2-3-1</span>
-                            <button onclick="shareSectionAsPng('PERFORMANCE_XI')" title="Compartir imagen PNG" class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
+                            <button onclick="shareSectionAsPng('PERFORMANCE_XI')" title="Compartir imagen" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                                <span class="text-[10px] font-mono font-bold uppercase">PNG</span>
+                                <span class="text-[10px] font-mono font-bold uppercase">Compartir</span>
                             </button>
                         </div>
                     </div>
@@ -489,6 +489,44 @@
 
         function normalizarTexto(texto) {
             return (texto || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').trim();
+        }
+
+        function getUserTimeZone() {
+            try {
+                return Intl.DateTimeFormat().resolvedOptions().timeZone || undefined;
+            } catch (e) {
+                return undefined;
+            }
+        }
+
+        function formatLocalTime(dateOrMs, options = { hour: '2-digit', minute: '2-digit', hour12: false }) {
+            const d = typeof dateOrMs === 'number' ? new Date(dateOrMs) : new Date(dateOrMs);
+            if (isNaN(d.getTime())) return '';
+            const tz = getUserTimeZone();
+            return d.toLocaleTimeString(undefined, tz ? { ...options, timeZone: tz } : options);
+        }
+
+        function formatLocalDate(dateOrMs, options = { weekday: 'short', day: 'numeric', month: 'short' }) {
+            const d = typeof dateOrMs === 'number' ? new Date(dateOrMs) : new Date(dateOrMs);
+            if (isNaN(d.getTime())) return '';
+            const tz = getUserTimeZone();
+            return d.toLocaleDateString(undefined, tz ? { ...options, timeZone: tz } : options);
+        }
+
+        function getShortZoneLabel(dateOrMs = Date.now()) {
+            const d = typeof dateOrMs === 'number' ? new Date(dateOrMs) : new Date(dateOrMs);
+            if (isNaN(d.getTime())) return 'HORA';
+            const tz = getUserTimeZone();
+            try {
+                const parts = new Intl.DateTimeFormat(undefined, {
+                    timeZone: tz,
+                    timeZoneName: 'short'
+                }).formatToParts(d);
+                const tzPart = parts.find(p => p.type === 'timeZoneName')?.value;
+                return tzPart || 'HORA';
+            } catch (e) {
+                return 'HORA';
+            }
         }
 
         function obtenerPuestoDeMapa(player) {
@@ -643,15 +681,14 @@
         async function exportCanvasAsPng(canvas, filename) {
             try {
                 const blob = await new Promise((resolve, reject) => {
-                    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('No se pudo crear el PNG'))), 'image/png');
+                    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('No se pudo crear el PNG'))), 'image/png', 1);
                 });
                 const file = new File([blob], filename, { type: 'image/png' });
 
                 if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
                     await navigator.share({
                         files: [file],
-                        title: 'La V Azulada • Vélez Sarsfield',
-                        text: 'La V Azulada • Pizarra Táctica y Estadísticas de Vélez Sarsfield'
+                        title: 'La V Azulada • Vélez Sarsfield'
                     });
                     showToast('La V Azulada', 'Placa lista para compartir.');
                     return;
@@ -682,7 +719,6 @@
             canvas.height = 630;
             const ctx = canvas.getContext('2d');
 
-            // Fondo oscuro + acento azul Vélez
             ctx.fillStyle = '#0b0e14';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -696,7 +732,6 @@
             ctx.lineWidth = 3;
             ctx.strokeRect(24, 24, canvas.width - 48, canvas.height - 48);
 
-            // Cabecera de marca
             const logoImg = await loadCanvasImage('./logolva.png') || await loadCanvasImage('./escudo-velez.png');
             if (logoImg) {
                 ctx.drawImage(logoImg, 54, 48, 56, 56);
@@ -739,8 +774,8 @@
 
                 ctx.fillStyle = '#ffffff';
                 ctx.font = '800 42px "Barlow Condensed", sans-serif';
-                ctx.fillText((m.teams?.home?.name || 'Local').toUpperCase(), 280, 250);
-                ctx.fillText((m.teams?.away?.name || 'Visitante').toUpperCase(), 920, 250);
+                ctx.fillText((m.teams?.home?.name || 'Local').toUpperCase(), 260, 250);
+                ctx.fillText((m.teams?.away?.name || 'Visitante').toUpperCase(), 940, 250);
 
                 ctx.fillStyle = '#121721';
                 ctx.fillRect(465, 192, 270, 102);
@@ -756,8 +791,8 @@
                 const aGoals = (m.scorers?.away || []).join('  •  ');
                 ctx.fillStyle = '#e2e8f0';
                 ctx.font = '600 18px "JetBrains Mono", monospace';
-                if (hGoals) ctx.fillText(`⚽ ${hGoals}`, 280, 345);
-                if (aGoals) ctx.fillText(`⚽ ${aGoals}`, 920, 345);
+                if (hGoals) ctx.fillText(`⚽ ${hGoals}`, 260, 345);
+                if (aGoals) ctx.fillText(`⚽ ${aGoals}`, 940, 345);
 
                 if (isLive) {
                     const hCards = [...(m.cards?.home?.red || []).map(x => `🟥 ${x}`), ...(m.cards?.home?.yellow || []).map(x => `🟨 ${x}`)].join('  ');
@@ -765,11 +800,11 @@
                     ctx.font = '600 16px "JetBrains Mono", monospace';
                     if (hCards) {
                         ctx.fillStyle = '#fde68a';
-                        ctx.fillText(hCards, 280, 392);
+                        ctx.fillText(hCards, 260, 392);
                     }
                     if (aCards) {
                         ctx.fillStyle = '#fde68a';
-                        ctx.fillText(aCards, 920, 392);
+                        ctx.fillText(aCards, 940, 392);
                     }
                 }
                 ctx.textAlign = 'left';
@@ -802,25 +837,31 @@
             } else if (sectionKey === 'UPCOMING') {
                 ctx.fillStyle = '#ffffff';
                 ctx.font = '800 32px "Barlow Condensed", sans-serif';
-                ctx.fillText('PRÓXIMOS PARTIDOS DE VÉLEZ (ART)', 54, 168);
+                ctx.fillText('PRÓXIMOS PARTIDOS DE VÉLEZ', 54, 168);
 
                 const rows = (STATE.upcomingMatches || []).slice(0, 4);
                 rows.forEach((item, i) => {
                     const y = 222 + i * 82;
+                    const condLabel = item.cond === 'L' ? 'LOCAL' : 'VISITANTE';
                     ctx.fillStyle = '#121721';
                     ctx.fillRect(54, y - 34, 1092, 62);
-                    ctx.fillStyle = '#38bdf8';
-                    ctx.font = '700 15px "JetBrains Mono", monospace';
-                    ctx.fillText(`${item.fecha} • ${item.cond === 'L' ? 'LOCAL' : 'VISITANTE'}`, 76, y + 3);
+
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.font = '600 14px "JetBrains Mono", monospace';
+                    ctx.fillText((item.fecha || 'PRÓXIMO').slice(0, 26), 76, y + 3);
 
                     ctx.fillStyle = '#ffffff';
-                    ctx.font = '700 26px "Barlow Condensed", sans-serif';
-                    ctx.fillText(`vs ${item.rival.toUpperCase()}`, 340, y + 6);
+                    ctx.font = '700 24px "Barlow Condensed", sans-serif';
+                    ctx.fillText(`vs ${item.rival.toUpperCase()}`, 335, y + 5);
+
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.font = '700 12px "JetBrains Mono", monospace';
+                    ctx.fillText(condLabel, 610, y + 4);
 
                     ctx.textAlign = 'right';
                     ctx.fillStyle = '#e2e8f0';
                     ctx.font = '700 18px "JetBrains Mono", monospace';
-                    ctx.fillText(`${item.date} • ${item.timeART}`, 1124, y + 5);
+                    ctx.fillText(`${item.date} • ${item.timeLocal}`, 1124, y + 5);
                     ctx.textAlign = 'left';
                 });
             } else if (sectionKey === 'PERFORMANCE_XI') {
@@ -854,7 +895,13 @@
             ctx.font = '600 13px "JetBrains Mono", monospace';
             ctx.fillText('LA V AZULADA • CLUB ATLÉTICO VÉLEZ SARSFIELD', 54, canvas.height - 40);
 
-            await exportCanvasAsPng(canvas, `la-v-azulada-${sectionKey.toLowerCase()}.png`);
+            const cleanNameMap = {
+                LIVE_MATCH: 'la-v-azulada-partido.png',
+                LAST_FIVE: 'la-v-azulada-ultimos5.png',
+                UPCOMING: 'la-v-azulada-proximos.png',
+                PERFORMANCE_XI: 'la-v-azulada-rendimiento.png'
+            };
+            await exportCanvasAsPng(canvas, cleanNameMap[sectionKey] || 'la-v-azulada.png');
         }
 
         function initMobileInstallPrompt() {
@@ -908,7 +955,7 @@
 
         function registrarMarcaDeTiempoActualizacion() {
             const ahora = new Date();
-            const horaStr = ahora.toLocaleTimeString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', hour12: false });
+            const horaStr = formatLocalTime(ahora, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
             const el = document.getElementById('last-updated-time');
             if (el) el.textContent = horaStr;
         }
@@ -978,7 +1025,22 @@
                     if (data.rivalLast2) STATE.rivalLast2 = data.rivalLast2;
                     else if (data.rivalLastMatches) STATE.rivalLast2 = data.rivalLastMatches.slice(0, 2);
 
-                    if (data.upcomingMatches) STATE.upcomingMatches = data.upcomingMatches;
+                    if (data.upcomingMatches) {
+                        STATE.upcomingMatches = data.upcomingMatches.map(item => {
+                            const rawMs = item.timestamp || (item.isoDate ? new Date(item.isoDate).getTime() : NaN);
+                            const timeLocal = !isNaN(rawMs)
+                                ? `${formatLocalTime(rawMs)} ${getShortZoneLabel(rawMs)}`.trim()
+                                : (item.timeART || '').replace(/\s*ART\s*/i, '').trim();
+                            const dateLocal = !isNaN(rawMs)
+                                ? formatLocalDate(rawMs)
+                                : item.date;
+                            return {
+                                ...item,
+                                date: dateLocal,
+                                timeLocal
+                            };
+                        });
+                    }
                     if (data.squad) STATE.squad = data.squad;
                     if (data.lastLineup) STATE.lastLineup = data.lastLineup;
                     if (Array.isArray(data.recentLineups) && data.recentLineups.length > 0) {
@@ -1075,9 +1137,14 @@
 
         setInterval(() => {
             const now = new Date();
-            const artStr = now.toLocaleTimeString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', hour12: false });
+            const localStr = formatLocalTime(now, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+            const tzLabel = getShortZoneLabel(now);
             const clockHeader = document.getElementById('header-art-clock');
-            if (clockHeader) clockHeader.textContent = artStr;
+            const tzHeader = document.getElementById('header-tz-label');
+            const upTzBadge = document.getElementById('upcoming-tz-badge');
+            if (clockHeader) clockHeader.textContent = localStr;
+            if (tzHeader) tzHeader.textContent = tzLabel;
+            if (upTzBadge) upTzBadge.textContent = tzLabel;
 
             if (STATE.isLiveMatch) {
                 STATE.countdown = STATE.countdown > 1 ? STATE.countdown - 1 : STATE.pollingIntervalSec;
@@ -1204,7 +1271,7 @@
                     badge.className = "px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold uppercase tracking-wider text-[11px]";
                     const matchDateObj = new Date(cm.isoDate || m.fixture.date);
                     statusTitle.textContent = !isNaN(matchDateObj.getTime())
-                        ? matchDateObj.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Argentina/Buenos_Aires' }).toUpperCase()
+                        ? formatLocalDate(matchDateObj, { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase()
                         : 'RESULTADO FINAL';
                     centerBox.innerHTML = `
                         <span class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">${m.goals.home ?? 0} - ${m.goals.away ?? 0}</span>
@@ -1251,11 +1318,12 @@
                 badge.className = "px-2 py-0.5 rounded bg-sky-500/20 text-pizarra-electric border border-sky-500/40 font-bold uppercase tracking-wider text-[11px]";
                 const matchDateObj = new Date(cm.isoDate || m.fixture.date);
                 if (!isNaN(matchDateObj.getTime())) {
-                    statusTitle.textContent = matchDateObj.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Argentina/Buenos_Aires' }).toUpperCase();
-                    const horaStr = matchDateObj.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Argentina/Buenos_Aires' });
+                    statusTitle.textContent = formatLocalDate(matchDateObj, { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
+                    const horaStr = formatLocalTime(matchDateObj);
+                    const tzShort = getShortZoneLabel(matchDateObj);
                     centerBox.innerHTML = `
                         <span class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">${horaStr}</span>
-                        <span class="block text-[10px] font-mono text-pizarra-electric font-bold tracking-widest uppercase">HORA ART (UTC-3)</span>
+                        <span class="block text-[10px] font-mono text-pizarra-electric font-bold tracking-widest uppercase">${tzShort}</span>
                     `;
                 }
             }
@@ -1331,6 +1399,7 @@
                 const condText = m.cond === 'L' ? 'LOCAL' : (m.cond === 'V' ? 'VISITANTE' : 'NEUTRAL');
                 const condClass = m.cond === 'L' ? 'bg-pizarra-accent/30 text-pizarra-electric border-pizarra-accent/50' : 'bg-slate-800 text-slate-300 border-slate-700';
                 const highlightNext = i === 0 ? 'bg-[#0055a5]/15 border-l-4 border-l-pizarra-electric' : 'hover:bg-pizarra-cardHover/50';
+                const displayTime = m.timeLocal || (m.timeART || '').replace(/\s*ART\s*/i, '').trim();
                 return `
                     <div class="p-3.5 transition flex items-center justify-between gap-3 ${highlightNext}">
                         <div class="flex items-center gap-3 min-w-0 flex-1">
@@ -1343,7 +1412,7 @@
                         </div>
                         <div class="text-right flex-shrink-0 bg-[#0b0e14] px-3 py-1.5 rounded-xl border border-pizarra-border">
                             <div class="font-display text-sm font-bold uppercase text-white">${m.date}</div>
-                            <div class="font-mono text-xs font-bold text-pizarra-electric">${m.timeART}</div>
+                            <div class="font-mono text-xs font-bold text-pizarra-electric">${displayTime}</div>
                         </div>
                     </div>
                 `;
@@ -1474,10 +1543,19 @@
             renderSquadTable();
         }
 
+        function getVelezGroupLabel() {
+            const inGroupA = (STATE.standingsGrupoA || []).some(t => t.isVelez);
+            if (inGroupA) return STATE.grupoAName || 'Grupo A';
+            const inGroupB = (STATE.standingsGrupoB || []).some(t => t.isVelez);
+            if (inGroupB) return STATE.grupoBName || 'Grupo B';
+            return STATE.grupoAName || 'Grupo A';
+        }
+
         function renderSquadTable() {
             const captionEl = document.getElementById('squad-tournament-caption');
+            const velezGroupLabel = getVelezGroupLabel();
             if (captionEl) {
-                captionEl.textContent = `Dorsales oficiales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas exclusivas del ${STATE.activeTournamentName}`;
+                captionEl.textContent = `Dorsales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas del ${velezGroupLabel}`;
             }
 
             const searchQuery = (document.getElementById('squad-search')?.value || '').toLowerCase().trim();
