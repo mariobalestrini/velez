@@ -183,7 +183,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-5 border-t border-pizarra-border/80">
                     <div class="bg-[#0b0e14]/90 rounded-xl border border-pizarra-border p-4 space-y-3.5">
                         <div class="flex items-center justify-between border-b border-pizarra-border pb-2.5">
-                            <h3 class="font-display text-base sm:text-lg font-bold uppercase text-white tracking-wide">Cómo llega Vélez Sarsfield</h3>
+                            <h3 class="font-display text-base sm:text-lg font-bold uppercase text-white tracking-wide">Cómo llega El Fortín</h3>
                             <span class="font-mono text-[11px] text-emerald-400 font-bold">Últimos 2 encuentros</span>
                         </div>
                         <div>
@@ -231,7 +231,7 @@
             </div>
         </section>
 
-        <!-- TABLAS DE POSICIONES (TORNEO ACTUAL Y ANUAL CLASIFICACIÓN A COPAS) -->
+        <!-- TABLAS DE POSICIONES (GRUPO A, GRUPO B Y ANUAL CLASIFICACIÓN A COPAS) -->
         <section class="bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden">
             <div class="p-4 border-b border-pizarra-border flex flex-wrap items-center justify-between gap-3 bg-[#0e131c]">
                 <div>
@@ -242,8 +242,9 @@
                     <p id="standings-subtitle" class="text-xs text-slate-400">Datos oficiales sincronizados en tiempo real • Clasificación a Copas</p>
                 </div>
 
-                <div class="flex bg-[#0b0e14] p-1 rounded-xl border border-pizarra-border text-xs font-semibold">
-                    <button onclick="switchTableTab('TORNEO')" id="tab-TORNEO" class="px-3.5 py-1.5 rounded-lg bg-pizarra-accent text-white transition">Posiciones Torneo</button>
+                <div class="flex flex-wrap bg-[#0b0e14] p-1 rounded-xl border border-pizarra-border text-xs font-semibold gap-1">
+                    <button onclick="switchTableTab('GRUPO_A')" id="tab-GRUPO_A" class="px-3.5 py-1.5 rounded-lg bg-pizarra-accent text-white transition">Posiciones Grupo A</button>
+                    <button onclick="switchTableTab('GRUPO_B')" id="tab-GRUPO_B" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Posiciones Grupo B</button>
                     <button onclick="switchTableTab('ANUAL')" id="tab-ANUAL" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Tabla Anual (Copas)</button>
                 </div>
             </div>
@@ -423,6 +424,12 @@
             'atletico tucuman': 'atletico-tucuman', 'barracas': 'barracas', 'independiente rivadavia': 'independiente-rivadavia'
         };
 
+        // Clasificaciones manuales a Copas en la Tabla Anual
+        // Valores posibles de cupType: 'LIBERTADORES' o 'SUDAMERICANA'
+        const CLASIFICADOS_MANUALES_ANUAL = {
+            'belgrano': { cupType: 'LIBERTADORES', cupNote: 'Campeón Apertura' }
+        };
+
         // Coordenadas en la cancha por puesto táctico (1 al 11)
         const SLOTS_CANCHA = {
             '4-2-3-1': {
@@ -570,7 +577,9 @@
             isLiveMatch: false,
             livePollingTimer: null,
             activeTournamentName: 'Torneo Clausura',
-            activeTableTab: 'TORNEO',
+            grupoAName: 'Grupo A',
+            grupoBName: 'Grupo B',
+            activeTableTab: 'GRUPO_A',
             squadFilterGroup: 'TODOS',
             squadSortCol: 'number',
             squadSortAsc: true,
@@ -585,6 +594,8 @@
             recentLineups: [],
             lastMatchStats: null,
             standingsClausura: [],
+            standingsGrupoA: [],
+            standingsGrupoB: [],
             standingsAnual: []
         };
 
@@ -700,6 +711,8 @@
                     const data = await res.json();
                     
                     if (data.activeTournamentName) STATE.activeTournamentName = data.activeTournamentName;
+                    if (data.grupoAName) STATE.grupoAName = data.grupoAName;
+                    if (data.grupoBName) STATE.grupoBName = data.grupoBName;
                     if (data.currentMatch) STATE.currentMatchData = data.currentMatch;
                     if (data.lastMatches) STATE.lastFiveMatches = data.lastMatches;
                     if (data.velezLast2) STATE.velezLast2 = data.velezLast2;
@@ -718,6 +731,9 @@
                     }
                     if (data.lastMatchStats) STATE.lastMatchStats = data.lastMatchStats;
                     if (data.standingsClausura) STATE.standingsClausura = data.standingsClausura;
+                    if (data.standingsGrupoA) STATE.standingsGrupoA = data.standingsGrupoA;
+                    else if (data.standingsClausura) STATE.standingsGrupoA = data.standingsClausura;
+                    if (data.standingsGrupoB) STATE.standingsGrupoB = data.standingsGrupoB;
                     if (data.standingsAnual) STATE.standingsAnual = data.standingsAnual;
 
                     const isLiveNow = data.currentMatch?.type === 'LIVE';
@@ -1044,7 +1060,7 @@
 
         function switchTableTab(tab) {
             STATE.activeTableTab = tab;
-            ['TORNEO', 'ANUAL'].forEach(t => {
+            ['GRUPO_A', 'GRUPO_B', 'ANUAL'].forEach(t => {
                 const el = document.getElementById(`tab-${t}`);
                 if (el) el.className = t === tab ? 'px-3.5 py-1.5 rounded-lg bg-pizarra-accent text-white transition' : 'px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
             });
@@ -1054,21 +1070,32 @@
         function renderStandingsTable() {
             const thead = document.getElementById('standings-thead');
             const tbody = document.getElementById('standings-tbody');
-            const tabBtnTorneo = document.getElementById('tab-TORNEO');
+            const tabBtnA = document.getElementById('tab-GRUPO_A');
+            const tabBtnB = document.getElementById('tab-GRUPO_B');
             const tab = STATE.activeTableTab;
 
-            if (tabBtnTorneo) {
-                tabBtnTorneo.textContent = `Posiciones ${STATE.activeTournamentName}`;
+            if (tabBtnA) tabBtnA.textContent = `Posiciones ${STATE.grupoAName || 'Grupo A'}`;
+            if (tabBtnB) tabBtnB.textContent = `Posiciones ${STATE.grupoBName || 'Grupo B'}`;
+
+            let sourceList = [];
+            let titleCol = '';
+            if (tab === 'GRUPO_A') {
+                sourceList = STATE.standingsGrupoA.length > 0 ? STATE.standingsGrupoA : STATE.standingsClausura;
+                titleCol = `Equipo (${STATE.grupoAName || 'Grupo A'})`;
+            } else if (tab === 'GRUPO_B') {
+                sourceList = STATE.standingsGrupoB;
+                titleCol = `Equipo (${STATE.grupoBName || 'Grupo B'})`;
+            } else {
+                sourceList = STATE.standingsAnual;
+                titleCol = 'Equipo (Tabla Anual Apertura + Clausura)';
             }
 
-            const sourceList = tab === 'TORNEO' ? STATE.standingsClausura : STATE.standingsAnual;
             if (!sourceList || sourceList.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-500 text-xs">Sincronizando tabla de posiciones...</td></tr>`;
                 return;
             }
 
             const teams = [...sourceList].sort((a, b) => b.pts - a.pts || b.dg - a.dg || (b.gf || 0) - (a.gf || 0));
-            const titleCol = tab === 'TORNEO' ? `Equipo (${STATE.activeTournamentName})` : 'Equipo (Tabla Anual Apertura + Clausura)';
             thead.innerHTML = `<th class="py-2.5 px-3 text-center w-12">#</th><th class="py-2.5 px-3">${titleCol}</th><th class="py-2.5 px-2 text-center font-bold text-white">Pts</th><th class="py-2.5 px-2 text-center">PJ</th><th class="py-2.5 px-2 text-center">PG</th><th class="py-2.5 px-2 text-center">PE</th><th class="py-2.5 px-2 text-center">PP</th><th class="py-2.5 px-3 text-center">DG</th>`;
 
             const hasOfficialCupNotes = teams.some(t => t.cupType === 'LIBERTADORES' || t.cupType === 'SUDAMERICANA');
@@ -1079,23 +1106,35 @@
                 let posBadge = `<span class="font-mono text-xs text-slate-400">${pos}</span>`;
                 let cupTag = '';
 
-                let effectiveCup = t.cupType;
-                if (tab === 'ANUAL' && !hasOfficialCupNotes) {
+                // Revisar si el equipo está cargado en CLASIFICADOS_MANUALES_ANUAL
+                const normTeam = normalizarTexto(t.name);
+                let manualCup = null;
+                if (tab === 'ANUAL') {
+                    for (const [clave, cfg] of Object.entries(CLASIFICADOS_MANUALES_ANUAL)) {
+                        if (normTeam.includes(clave)) {
+                            manualCup = cfg;
+                            break;
+                        }
+                    }
+                }
+
+                let effectiveCup = t.cupType || manualCup?.cupType || null;
+                if (tab === 'ANUAL' && !effectiveCup && !hasOfficialCupNotes) {
                     if (pos <= 3) effectiveCup = 'LIBERTADORES';
                     else if (pos <= 9) effectiveCup = 'SUDAMERICANA';
                 }
 
+                const effectiveNote = t.cupNote || manualCup?.cupNote || (effectiveCup === 'LIBERTADORES' ? 'Copa Libertadores' : 'Copa Sudamericana');
+
                 if (tab === 'ANUAL' || t.cupType) {
                     if (effectiveCup === 'LIBERTADORES') {
-                        const labelText = t.cupNote || 'Copa Libertadores';
                         rowStyle = 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-100 border-l-4 border-l-emerald-500';
                         posBadge = `<span class="inline-flex items-center justify-center w-6 h-6 rounded bg-emerald-500 text-slate-950 font-mono font-extrabold text-xs shadow">${pos}</span>`;
-                        cupTag = `<span class="ml-auto px-1.5 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-mono text-[9px] uppercase tracking-wider hidden sm:inline-block">${labelText}</span>`;
+                        cupTag = `<span class="ml-auto px-1.5 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-mono text-[9px] uppercase tracking-wider hidden sm:inline-block">${effectiveNote}</span>`;
                     } else if (effectiveCup === 'SUDAMERICANA') {
-                        const labelText = t.cupNote || 'Copa Sudamericana';
                         rowStyle = 'bg-amber-400/15 hover:bg-amber-400/25 text-amber-100 border-l-4 border-l-amber-400';
                         posBadge = `<span class="inline-flex items-center justify-center w-6 h-6 rounded bg-amber-400 text-slate-950 font-mono font-extrabold text-xs shadow">${pos}</span>`;
-                        cupTag = `<span class="ml-auto px-1.5 py-0.5 rounded bg-amber-400/20 border border-amber-400/40 text-amber-300 font-mono text-[9px] uppercase tracking-wider hidden sm:inline-block">${labelText}</span>`;
+                        cupTag = `<span class="ml-auto px-1.5 py-0.5 rounded bg-amber-400/20 border border-amber-400/40 text-amber-300 font-mono text-[9px] uppercase tracking-wider hidden sm:inline-block">${effectiveNote}</span>`;
                     }
                 }
 
