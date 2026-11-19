@@ -276,10 +276,16 @@
                     <p id="standings-subtitle" class="text-xs text-slate-400">Datos oficiales sincronizados en tiempo real • Clasificación a Copas</p>
                 </div>
 
-                <div class="flex flex-wrap bg-[#0b0e14] p-1 rounded-xl border border-pizarra-border text-xs font-semibold gap-1">
-                    <button onclick="switchTableTab('GRUPO_A')" id="tab-GRUPO_A" class="px-3.5 py-1.5 rounded-lg bg-pizarra-accent text-white transition">Grupo A</button>
-                    <button onclick="switchTableTab('GRUPO_B')" id="tab-GRUPO_B" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Grupo B</button>
-                    <button onclick="switchTableTab('ANUAL')" id="tab-ANUAL" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Tabla anual (Copas)</button>
+                <div class="flex flex-wrap items-center gap-2">
+                    <div class="flex flex-wrap bg-[#0b0e14] p-1 rounded-xl border border-pizarra-border text-xs font-semibold gap-1">
+                        <button onclick="switchTableTab('GRUPO_A')" id="tab-GRUPO_A" class="px-3.5 py-1.5 rounded-lg bg-pizarra-accent text-white transition">Grupo A</button>
+                        <button onclick="switchTableTab('GRUPO_B')" id="tab-GRUPO_B" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Grupo B</button>
+                        <button onclick="switchTableTab('ANUAL')" id="tab-ANUAL" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Tabla anual (Copas)</button>
+                    </div>
+                    <button onclick="shareSectionAsPng('STANDINGS')" title="Compartir tabla en historia" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                        <span class="text-[10px] font-mono font-bold uppercase">Compartir</span>
+                    </button>
                 </div>
             </div>
 
@@ -908,6 +914,67 @@
                     ctx.fillText(`${item.timeLocal}`, 964, y + 26);
                     ctx.textAlign = 'left';
                 });
+            } else if (sectionKey === 'STANDINGS') {
+                const tab = STATE.activeTableTab;
+                let sourceList = [];
+                let tabTitle = '';
+                if (tab === 'GRUPO_A') {
+                    sourceList = STATE.standingsGrupoA.length > 0 ? STATE.standingsGrupoA : STATE.standingsClausura;
+                    tabTitle = (STATE.grupoAName || 'GRUPO A').toUpperCase();
+                } else if (tab === 'GRUPO_B') {
+                    sourceList = STATE.standingsGrupoB;
+                    tabTitle = (STATE.grupoBName || 'GRUPO B').toUpperCase();
+                } else {
+                    sourceList = STATE.standingsAnual;
+                    tabTitle = 'TABLA ANUAL (COPAS)';
+                }
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '800 46px "Barlow Condensed", sans-serif';
+                ctx.fillText(`TABLAS DE PRIMERA DIVISIÓN • ${tabTitle}`, 84, 286);
+
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '700 18px "JetBrains Mono", monospace';
+                ctx.fillText('#', 106, 336);
+                ctx.fillText('EQUIPO', 175, 336);
+                ctx.textAlign = 'right';
+                ctx.fillText('PJ', 775, 336);
+                ctx.fillText('DG', 865, 336);
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText('PTS', 964, 336);
+                ctx.textAlign = 'left';
+
+                const sortedTeams = [...(sourceList || [])].sort((a, b) => b.pts - a.pts || b.dg - a.dg || (b.gf || 0) - (a.gf || 0)).slice(0, 14);
+                sortedTeams.forEach((t, idx) => {
+                    const y = 385 + idx * 92;
+                    ctx.fillStyle = t.isVelez ? 'rgba(0, 85, 165, 0.35)' : '#121721';
+                    ctx.fillRect(84, y - 34, 912, 74);
+                    ctx.strokeStyle = t.isVelez ? '#38bdf8' : '#1f293a';
+                    ctx.lineWidth = t.isVelez ? 2.5 : 1.5;
+                    ctx.strokeRect(84, y - 34, 912, 74);
+
+                    ctx.fillStyle = t.isVelez ? '#38bdf8' : '#94a3b8';
+                    ctx.font = '700 22px "JetBrains Mono", monospace';
+                    ctx.fillText(String(idx + 1), 106, y + 11);
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = `${t.isVelez ? '800' : '700'} 30px "Barlow Condensed", sans-serif`;
+                    ctx.fillText((t.name || '').toUpperCase().slice(0, 26), 175, y + 12);
+
+                    ctx.textAlign = 'right';
+                    ctx.fillStyle = '#cbd5e1';
+                    ctx.font = '600 20px "JetBrains Mono", monospace';
+                    ctx.fillText(String(t.pj ?? 0), 775, y + 10);
+
+                    const dgVal = t.dg ?? 0;
+                    ctx.fillStyle = dgVal >= 0 ? '#34d399' : '#fb7185';
+                    ctx.fillText(dgVal > 0 ? `+${dgVal}` : String(dgVal), 865, y + 10);
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = '800 24px "JetBrains Mono", monospace';
+                    ctx.fillText(String(t.pts ?? 0), 964, y + 11);
+                    ctx.textAlign = 'left';
+                });
             } else if (sectionKey === 'FORMATION') {
                 const lineups = STATE.recentLineups || [];
                 const lineup = lineups[STATE.selectedLineupIdx] || STATE.lastLineup;
@@ -1046,6 +1113,7 @@
                 LIVE_MATCH: 'lavazulada-historia-partido.png',
                 LAST_FIVE: 'lavazulada-historia-ultimos5.png',
                 UPCOMING: 'lavazulada-historia-proximos.png',
+                STANDINGS: 'lavazulada-historia-posiciones.png',
                 FORMATION: 'lavazulada-historia-formacion.png',
                 PERFORMANCE_XI: 'lavazulada-historia-rendimiento.png'
             };
