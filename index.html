@@ -177,7 +177,7 @@
                     </div>
                 </div>
 
-                <!-- GOLEADORES Y TARJETAS EN VIVO -->
+                <!-- GOLEADORES, TARJETAS Y POSESIÓN EN VIVO -->
                 <div class="space-y-2">
                     <div id="live-scorers-box" class="hidden pt-3 border-t border-pizarra-border/60 grid grid-cols-2 gap-4 text-xs font-mono leading-relaxed">
                         <div id="live-scorers-home" class="text-right space-y-1 text-slate-300 pr-2 border-r border-pizarra-border/50 min-w-0"></div>
@@ -188,6 +188,19 @@
                     <div id="live-cards-box" class="hidden mt-2 pt-2.5 border-t border-pizarra-border/40 grid grid-cols-2 gap-4 text-xs font-mono leading-relaxed">
                         <div id="live-cards-home" class="text-right space-y-1 text-slate-300 pr-2 border-r border-pizarra-border/50 min-w-0"></div>
                         <div id="live-cards-away" class="text-left space-y-1 text-slate-300 pl-2 min-w-0"></div>
+                    </div>
+
+                    <!-- POSESIÓN EN VIVO DEL PARTIDO EN CURSO -->
+                    <div id="live-possession-box" class="hidden mt-2 pt-2.5 border-t border-pizarra-border/40 max-w-md mx-auto w-full">
+                        <div class="flex items-center justify-between text-[11px] font-mono mb-1">
+                            <span id="live-poss-home-label" class="text-pizarra-electric font-bold">Local: --%</span>
+                            <span class="text-slate-400 uppercase text-[10px]">Posesión</span>
+                            <span id="live-poss-away-label" class="text-slate-300 font-bold">Visitante: --%</span>
+                        </div>
+                        <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden flex">
+                            <div id="live-poss-home-bar" style="width: 50%" class="bg-[#0055a5] h-full transition-all duration-300"></div>
+                            <div id="live-poss-away-bar" style="width: 50%" class="bg-slate-600 h-full transition-all duration-300"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -913,7 +926,6 @@
                 ctx.font = '700 22px "JetBrains Mono", monospace';
                 ctx.fillText(detalleLineup, 84, 304);
 
-                // Dibujar cancha dentro del canvas (x: 150..930, y: 340..1650)
                 const px = 150;
                 const py = 340;
                 const pw = 780;
@@ -930,7 +942,6 @@
                 ctx.lineWidth = 4;
                 ctx.strokeRect(px + 24, py + 24, pw - 48, ph - 48);
 
-                // Línea de medio campo y círculo central
                 const midY = py + ph / 2;
                 ctx.beginPath();
                 ctx.moveTo(px + 24, midY);
@@ -941,7 +952,6 @@
                 ctx.arc(px + pw / 2, midY, 105, 0, Math.PI * 2);
                 ctx.stroke();
 
-                // Áreas
                 ctx.strokeRect(px + pw * 0.25, py + 24, pw * 0.5, 165);
                 ctx.strokeRect(px + pw * 0.25, py + ph - 189, pw * 0.5, 165);
 
@@ -1015,7 +1025,6 @@
                 });
             }
 
-            // Pie de la historia con dominio y redes sociales
             ctx.strokeStyle = '#1f293a';
             ctx.lineWidth = 2;
             ctx.beginPath();
@@ -1349,6 +1358,11 @@
             const cardsBox = document.getElementById('live-cards-box');
             const cardsHome = document.getElementById('live-cards-home');
             const cardsAway = document.getElementById('live-cards-away');
+            const possBox = document.getElementById('live-possession-box');
+            const possHomeLabel = document.getElementById('live-poss-home-label');
+            const possAwayLabel = document.getElementById('live-poss-away-label');
+            const possHomeBar = document.getElementById('live-poss-home-bar');
+            const possAwayBar = document.getElementById('live-poss-away-bar');
             const shareLiveBtn = document.getElementById('share-live-match-btn');
 
             const m = cm.match;
@@ -1366,6 +1380,7 @@
             if (cm.type === 'TBD') {
                 if (scorersBox) scorersBox.classList.add('hidden');
                 if (cardsBox) cardsBox.classList.add('hidden');
+                if (possBox) possBox.classList.add('hidden');
                 badge.textContent = "PRÓXIMO ENCUENTRO";
                 badge.className = "px-2 py-0.5 rounded bg-slate-700/60 text-slate-300 border border-slate-600 font-bold uppercase tracking-wider text-[11px]";
                 if (homeRole) homeRole.textContent = "C.A.V.S.";
@@ -1448,9 +1463,22 @@
                 } else if (cardsBox) {
                     cardsBox.classList.add('hidden');
                 }
+
+                if (cm.type === 'LIVE' && possBox && m.possession && typeof m.possession.home === 'number' && typeof m.possession.away === 'number') {
+                    const hp = Math.max(0, Math.min(100, Math.round(m.possession.home)));
+                    const ap = Math.max(0, Math.min(100, Math.round(m.possession.away)));
+                    possBox.classList.remove('hidden');
+                    if (possHomeLabel) possHomeLabel.textContent = `${m.teams.home.name}: ${hp}%`;
+                    if (possAwayLabel) possAwayLabel.textContent = `${m.teams.away.name}: ${ap}%`;
+                    if (possHomeBar) possHomeBar.style.width = `${hp}%`;
+                    if (possAwayBar) possAwayBar.style.width = `${ap}%`;
+                } else if (possBox) {
+                    possBox.classList.add('hidden');
+                }
             } else {
                 if (scorersBox) scorersBox.classList.add('hidden');
                 if (cardsBox) cardsBox.classList.add('hidden');
+                if (possBox) possBox.classList.add('hidden');
                 badge.textContent = "PRÓXIMO PARTIDO OFICIAL";
                 badge.className = "px-2 py-0.5 rounded bg-sky-500/20 text-pizarra-electric border border-sky-500/40 font-bold uppercase tracking-wider text-[11px]";
                 const matchDateObj = new Date(cm.isoDate || m.fixture.date);
