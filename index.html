@@ -1464,7 +1464,7 @@
         }
 
         function renderAll() {
-            document.getElementById('header-velez-crest').innerHTML = renderEscudoImg('Vélez Sarsfield', 'w-10 h-10 sm:w-11 sm:h-11', MI_ESCUDO_VELEZ);
+            document.getElementById('header-velez-crest').innerHTML = `<img src="./logolva.png" onerror="this.onerror=null;this.src='${MI_ESCUDO_VELEZ}';" alt="La V Azulada" class="w-10 h-10 sm:w-11 sm:h-11 object-contain select-none">`;
             renderMatchCenter();
             renderLastFiveMatches();
             renderUpcomingMatches();
