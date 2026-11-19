@@ -931,35 +931,35 @@
 
                 ctx.fillStyle = '#ffffff';
                 ctx.font = '800 46px "Barlow Condensed", sans-serif';
-                ctx.fillText(`TABLAS DE PRIMERA DIVISIÓN • ${tabTitle}`, 84, 286);
+                ctx.fillText(`TABLAS DE PRIMERA DIVISIÓN • ${tabTitle}`, 84, 276);
 
                 ctx.fillStyle = '#94a3b8';
                 ctx.font = '700 18px "JetBrains Mono", monospace';
-                ctx.fillText('#', 106, 336);
-                ctx.fillText('EQUIPO', 175, 336);
+                ctx.fillText('#', 106, 324);
+                ctx.fillText('EQUIPO', 175, 324);
                 ctx.textAlign = 'right';
-                ctx.fillText('PJ', 775, 336);
-                ctx.fillText('DG', 865, 336);
+                ctx.fillText('PJ', 775, 324);
+                ctx.fillText('DG', 865, 324);
                 ctx.fillStyle = '#ffffff';
-                ctx.fillText('PTS', 964, 336);
+                ctx.fillText('PTS', 964, 324);
                 ctx.textAlign = 'left';
 
-                const sortedTeams = [...(sourceList || [])].sort((a, b) => b.pts - a.pts || b.dg - a.dg || (b.gf || 0) - (a.gf || 0)).slice(0, 14);
+                const sortedTeams = [...(sourceList || [])].sort((a, b) => b.pts - a.pts || b.dg - a.dg || (b.gf || 0) - (a.gf || 0)).slice(0, 15);
                 sortedTeams.forEach((t, idx) => {
-                    const y = 385 + idx * 92;
+                    const y = 375 + idx * 86;
                     ctx.fillStyle = t.isVelez ? 'rgba(0, 85, 165, 0.35)' : '#121721';
-                    ctx.fillRect(84, y - 34, 912, 74);
+                    ctx.fillRect(84, y - 32, 912, 70);
                     ctx.strokeStyle = t.isVelez ? '#38bdf8' : '#1f293a';
                     ctx.lineWidth = t.isVelez ? 2.5 : 1.5;
-                    ctx.strokeRect(84, y - 34, 912, 74);
+                    ctx.strokeRect(84, y - 32, 912, 70);
 
                     ctx.fillStyle = t.isVelez ? '#38bdf8' : '#94a3b8';
                     ctx.font = '700 22px "JetBrains Mono", monospace';
                     ctx.fillText(String(idx + 1), 106, y + 11);
 
                     ctx.fillStyle = '#ffffff';
-                    ctx.font = `${t.isVelez ? '800' : '700'} 30px "Barlow Condensed", sans-serif`;
-                    ctx.fillText((t.name || '').toUpperCase().slice(0, 26), 175, y + 12);
+                    ctx.font = `${t.isVelez ? '800' : '700'} 29px "Barlow Condensed", sans-serif`;
+                    ctx.fillText((t.name || '').toUpperCase().slice(0, 26), 175, y + 11);
 
                     ctx.textAlign = 'right';
                     ctx.fillStyle = '#cbd5e1';
