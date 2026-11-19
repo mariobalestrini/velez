@@ -143,6 +143,10 @@
                     <span>📍 <span id="match-stadium" class="text-white">Estadio José Amalfitani (Liniers)</span></span>
                     <span class="hidden sm:inline text-slate-600">|</span>
                     <span>📺 <span class="text-pizarra-electric font-bold">ESPN Premium / TNT Sports</span></span>
+                    <button id="share-live-match-btn" onclick="shareSectionAsPng('LIVE_MATCH')" title="Generar imagen PNG para compartir" class="hidden items-center gap-1 px-2 py-1 rounded-md bg-[#121721] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                        <span class="text-[10px] font-bold uppercase">PNG</span>
+                    </button>
                 </div>
             </div>
 
@@ -222,18 +226,30 @@
                         <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
                         Últimos 5 Partidos Disputados
                     </h3>
-                    <div id="form-streak-badges" class="flex items-center gap-1 font-mono text-xs font-bold"></div>
+                    <div class="flex items-center gap-2">
+                        <div id="form-streak-badges" class="flex items-center gap-1 font-mono text-xs font-bold"></div>
+                        <button onclick="shareSectionAsPng('LAST_FIVE')" title="Compartir imagen PNG" class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                            <span class="text-[10px] font-mono font-bold uppercase">PNG</span>
+                        </button>
+                    </div>
                 </div>
                 <div id="last-five-list" class="divide-y divide-pizarra-border/70 flex-1"></div>
             </div>
 
             <div class="lg:col-span-6 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden flex flex-col">
-                <div class="p-4 border-b border-pizarra-border flex items-center justify-between bg-[#0e131c]">
+                <div class="p-4 border-b border-pizarra-border flex items-center justify-between gap-2 bg-[#0e131c]">
                     <h3 class="font-display text-xl font-bold uppercase tracking-wide text-white flex items-center gap-2">
                         <span class="w-1.5 h-5 bg-pizarra-electric rounded-full"></span>
                         Próximos Partidos de Vélez
                     </h3>
-                    <span class="px-2.5 py-1 rounded bg-[#0b0e14] border border-pizarra-border text-[11px] font-mono text-pizarra-electric">ART (UTC-3)</span>
+                    <div class="flex items-center gap-2">
+                        <span class="px-2.5 py-1 rounded bg-[#0b0e14] border border-pizarra-border text-[11px] font-mono text-pizarra-electric">ART (UTC-3)</span>
+                        <button onclick="shareSectionAsPng('UPCOMING')" title="Compartir imagen PNG" class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                            <span class="text-[10px] font-mono font-bold uppercase">PNG</span>
+                        </button>
+                    </div>
                 </div>
                 <div id="upcoming-matches-list" class="divide-y divide-pizarra-border/70 flex-1"></div>
             </div>
@@ -361,9 +377,15 @@
 
             <div class="lg:col-span-5 bg-pizarra-card rounded-2xl border border-pizarra-border p-5 flex flex-col justify-between space-y-4">
                 <div>
-                    <div class="flex items-center justify-between border-b border-pizarra-border pb-3 mb-3.5">
+                    <div class="flex items-center justify-between gap-2 border-b border-pizarra-border pb-3 mb-3.5">
                         <h4 class="font-display text-xl font-bold uppercase text-white">Rendimiento & XI</h4>
-                        <span id="tactical-formation-badge" class="px-2 py-0.5 rounded bg-pizarra-accent/20 text-pizarra-electric font-mono text-xs border border-pizarra-accent/40">4-2-3-1</span>
+                        <div class="flex items-center gap-2">
+                            <span id="tactical-formation-badge" class="px-2 py-0.5 rounded bg-pizarra-accent/20 text-pizarra-electric font-mono text-xs border border-pizarra-accent/40">4-2-3-1</span>
+                            <button onclick="shareSectionAsPng('PERFORMANCE_XI')" title="Compartir imagen PNG" class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                                <span class="text-[10px] font-mono font-bold uppercase">PNG</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="space-y-2.5 text-xs text-slate-300 leading-relaxed">
                         <!-- 1. BALANCE DE GOLES -->
@@ -603,6 +625,237 @@
             standingsGrupoB: [],
             standingsAnual: []
         };
+
+        // --- GENERACIÓN DE PLACA PNG PARA COMPARTIR EN REDES Y WHATSAPP ---
+        function loadCanvasImage(src) {
+            return new Promise((resolve) => {
+                if (!src) return resolve(null);
+                const img = new Image();
+                if (/^https?:\/\//i.test(src)) {
+                    img.crossOrigin = 'anonymous';
+                }
+                img.onload = () => resolve(img);
+                img.onerror = () => resolve(null);
+                img.src = src;
+            });
+        }
+
+        async function exportCanvasAsPng(canvas, filename) {
+            try {
+                const blob = await new Promise((resolve, reject) => {
+                    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('No se pudo crear el PNG'))), 'image/png');
+                });
+                const file = new File([blob], filename, { type: 'image/png' });
+
+                if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+                    await navigator.share({
+                        files: [file],
+                        title: 'La V Azulada • Vélez Sarsfield',
+                        text: 'La V Azulada • Pizarra Táctica y Estadísticas de Vélez Sarsfield'
+                    });
+                    showToast('La V Azulada', 'Placa lista para compartir.');
+                    return;
+                }
+
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 4000);
+                showToast('La V Azulada', `Imagen ${filename} descargada.`);
+            } catch (err) {
+                if (err && err.name === 'AbortError') return;
+                showToast('La V Azulada', 'No se pudo generar la imagen en este momento.');
+            }
+        }
+
+        async function shareSectionAsPng(sectionKey) {
+            if (document.fonts && document.fonts.ready) {
+                try { await document.fonts.ready; } catch (e) {}
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 1200;
+            canvas.height = 630;
+            const ctx = canvas.getContext('2d');
+
+            // Fondo oscuro + acento azul Vélez
+            ctx.fillStyle = '#0b0e14';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const grad = ctx.createRadialGradient(180, 70, 20, 180, 70, 560);
+            grad.addColorStop(0, 'rgba(0, 85, 165, 0.35)');
+            grad.addColorStop(1, 'rgba(11, 14, 20, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = '#1f293a';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(24, 24, canvas.width - 48, canvas.height - 48);
+
+            // Cabecera de marca
+            const logoImg = await loadCanvasImage('./logolva.png') || await loadCanvasImage('./escudo-velez.png');
+            if (logoImg) {
+                ctx.drawImage(logoImg, 54, 48, 56, 56);
+            }
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '800 34px "Barlow Condensed", sans-serif';
+            ctx.fillText('LA V AZULADA', 124, 80);
+
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = '700 15px "JetBrains Mono", monospace';
+            ctx.fillText('C.A. VÉLEZ SARSFIELD • 1910', 124, 102);
+
+            ctx.fillStyle = '#64748b';
+            ctx.font = '600 14px "JetBrains Mono", monospace';
+            ctx.textAlign = 'right';
+            ctx.fillText('PIZARRA TÁCTICA & ESTADÍSTICAS', canvas.width - 54, 82);
+            ctx.textAlign = 'left';
+
+            ctx.strokeStyle = '#1f293a';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(54, 122);
+            ctx.lineTo(canvas.width - 54, 122);
+            ctx.stroke();
+
+            if (sectionKey === 'LIVE_MATCH') {
+                const cm = STATE.currentMatchData;
+                const m = cm?.match;
+                if (!m || (cm.type !== 'LIVE' && cm.type !== 'FINISHED_24H')) return;
+
+                const isLive = cm.type === 'LIVE';
+                ctx.fillStyle = isLive ? '#ef4444' : '#10b981';
+                ctx.font = '700 18px "JetBrains Mono", monospace';
+                ctx.textAlign = 'center';
+                const statusLabel = isLive
+                    ? `EN VIVO • ${m.fixture?.status?.elapsed || 'EN JUEGO'}`
+                    : 'RESULTADO FINAL';
+                ctx.fillText(statusLabel, 600, 168);
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '800 42px "Barlow Condensed", sans-serif';
+                ctx.fillText((m.teams?.home?.name || 'Local').toUpperCase(), 280, 250);
+                ctx.fillText((m.teams?.away?.name || 'Visitante').toUpperCase(), 920, 250);
+
+                ctx.fillStyle = '#121721';
+                ctx.fillRect(465, 192, 270, 102);
+                ctx.strokeStyle = '#0055a5';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(465, 192, 270, 102);
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '800 64px "Barlow Condensed", sans-serif';
+                ctx.fillText(`${m.goals?.home ?? 0} - ${m.goals?.away ?? 0}`, 600, 264);
+
+                const hGoals = (m.scorers?.home || []).join('  •  ');
+                const aGoals = (m.scorers?.away || []).join('  •  ');
+                ctx.fillStyle = '#e2e8f0';
+                ctx.font = '600 18px "JetBrains Mono", monospace';
+                if (hGoals) ctx.fillText(`⚽ ${hGoals}`, 280, 345);
+                if (aGoals) ctx.fillText(`⚽ ${aGoals}`, 920, 345);
+
+                if (isLive) {
+                    const hCards = [...(m.cards?.home?.red || []).map(x => `🟥 ${x}`), ...(m.cards?.home?.yellow || []).map(x => `🟨 ${x}`)].join('  ');
+                    const aCards = [...(m.cards?.away?.red || []).map(x => `🟥 ${x}`), ...(m.cards?.away?.yellow || []).map(x => `🟨 ${x}`)].join('  ');
+                    ctx.font = '600 16px "JetBrains Mono", monospace';
+                    if (hCards) {
+                        ctx.fillStyle = '#fde68a';
+                        ctx.fillText(hCards, 280, 392);
+                    }
+                    if (aCards) {
+                        ctx.fillStyle = '#fde68a';
+                        ctx.fillText(aCards, 920, 392);
+                    }
+                }
+                ctx.textAlign = 'left';
+            } else if (sectionKey === 'LAST_FIVE') {
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '800 32px "Barlow Condensed", sans-serif';
+                ctx.fillText('ÚLTIMOS 5 PARTIDOS DISPUTADOS', 54, 168);
+
+                const rows = (STATE.lastFiveMatches || []).slice(0, 5);
+                rows.forEach((item, i) => {
+                    const y = 215 + i * 68;
+                    ctx.fillStyle = '#121721';
+                    ctx.fillRect(54, y - 30, 1092, 54);
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.font = '600 15px "JetBrains Mono", monospace';
+                    ctx.fillText(`${item.date} • ${item.cond === 'L' ? 'LOCAL' : 'VISITANTE'}`, 76, y + 4);
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = '700 24px "Barlow Condensed", sans-serif';
+                    const cruce = item.cond === 'L' ? `VÉLEZ vs ${item.rival.toUpperCase()}` : `${item.rival.toUpperCase()} vs VÉLEZ`;
+                    ctx.fillText(cruce, 340, y + 6);
+
+                    ctx.textAlign = 'right';
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.font = '700 22px "JetBrains Mono", monospace';
+                    const marcador = item.cond === 'L' ? `${item.velezGoals} - ${item.rivalGoals}` : `${item.rivalGoals} - ${item.velezGoals}`;
+                    ctx.fillText(`${marcador}   [${item.outcome}]`, 1124, y + 5);
+                    ctx.textAlign = 'left';
+                });
+            } else if (sectionKey === 'UPCOMING') {
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '800 32px "Barlow Condensed", sans-serif';
+                ctx.fillText('PRÓXIMOS PARTIDOS DE VÉLEZ (ART)', 54, 168);
+
+                const rows = (STATE.upcomingMatches || []).slice(0, 4);
+                rows.forEach((item, i) => {
+                    const y = 222 + i * 82;
+                    ctx.fillStyle = '#121721';
+                    ctx.fillRect(54, y - 34, 1092, 62);
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.font = '700 15px "JetBrains Mono", monospace';
+                    ctx.fillText(`${item.fecha} • ${item.cond === 'L' ? 'LOCAL' : 'VISITANTE'}`, 76, y + 3);
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = '700 26px "Barlow Condensed", sans-serif';
+                    ctx.fillText(`vs ${item.rival.toUpperCase()}`, 340, y + 6);
+
+                    ctx.textAlign = 'right';
+                    ctx.fillStyle = '#e2e8f0';
+                    ctx.font = '700 18px "JetBrains Mono", monospace';
+                    ctx.fillText(`${item.date} • ${item.timeART}`, 1124, y + 5);
+                    ctx.textAlign = 'left';
+                });
+            } else if (sectionKey === 'PERFORMANCE_XI') {
+                const formName = document.getElementById('tactical-formation-badge')?.textContent || '4-2-3-1';
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '800 32px "Barlow Condensed", sans-serif';
+                ctx.fillText(`RENDIMIENTO & XI • ESQUEMA ${formName}`, 54, 168);
+
+                const items = [
+                    { label: 'BALANCE DE GOLES', text: document.getElementById('tactical-card-1')?.textContent || '' },
+                    { label: 'GOLEADOR EN EL TORNEO', text: document.getElementById('tactical-card-scorers')?.textContent || '' },
+                    { label: 'MÁS AMARILLAS', text: document.getElementById('tactical-card-yellows')?.textContent || '' },
+                    { label: 'MÁS ROJAS', text: document.getElementById('tactical-card-reds')?.textContent || '' }
+                ];
+
+                items.forEach((box, i) => {
+                    const y = 216 + i * 82;
+                    ctx.fillStyle = '#121721';
+                    ctx.fillRect(54, y - 30, 1092, 64);
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.font = '700 13px "JetBrains Mono", monospace';
+                    ctx.fillText(box.label, 76, y - 6);
+
+                    ctx.fillStyle = '#e2e8f0';
+                    ctx.font = '500 17px Inter, sans-serif';
+                    ctx.fillText(box.text.slice(0, 108), 76, y + 20);
+                });
+            }
+
+            ctx.fillStyle = '#64748b';
+            ctx.font = '600 13px "JetBrains Mono", monospace';
+            ctx.fillText('LA V AZULADA • CLUB ATLÉTICO VÉLEZ SARSFIELD', 54, canvas.height - 40);
+
+            await exportCanvasAsPng(canvas, `la-v-azulada-${sectionKey.toLowerCase()}.png`);
+        }
 
         function initMobileInstallPrompt() {
             const banner = document.getElementById('pwa-install-banner');
@@ -892,12 +1145,19 @@
             const cardsBox = document.getElementById('live-cards-box');
             const cardsHome = document.getElementById('live-cards-home');
             const cardsAway = document.getElementById('live-cards-away');
+            const shareLiveBtn = document.getElementById('share-live-match-btn');
 
             const m = cm.match;
             homeCrest.innerHTML = renderEscudoImg(m.teams.home, 'w-16 h-16 sm:w-20 sm:h-20', m.teams.home.logo);
             awayCrest.innerHTML = renderEscudoImg(m.teams.away, 'w-16 h-16 sm:w-20 sm:h-20', m.teams.away.logo);
             homeName.textContent = m.teams.home.name;
             awayName.textContent = m.teams.away.name;
+
+            const showShareForMatch = cm.type === 'LIVE' || cm.type === 'FINISHED_24H';
+            if (shareLiveBtn) {
+                shareLiveBtn.classList.toggle('hidden', !showShareForMatch);
+                shareLiveBtn.classList.toggle('inline-flex', showShareForMatch);
+            }
 
             if (cm.type === 'TBD') {
                 if (scorersBox) scorersBox.classList.add('hidden');
@@ -1217,7 +1477,7 @@
         function renderSquadTable() {
             const captionEl = document.getElementById('squad-tournament-caption');
             if (captionEl) {
-                captionEl.textContent = `Dorsales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas del ${STATE.activeTournamentName}`;
+                captionEl.textContent = `Dorsales oficiales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas exclusivas del ${STATE.activeTournamentName}`;
             }
 
             const searchQuery = (document.getElementById('squad-search')?.value || '').toLowerCase().trim();
