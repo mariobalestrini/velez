@@ -243,13 +243,10 @@
                         <span class="w-1.5 h-5 bg-pizarra-electric rounded-full"></span>
                         Próximos Partidos de Vélez
                     </h3>
-                    <div class="flex items-center gap-2">
-                        <span id="upcoming-tz-badge" class="px-2.5 py-1 rounded bg-[#0b0e14] border border-pizarra-border text-[11px] font-mono text-pizarra-electric">HORA LOCAL</span>
-                        <button onclick="shareSectionAsPng('UPCOMING')" title="Compartir imagen" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                            <span class="text-[10px] font-mono font-bold uppercase">Compartir</span>
-                        </button>
-                    </div>
+                    <button onclick="shareSectionAsPng('UPCOMING')" title="Compartir imagen" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                        <span class="text-[10px] font-mono font-bold uppercase">Compartir</span>
+                    </button>
                 </div>
                 <div id="upcoming-matches-list" class="divide-y divide-pizarra-border/70 flex-1"></div>
             </div>
@@ -267,9 +264,9 @@
                 </div>
 
                 <div class="flex flex-wrap bg-[#0b0e14] p-1 rounded-xl border border-pizarra-border text-xs font-semibold gap-1">
-                    <button onclick="switchTableTab('GRUPO_A')" id="tab-GRUPO_A" class="px-3.5 py-1.5 rounded-lg bg-pizarra-accent text-white transition">Posiciones Grupo A</button>
-                    <button onclick="switchTableTab('GRUPO_B')" id="tab-GRUPO_B" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Posiciones Grupo B</button>
-                    <button onclick="switchTableTab('ANUAL')" id="tab-ANUAL" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Tabla Anual (Copas)</button>
+                    <button onclick="switchTableTab('GRUPO_A')" id="tab-GRUPO_A" class="px-3.5 py-1.5 rounded-lg bg-pizarra-accent text-white transition">Grupo A</button>
+                    <button onclick="switchTableTab('GRUPO_B')" id="tab-GRUPO_B" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Grupo B</button>
+                    <button onclick="switchTableTab('ANUAL')" id="tab-ANUAL" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Tabla anual (Copas)</button>
                 </div>
             </div>
 
@@ -847,16 +844,16 @@
                     ctx.fillRect(54, y - 34, 1092, 62);
 
                     ctx.fillStyle = '#94a3b8';
-                    ctx.font = '600 14px "JetBrains Mono", monospace';
-                    ctx.fillText((item.fecha || 'PRÓXIMO').slice(0, 26), 76, y + 3);
+                    ctx.font = '600 13px "JetBrains Mono", monospace';
+                    ctx.fillText((item.fecha || 'PRÓXIMO').slice(0, 24), 76, y + 4);
 
                     ctx.fillStyle = '#ffffff';
                     ctx.font = '700 24px "Barlow Condensed", sans-serif';
-                    ctx.fillText(`vs ${item.rival.toUpperCase()}`, 335, y + 5);
+                    ctx.fillText(`vs ${item.rival.toUpperCase()}`, 330, y + 5);
 
                     ctx.fillStyle = '#38bdf8';
-                    ctx.font = '700 12px "JetBrains Mono", monospace';
-                    ctx.fillText(condLabel, 610, y + 4);
+                    ctx.font = '700 11px "JetBrains Mono", monospace';
+                    ctx.fillText(condLabel, 635, y + 4);
 
                     ctx.textAlign = 'right';
                     ctx.fillStyle = '#e2e8f0';
@@ -1141,10 +1138,8 @@
             const tzLabel = getShortZoneLabel(now);
             const clockHeader = document.getElementById('header-art-clock');
             const tzHeader = document.getElementById('header-tz-label');
-            const upTzBadge = document.getElementById('upcoming-tz-badge');
             if (clockHeader) clockHeader.textContent = localStr;
             if (tzHeader) tzHeader.textContent = tzLabel;
-            if (upTzBadge) upTzBadge.textContent = tzLabel;
 
             if (STATE.isLiveMatch) {
                 STATE.countdown = STATE.countdown > 1 ? STATE.countdown - 1 : STATE.pollingIntervalSec;
@@ -1435,8 +1430,8 @@
             const tabBtnB = document.getElementById('tab-GRUPO_B');
             const tab = STATE.activeTableTab;
 
-            if (tabBtnA) tabBtnA.textContent = `Posiciones ${STATE.grupoAName || 'Grupo A'}`;
-            if (tabBtnB) tabBtnB.textContent = `Posiciones ${STATE.grupoBName || 'Grupo B'}`;
+            if (tabBtnA) tabBtnA.textContent = STATE.grupoAName || 'Grupo A';
+            if (tabBtnB) tabBtnB.textContent = STATE.grupoBName || 'Grupo B';
 
             let sourceList = [];
             let titleCol = '';
@@ -1448,7 +1443,7 @@
                 titleCol = `Equipo (${STATE.grupoBName || 'Grupo B'})`;
             } else {
                 sourceList = STATE.standingsAnual;
-                titleCol = 'Equipo (Tabla Anual Apertura + Clausura)';
+                titleCol = 'Equipo (Tabla anual Apertura + Clausura)';
             }
 
             if (!sourceList || sourceList.length === 0) {
