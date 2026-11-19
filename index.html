@@ -344,9 +344,15 @@
                         </h3>
                         <p id="lineup-match-subtitle" class="text-[11px] font-mono text-pizarra-electric mt-0.5 truncate">Sincronizando formaciones de los últimos 5 partidos...</p>
                     </div>
-                    <select id="formation-selector" onchange="renderPitch(this.value)" class="bg-[#0b0e14] border border-pizarra-border text-xs font-mono text-white rounded-lg px-3 py-1.5 focus:outline-none focus:border-pizarra-electric flex-shrink-0 max-w-[230px] sm:max-w-[260px] truncate">
-                        <option value="0">Último XI Oficial</option>
-                    </select>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <select id="formation-selector" onchange="renderPitch(this.value)" class="bg-[#0b0e14] border border-pizarra-border text-xs font-mono text-white rounded-lg px-3 py-1.5 focus:outline-none focus:border-pizarra-electric max-w-[190px] sm:max-w-[230px] truncate">
+                            <option value="0">Último XI Oficial</option>
+                        </select>
+                        <button onclick="shareSectionAsPng('FORMATION')" title="Compartir formación en historia" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                            <span class="text-[10px] font-mono font-bold uppercase">Compartir</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="p-4 sm:p-6 bg-[#0b0e14] flex-1 flex items-center justify-center tactical-grid">
                     <div class="relative w-full max-w-md aspect-[3/4] rounded-xl overflow-hidden border-2 border-[#1f293a] bg-[#0d1520] shadow-2xl">
@@ -426,7 +432,7 @@
         </section>
     </main>
 
-   <footer class="mt-8 border-t border-pizarra-border bg-[#090c11] py-4 px-4 text-xs text-slate-500">
+    <footer class="mt-8 border-t border-pizarra-border bg-[#090c11] py-4 px-4 text-xs text-slate-500">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
             <span class="font-mono text-slate-300 font-semibold">lavazulada.com</span>
             <div class="flex flex-wrap items-center gap-4 font-mono text-[11px] text-slate-400">
@@ -737,7 +743,6 @@
                 try { await document.fonts.ready; } catch (e) {}
             }
 
-            // Formato Historia vertical 9:16 (1080x1920)
             const canvas = document.createElement('canvas');
             canvas.width = 1080;
             canvas.height = 1920;
@@ -756,7 +761,6 @@
             ctx.lineWidth = 4;
             ctx.strokeRect(36, 36, canvas.width - 72, canvas.height - 72);
 
-            // Cabecera superior de marca con dominio lavazulada.com
             const logoImg = await loadCanvasImage('./logolva.png') || await loadCanvasImage('./escudo-velez.png');
             if (logoImg) {
                 ctx.drawImage(logoImg, 84, 86, 84, 84);
@@ -891,6 +895,91 @@
                     ctx.fillText(`${item.timeLocal}`, 964, y + 26);
                     ctx.textAlign = 'left';
                 });
+            } else if (sectionKey === 'FORMATION') {
+                const lineups = STATE.recentLineups || [];
+                const lineup = lineups[STATE.selectedLineupIdx] || STATE.lastLineup;
+                const formName = lineup?.formation || '4-2-3-1';
+                const schemeKey = formName.includes('4-3-3') ? '4-3-3' : '4-2-3-1';
+                const slotCoords = SLOTS_CANCHA[schemeKey];
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '800 44px "Barlow Condensed", sans-serif';
+                ctx.fillText('LA PIZARRA TÁCTICA • FORMACIONES', 84, 265);
+
+                const detalleLineup = lineup?.rival
+                    ? `vs ${lineup.rival.toUpperCase()}${lineup.date ? ' • ' + lineup.date : ''}${lineup.score ? ' [' + lineup.score + ']' : ''} • ${formName}`
+                    : `Esquema ${formName}`;
+                ctx.fillStyle = '#38bdf8';
+                ctx.font = '700 22px "JetBrains Mono", monospace';
+                ctx.fillText(detalleLineup, 84, 304);
+
+                // Dibujar cancha dentro del canvas (x: 150..930, y: 340..1650)
+                const px = 150;
+                const py = 340;
+                const pw = 780;
+                const ph = 1310;
+
+                ctx.fillStyle = '#0c131d';
+                ctx.fillRect(px, py, pw, ph);
+                for (let f = 0; f < 8; f += 2) {
+                    ctx.fillStyle = '#101926';
+                    ctx.fillRect(px, py + (ph / 8) * f, pw, ph / 8);
+                }
+
+                ctx.strokeStyle = '#334155';
+                ctx.lineWidth = 4;
+                ctx.strokeRect(px + 24, py + 24, pw - 48, ph - 48);
+
+                // Línea de medio campo y círculo central
+                const midY = py + ph / 2;
+                ctx.beginPath();
+                ctx.moveTo(px + 24, midY);
+                ctx.lineTo(px + pw - 24, midY);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(px + pw / 2, midY, 105, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Áreas
+                ctx.strokeRect(px + pw * 0.25, py + 24, pw * 0.5, 165);
+                ctx.strokeRect(px + pw * 0.25, py + ph - 189, pw * 0.5, 165);
+
+                const starters = (lineup && Array.isArray(lineup.starters) && lineup.starters.length === 11)
+                    ? lineup.starters
+                    : (STATE.squad && STATE.squad.length >= 11
+                        ? [...STATE.squad].sort((a, b) => (b.pj || 0) - (a.pj || 0)).slice(0, 11)
+                        : []);
+
+                const asignaciones = asignarSlotsEnCancha(starters);
+                ctx.textAlign = 'center';
+                asignaciones.forEach(({ player: p, slot }) => {
+                    const pos = slotCoords[slot] || { x: 50, y: 50 };
+                    const cx = px + (pos.x / 100) * pw;
+                    const cy = py + (pos.y / 100) * ph;
+                    const shortLabel = (p.shortName || p.name || '').split(' ').pop();
+
+                    ctx.fillStyle = '#0055a5';
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 34, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = '800 28px "Barlow Condensed", sans-serif';
+                    ctx.fillText(String(p.number || '-'), cx, cy + 10);
+
+                    ctx.fillStyle = 'rgba(11, 14, 20, 0.92)';
+                    const pillW = Math.max(110, shortLabel.length * 14 + 28);
+                    ctx.fillRect(cx - pillW / 2, cy + 42, pillW, 34);
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = '600 20px Inter, sans-serif';
+                    ctx.fillText(shortLabel, cx, cy + 66);
+                });
+                ctx.textAlign = 'left';
             } else if (sectionKey === 'PERFORMANCE_XI') {
                 const formName = document.getElementById('tactical-formation-badge')?.textContent || '4-2-3-1';
                 ctx.fillStyle = '#ffffff';
@@ -948,6 +1037,7 @@
                 LIVE_MATCH: 'lavazulada-historia-partido.png',
                 LAST_FIVE: 'lavazulada-historia-ultimos5.png',
                 UPCOMING: 'lavazulada-historia-proximos.png',
+                FORMATION: 'lavazulada-historia-formacion.png',
                 PERFORMANCE_XI: 'lavazulada-historia-rendimiento.png'
             };
             await exportCanvasAsPng(canvas, cleanNameMap[sectionKey] || 'lavazulada-historia.png');
