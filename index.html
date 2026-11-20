@@ -111,15 +111,9 @@
                     <span>Últ. act:</span>
                     <span id="last-updated-time" class="text-white font-bold">--:--:--</span>
                 </div>
-                <div class="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-pizarra-card border border-pizarra-border text-xs font-mono text-slate-300">
-                    <span id="header-tz-label" class="text-pizarra-electric font-bold">HORA</span>
-                    <span id="header-art-clock">--:--:--</span>
-                </div>
                 <div id="polling-status-pill" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700 text-xs font-mono">
                     <span id="polling-status-dot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
                     <span id="polling-status-label" class="font-bold text-slate-300 tracking-wide">SIN PARTIDO EN VIVO</span>
-                    <span class="text-slate-600">|</span>
-                    <span id="polling-countdown" class="text-slate-400 font-bold">MANUAL</span>
                 </div>
                 <a href="./fixture.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-xs font-mono font-bold text-pizarra-electric hover:text-white transition">
                     <span>Fixture</span>
@@ -1183,7 +1177,6 @@
             const pill = document.getElementById('polling-status-pill');
             const dot = document.getElementById('polling-status-dot');
             const label = document.getElementById('polling-status-label');
-            const cdEl = document.getElementById('polling-countdown');
 
             STATE.isLiveMatch = Boolean(isLive);
 
@@ -1196,10 +1189,6 @@
                 }
                 if (!STATE.livePollingTimer) {
                     STATE.countdown = STATE.pollingIntervalSec;
-                    if (cdEl) {
-                        cdEl.className = 'text-slate-200 font-bold';
-                        cdEl.textContent = `${STATE.countdown}s`;
-                    }
                     STATE.livePollingTimer = setInterval(() => {
                         fetchBackendData(false);
                     }, STATE.pollingIntervalSec * 1000);
@@ -1214,10 +1203,6 @@
                 if (label) {
                     label.className = 'font-bold text-slate-300 tracking-wide';
                     label.textContent = 'SIN PARTIDO EN VIVO';
-                }
-                if (cdEl) {
-                    cdEl.className = 'text-slate-400 font-bold';
-                    cdEl.textContent = 'MANUAL';
                 }
             }
         }
@@ -1291,8 +1276,6 @@
         function manualRefresh() {
             if (STATE.isLiveMatch) {
                 STATE.countdown = STATE.pollingIntervalSec;
-                const cdEl = document.getElementById('polling-countdown');
-                if (cdEl) cdEl.textContent = `${STATE.countdown}s`;
             }
             fetchBackendData(true);
         }
@@ -1355,18 +1338,8 @@
         }
 
         setInterval(() => {
-            const now = new Date();
-            const localStr = formatLocalTime(now, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-            const tzLabel = getShortZoneLabel(now);
-            const clockHeader = document.getElementById('header-art-clock');
-            const tzHeader = document.getElementById('header-tz-label');
-            if (clockHeader) clockHeader.textContent = localStr;
-            if (tzHeader) tzHeader.textContent = tzLabel;
-
             if (STATE.isLiveMatch) {
                 STATE.countdown = STATE.countdown > 1 ? STATE.countdown - 1 : STATE.pollingIntervalSec;
-                const cdEl = document.getElementById('polling-countdown');
-                if (cdEl) cdEl.textContent = `${STATE.countdown}s`;
             }
 
             updateMatchCountdown();
