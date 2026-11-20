@@ -15,6 +15,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Diccionario propio de posiciones tácticas del plantel -->
     <script src="./posiciones.js"></script>
+    <!-- Efemérides históricas de Vélez Sarsfield -->
+    <script src="./efemerides.js"></script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -128,6 +130,30 @@
     </header>
 
     <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-5 space-y-6">
+
+        <!-- TARJETA AUTOMÁTICA DE EFEMÉRIDE FORTINERA (SOLO VISIBLE EN FECHAS HISTÓRICAS) -->
+        <section id="efemeride-section" class="hidden relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0e192b] via-[#121721] to-[#0d1f36] border border-[#0055a5]/70 shadow-2xl">
+            <div class="px-4 py-2 bg-[#0055a5]/25 border-b border-[#0055a5]/40 flex flex-wrap items-center justify-between gap-2 text-xs">
+                <div class="flex items-center gap-2">
+                    <span id="efemeride-badge" class="px-2 py-0.5 rounded bg-[#0055a5] text-white font-mono font-bold uppercase tracking-wider text-[10px]">UN DÍA COMO HOY</span>
+                    <span id="efemeride-date-label" class="font-mono text-pizarra-electric font-bold"></span>
+                </div>
+                <button onclick="shareSectionAsPng('EFEMERIDE')" title="Compartir efeméride en historia" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-200 hover:text-pizarra-electric transition">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    <span class="text-[10px] font-mono font-bold uppercase">Compartir</span>
+                </button>
+            </div>
+            <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-start sm:items-center gap-3.5">
+                    <img src="./escudo-velez.png" alt="Vélez" class="w-12 h-12 sm:w-14 sm:h-14 object-contain flex-shrink-0 drop-shadow-[0_0_12px_rgba(0,85,165,0.7)]">
+                    <div>
+                        <div id="efemeride-years-pill" class="inline-block text-[11px] font-mono font-bold text-amber-300 uppercase tracking-wide mb-0.5"></div>
+                        <h2 id="efemeride-title" class="font-display text-xl sm:text-2xl font-extrabold uppercase tracking-wide text-white leading-tight"></h2>
+                        <p id="efemeride-desc" class="text-xs sm:text-sm text-slate-300 mt-1 max-w-3xl leading-relaxed"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <!-- PREVIA OFICIAL / PARTIDO EN VIVO / RESULTADO 24HS / A CONFIRMAR -->
         <section class="relative overflow-hidden rounded-2xl bg-pizarra-card border border-pizarra-border tactical-grid shadow-2xl">
@@ -694,6 +720,7 @@
             squadSortCol: 'number',
             squadSortAsc: true,
             selectedLineupIdx: 0,
+            todayEfemeride: null,
             squad: [],
             lastFiveMatches: [],
             velezLast2: [],
@@ -708,6 +735,70 @@
             standingsGrupoB: [],
             standingsAnual: []
         };
+
+        // --- DETECCIÓN AUTOMÁTICA DE EFEMÉRIDES POR FECHA DE ARGENTINA ---
+        function getArgentinaTodayEfemeride() {
+            const dict = window.EFEMERIDES_VELEZ || {};
+            const now = new Date();
+            const fmt = new Intl.DateTimeFormat('en-CA', {
+                timeZone: 'America/Argentina/Buenos_Aires',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+            const [curYearStr, monthStr, dayStr] = fmt.format(now).split('-');
+            const key = `${monthStr}-${dayStr}`;
+            const item = dict[key];
+            if (!item) return null;
+
+            const curYear = Number(curYearStr);
+            const yearsAgo = item.year ? Math.max(0, curYear - Number(item.year)) : null;
+            const dateDisplay = now.toLocaleDateString('es-AR', {
+                day: 'numeric',
+                month: 'long',
+                timeZone: 'America/Argentina/Buenos_Aires'
+            });
+
+            return {
+                key,
+                year: item.year,
+                yearsAgo,
+                badge: item.badge || 'UN DÍA COMO HOY',
+                title: item.title || '',
+                description: item.description || '',
+                dateDisplay: `${dateDisplay} de ${item.year}`
+            };
+        }
+
+        function renderEfemerideBanner() {
+            const sec = document.getElementById('efemeride-section');
+            if (!sec) return;
+
+            const ef = getArgentinaTodayEfemeride();
+            STATE.todayEfemeride = ef;
+
+            if (!ef) {
+                sec.classList.add('hidden');
+                return;
+            }
+
+            sec.classList.remove('hidden');
+            const badgeEl = document.getElementById('efemeride-badge');
+            const dateEl = document.getElementById('efemeride-date-label');
+            const yearsEl = document.getElementById('efemeride-years-pill');
+            const titleEl = document.getElementById('efemeride-title');
+            const descEl = document.getElementById('efemeride-desc');
+
+            if (badgeEl) badgeEl.textContent = ef.badge;
+            if (dateEl) dateEl.textContent = ef.dateDisplay.toUpperCase();
+            if (yearsEl) {
+                yearsEl.textContent = ef.yearsAgo > 0
+                    ? `• SE CUMPLEN ${ef.yearsAgo} ${ef.yearsAgo === 1 ? 'AÑO' : 'AÑOS'}`
+                    : '• EFEMÉRIDE FORTINERA';
+            }
+            if (titleEl) titleEl.textContent = ef.title;
+            if (descEl) descEl.textContent = ef.description;
+        }
 
         // --- GENERACIÓN DE PLACA PNG FORMATO HISTORIA (1080x1920) PARA COMPARTIR ---
         function loadCanvasImage(src) {
@@ -754,6 +845,28 @@
             }
         }
 
+        function drawWrappedCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 6) {
+            const words = String(text || '').split(/\s+/);
+            let line = '';
+            let linesCount = 0;
+
+            for (let n = 0; n < words.length; n++) {
+                const testLine = line ? `${line} ${words[n]}` : words[n];
+                const metrics = ctx.measureText(testLine);
+                if (metrics.width > maxWidth && n > 0) {
+                    ctx.fillText(line, x, y + linesCount * lineHeight);
+                    linesCount++;
+                    line = words[n];
+                    if (linesCount >= maxLines - 1) break;
+                } else {
+                    line = testLine;
+                }
+            }
+            if (line && linesCount < maxLines) {
+                ctx.fillText(line, x, y + linesCount * lineHeight);
+            }
+        }
+
         async function shareSectionAsPng(sectionKey) {
             if (document.fonts && document.fonts.ready) {
                 try { await document.fonts.ready; } catch (e) {}
@@ -797,7 +910,43 @@
             ctx.lineTo(canvas.width - 84, 204);
             ctx.stroke();
 
-            if (sectionKey === 'LIVE_MATCH') {
+            if (sectionKey === 'EFEMERIDE') {
+                const ef = STATE.todayEfemeride;
+                if (!ef) return;
+
+                const escudoVelez = await loadCanvasImage('./escudo-velez.png');
+                ctx.textAlign = 'center';
+
+                ctx.fillStyle = '#38bdf8';
+                ctx.font = '700 28px "JetBrains Mono", monospace';
+                ctx.fillText(ef.badge.toUpperCase(), 540, 315);
+
+                ctx.fillStyle = '#fde68a';
+                ctx.font = '700 32px "JetBrains Mono", monospace';
+                ctx.fillText(ef.dateDisplay.toUpperCase(), 540, 370);
+
+                if (escudoVelez) {
+                    ctx.drawImage(escudoVelez, 415, 430, 250, 275);
+                }
+
+                if (ef.yearsAgo > 0) {
+                    ctx.fillStyle = '#0055a5';
+                    ctx.fillRect(260, 755, 560, 64);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = '800 34px "Barlow Condensed", sans-serif';
+                    ctx.fillText(`SE CUMPLEN ${ef.yearsAgo} ${ef.yearsAgo === 1 ? 'AÑO' : 'AÑOS'}`, 540, 798);
+                }
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '800 66px "Barlow Condensed", sans-serif';
+                drawWrappedCanvasText(ctx, ef.title.toUpperCase(), 540, 920, 880, 76, 3);
+
+                ctx.fillStyle = '#cbd5e1';
+                ctx.font = '500 32px Inter, sans-serif';
+                drawWrappedCanvasText(ctx, ef.description, 540, 1180, 860, 48, 6);
+
+                ctx.textAlign = 'left';
+            } else if (sectionKey === 'LIVE_MATCH') {
                 const cm = STATE.currentMatchData;
                 const m = cm?.match;
                 if (!m || (cm.type !== 'LIVE' && cm.type !== 'FINISHED_24H')) return;
@@ -1107,6 +1256,7 @@
             ctx.textAlign = 'left';
 
             const cleanNameMap = {
+                EFEMERIDE: 'lavazulada-historia-efemeride.png',
                 LIVE_MATCH: 'lavazulada-historia-partido.png',
                 LAST_FIVE: 'lavazulada-historia-ultimos5.png',
                 UPCOMING: 'lavazulada-historia-proximos.png',
@@ -2015,6 +2165,7 @@
 
         function renderAll() {
             document.getElementById('header-velez-crest').innerHTML = `<img src="./logolva.png" onerror="this.onerror=null;this.src='${MI_ESCUDO_VELEZ}';" alt="La V Azulada" class="w-10 h-10 sm:w-11 sm:h-11 object-contain select-none">`;
+            renderEfemerideBanner();
             renderMatchCenter();
             renderLastFiveMatches();
             renderUpcomingMatches();
