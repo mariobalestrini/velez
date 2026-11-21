@@ -84,7 +84,6 @@
                 <p id="pwa-install-instructions" class="text-xs text-slate-300 leading-snug mt-0.5"></p>
             </div>
         </div>
-        <!-- Flecha indicadora hacia abajo (apunta al ícono Compartir en Safari iOS) -->
         <div id="pwa-ios-arrow" class="hidden flex justify-center mt-1.5 -mb-1 text-pizarra-electric animate-bounce">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
         </div>
@@ -228,8 +227,8 @@
                     </div>
                 </div>
 
-                <!-- CÓMO LLEGAN AMBOS EQUIPOS (ÚLTIMOS 2 PARTIDOS) -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-5 border-t border-pizarra-border/80">
+                <!-- CÓMO LLEGAN AMBOS EQUIPOS (SOLO CUANDO HAY PRÓXIMO PARTIDO PROGRAMADO) -->
+                <div id="both-teams-form-box" class="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-5 border-t border-pizarra-border/80">
                     <div class="bg-[#0b0e14]/90 rounded-xl border border-pizarra-border p-4 space-y-3.5">
                         <div class="flex items-center justify-between border-b border-pizarra-border pb-2.5">
                             <h3 class="font-display text-base sm:text-lg font-bold uppercase text-white tracking-wide">Cómo llega El Fortín</h3>
@@ -329,7 +328,7 @@
             </div>
         </section>
 
-        <!-- PLANTILLA COMPLETA DE VÉLEZ CON BANDERAS DE NACIONALIDAD Y ESTADÍSTICAS -->
+        <!-- PLANTILLA COMPLETA DE VÉLEZ CON BANDERAS DE NACIONALIDAD Y ESTADÍSTICAS DEL CLAUSURA -->
         <section class="bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden">
             <div class="p-4 border-b border-pizarra-border bg-[#0e131c] flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
@@ -337,7 +336,7 @@
                         <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
                         PLANTILLA OFICIAL & ESTADÍSTICAS
                     </h3>
-                    <p id="squad-tournament-caption" class="text-xs text-slate-400">Dorsales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas del Grupo A</p>
+                    <p id="squad-tournament-caption" class="text-xs text-slate-400">Dorsales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas del Torneo Clausura</p>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2">
@@ -558,6 +557,21 @@
             return /round of 16|octavos|quarter|cuartos|semi|final|play-?off|eliminaci[oó]n/i.test(String(text));
         }
 
+        function isClausuraMatchOrStat(item = {}) {
+            const compStr = normalizarTexto(
+                item.comp || item.competition || item.tournament || item.league?.name || item.league || ''
+            );
+            const roundStr = normalizarTexto(item.fecha || item.round || item.league?.round || '');
+            if (!compStr && !roundStr) return true;
+            if (/apertura|copa argentina|libertadores|sudamericana|amistoso|friendly|reserva|proyeccion/i.test(compStr)) {
+                return false;
+            }
+            if (/clausura|liga profesional|torneo/i.test(compStr) || /fecha\s*\d+|interzonal|clausura/i.test(roundStr)) {
+                return true;
+            }
+            return true;
+        }
+
         function limpiarRoundSinEst(roundStr) {
             if (!roundStr) return '';
             return String(roundStr)
@@ -729,6 +743,7 @@
             selectedLineupIdx: 0,
             todayEfemeride: null,
             squad: [],
+            clausuraSquad: [],
             lastFiveMatches: [],
             velezLast2: [],
             rivalLast2: [],
@@ -1464,6 +1479,7 @@
                         });
                     }
                     if (data.squad) STATE.squad = data.squad;
+                    if (data.clausuraSquad) STATE.clausuraSquad = data.clausuraSquad;
                     if (data.lastLineup) STATE.lastLineup = data.lastLineup;
                     if (Array.isArray(data.recentLineups) && data.recentLineups.length > 0) {
                         STATE.recentLineups = data.recentLineups;
@@ -1605,12 +1621,24 @@
         }
 
         function getPenaltyShootoutText(cm, m) {
-            const penObj = m?.score?.penalty || m?.penalty || cm?.penalties || null;
+            const penObj = m?.score?.penalty || m?.penalty || cm?.penalties || cm?.penaltyShootout || null;
             if (penObj && penObj.home !== null && penObj.home !== undefined && penObj.away !== null && penObj.away !== undefined) {
                 return `Penales: ${penObj.home} - ${penObj.away}`;
             }
             if (typeof cm?.penaltyText === 'string' && cm.penaltyText.trim()) {
                 return cm.penaltyText.trim();
+            }
+            if (typeof cm?.resultDetail === 'string' && /penal/i.test(cm.resultDetail)) {
+                return cm.resultDetail.trim();
+            }
+            const statusLong = String(m?.fixture?.status?.long || '');
+            const statusShort = String(m?.fixture?.status?.short || '');
+            if (statusShort === 'PEN' || /penalt/i.test(statusLong)) {
+                const matchNums = statusLong.match(/(\d+)\s*[-–]\s*(\d+)/);
+                if (matchNums) {
+                    return `Penales: ${matchNums[1]} - ${matchNums[2]}`;
+                }
+                return 'Definido por penales';
             }
             return '';
         }
@@ -1651,6 +1679,7 @@
             const leagueInfo = document.getElementById('match-league-info');
             const stadium = document.getElementById('match-stadium');
             const rivalFormTitle = document.getElementById('rival-form-title');
+            const bothTeamsFormBox = document.getElementById('both-teams-form-box');
             const scorersBox = document.getElementById('live-scorers-box');
             const scorersHome = document.getElementById('live-scorers-home');
             const scorersAway = document.getElementById('live-scorers-away');
@@ -1669,6 +1698,11 @@
             awayCrest.innerHTML = renderEscudoImg(m.teams.away, 'w-16 h-16 sm:w-20 sm:h-20', m.teams.away.logo);
             homeName.textContent = m.teams.home.name;
             awayName.textContent = m.teams.away.name;
+
+            const isNoUpcomingReference = cm.type === 'LAST_REFERENCE' || cm.type === 'FINISHED_24H' || cm.type === 'TBD';
+            if (bothTeamsFormBox) {
+                bothTeamsFormBox.classList.toggle('hidden', isNoUpcomingReference);
+            }
 
             const showShareForMatch = cm.type === 'LIVE' || cm.type === 'FINISHED_24H' || cm.type === 'LAST_REFERENCE';
             if (shareLiveBtn) {
@@ -1695,9 +1729,6 @@
                 if (rivalFormTitle) rivalFormTitle.textContent = 'Rival a confirmar';
 
                 updateMatchCountdown();
-                const vLast2 = cm.velezForm || STATE.velezLast2 || STATE.lastFiveMatches.slice(0, 2);
-                renderMiniFormList('prev-velez-last2', vLast2);
-                renderMiniFormList('prev-rival-last2', [], 'Rival a confirmar');
                 return;
             }
 
@@ -1731,7 +1762,7 @@
                     `;
                 }
 
-                // Tanda de penales si existió definición por penales
+                // Tanda de penales si el partido se definió por penales
                 const penText = getPenaltyShootoutText(cm, m);
                 if (penaltiesBadge) {
                     if (penText) {
@@ -1820,10 +1851,12 @@
 
             updateMatchCountdown();
 
-            const vLast2 = cm.velezForm || cm.velezLastMatches || STATE.velezLast2 || STATE.lastFiveMatches.slice(0, 2);
-            const rLast2 = cm.rivalForm || cm.rivalLastMatches || STATE.rivalLast2 || [];
-            renderMiniFormList('prev-velez-last2', vLast2);
-            renderMiniFormList('prev-rival-last2', rLast2);
+            if (!isNoUpcomingReference) {
+                const vLast2 = cm.velezForm || cm.velezLastMatches || STATE.velezLast2 || STATE.lastFiveMatches.slice(0, 2);
+                const rLast2 = cm.rivalForm || cm.rivalLastMatches || STATE.rivalLast2 || [];
+                renderMiniFormList('prev-velez-last2', vLast2);
+                renderMiniFormList('prev-rival-last2', rLast2);
+            }
         }
 
         function renderLastFiveMatches() {
@@ -1938,7 +1971,6 @@
                 titleCol = 'Equipo (Tabla anual Apertura + Clausura)';
             }
 
-            // Excluir cualquier entrada marcada como ronda de playoffs / eliminación directa
             const filteredSource = (sourceList || []).filter(t => {
                 const roundMeta = t.round || t.stage || t.description || '';
                 return !isPlayoffRoundLabel(roundMeta);
@@ -2044,15 +2076,46 @@
             return STATE.grupoAName || 'Grupo A';
         }
 
+        // Obtiene las estadísticas de jugadores correspondientes exclusivamente al Torneo Clausura
+        function getClausuraSquadList() {
+            if (Array.isArray(STATE.clausuraSquad) && STATE.clausuraSquad.length > 0) {
+                return STATE.clausuraSquad;
+            }
+            const base = STATE.squad || [];
+            const velezStanding = STATE.standingsClausura.find(t => t.isVelez);
+            const maxClausuraPj = velezStanding && typeof velezStanding.pj === 'number' ? velezStanding.pj : null;
+
+            return base.map(p => {
+                const clausuraStats = p.clausura || p.statsClausura || p.torneoClausura || null;
+                if (clausuraStats) {
+                    return {
+                        ...p,
+                        pj: clausuraStats.pj ?? p.pj ?? 0,
+                        goals: clausuraStats.goals ?? p.goals ?? 0,
+                        cleanSheets: clausuraStats.cleanSheets ?? p.cleanSheets ?? 0,
+                        yellowCards: clausuraStats.yellowCards ?? p.yellowCards ?? 0,
+                        redCards: clausuraStats.redCards ?? p.redCards ?? 0
+                    };
+                }
+                const rawPj = Number(p.pj || 0);
+                const cappedPj = maxClausuraPj !== null ? Math.min(rawPj, maxClausuraPj) : rawPj;
+                return {
+                    ...p,
+                    pj: cappedPj
+                };
+            });
+        }
+
         function renderSquadTable() {
             const captionEl = document.getElementById('squad-tournament-caption');
             const velezGroupLabel = getVelezGroupLabel();
             if (captionEl) {
-                captionEl.textContent = `Dorsales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas del ${velezGroupLabel}`;
+                captionEl.textContent = `Dorsales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas del Torneo Clausura (${velezGroupLabel})`;
             }
 
             const searchQuery = (document.getElementById('squad-search')?.value || '').toLowerCase().trim();
-            let list = [...STATE.squad];
+            const clausuraList = getClausuraSquadList();
+            let list = [...clausuraList];
             if (STATE.squadFilterGroup !== 'TODOS') list = list.filter(p => p.group === STATE.squadFilterGroup);
             if (searchQuery) list = list.filter(p => p.name.toLowerCase().includes(searchQuery) || (p.posLabel || '').toLowerCase().includes(searchQuery));
 
@@ -2098,10 +2161,10 @@
             const velezStanding = STATE.standingsClausura.find(t => t.isVelez);
             const velezGoalsFor = velezStanding && typeof velezStanding.gf === 'number'
                 ? velezStanding.gf
-                : STATE.squad.reduce((acc, p) => acc + (Number(p.goals) || 0), 0);
+                : clausuraList.reduce((acc, p) => acc + (Number(p.goals) || 0), 0);
 
-            const totalCleanSheets = STATE.squad.filter(p => p.group === 'ARQ').reduce((acc, p) => acc + (Number(p.cleanSheets) || 0), 0);
-            const totalCards = STATE.squad.reduce((acc, p) => acc + (Number(p.yellowCards) || 0) + (Number(p.redCards) || 0), 0);
+            const totalCleanSheets = clausuraList.filter(p => p.group === 'ARQ').reduce((acc, p) => acc + (Number(p.cleanSheets) || 0), 0);
+            const totalCards = clausuraList.reduce((acc, p) => acc + (Number(p.yellowCards) || 0) + (Number(p.redCards) || 0), 0);
 
             const kpiG = document.getElementById('kpi-total-goals');
             const kpiCS = document.getElementById('kpi-clean-sheets');
@@ -2122,7 +2185,7 @@
 
             const cardScorers = document.getElementById('tactical-card-scorers');
             if (cardScorers) {
-                const withGoals = [...STATE.squad]
+                const withGoals = [...clausuraList]
                     .filter(p => (Number(p.goals) || 0) > 0)
                     .sort((a, b) => (Number(b.goals) || 0) - (Number(a.goals) || 0));
 
@@ -2138,7 +2201,7 @@
 
             const cardYellows = document.getElementById('tactical-card-yellows');
             if (cardYellows) {
-                const withYellows = [...STATE.squad]
+                const withYellows = [...clausuraList]
                     .filter(p => (Number(p.yellowCards) || 0) > 0)
                     .sort((a, b) => (Number(b.yellowCards) || 0) - (Number(a.yellowCards) || 0));
 
@@ -2154,7 +2217,7 @@
 
             const cardReds = document.getElementById('tactical-card-reds');
             if (cardReds) {
-                const withReds = [...STATE.squad]
+                const withReds = [...clausuraList]
                     .filter(p => (Number(p.redCards) || 0) > 0)
                     .sort((a, b) => (Number(b.redCards) || 0) - (Number(a.redCards) || 0));
 
