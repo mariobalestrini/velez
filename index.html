@@ -259,9 +259,9 @@
                     </div>
                 </div>
 
-                <!-- PANEL 2: ESTADÍSTICAS DETALLADAS DEL PARTIDO -->
-                <div id="match-panel-STATS" class="hidden max-w-2xl mx-auto w-full pt-2">
-                    <div id="match-stats-tab-content" class="bg-[#0b0e14]/90 rounded-xl border border-pizarra-border p-4 space-y-3 text-xs font-mono">
+                <!-- PANEL 2: ESTADÍSTICAS DETALLADAS DEL PARTIDO (ESTILO BARRA DE POSESIÓN) -->
+                <div id="match-panel-STATS" class="hidden max-w-md mx-auto w-full pt-2">
+                    <div id="match-stats-tab-content" class="space-y-3 text-xs font-mono">
                         <div class="text-center text-slate-400 py-4">Sincronizando estadísticas del partido...</div>
                     </div>
                 </div>
@@ -611,8 +611,15 @@
             return (texto || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').trim();
         }
 
-        function traducirEtiquetasEsp(texto = '') {
+        function conTildeVelez(texto = '') {
             return String(texto || '')
+                .replace(/\bVelez\b/g, 'Vélez')
+                .replace(/\bvelez\b/g, 'vélez')
+                .trim();
+        }
+
+        function traducirEtiquetasEsp(texto = '') {
+            return conTildeVelez(String(texto || ''))
                 .replace(/\bRound of 64\b/gi, '32avos de Final')
                 .replace(/\bRound of 32\b/gi, 'Dieciseisavos de Final')
                 .replace(/\bRound of 16\b/gi, 'Octavos de Final')
@@ -1117,6 +1124,9 @@
                     loadCanvasImage(awayCrestSrc)
                 ]);
 
+                const homeTeamTitle = conTildeVelez(m.teams?.home?.name || 'Local').toUpperCase();
+                const awayTeamTitle = conTildeVelez(m.teams?.away?.name || 'Visitante').toUpperCase();
+
                 const isLive = cm.type === 'LIVE';
                 ctx.fillStyle = isLive ? '#ef4444' : '#10b981';
                 ctx.font = '700 28px "JetBrains Mono", monospace';
@@ -1148,8 +1158,8 @@
 
                 ctx.fillStyle = '#ffffff';
                 ctx.font = '800 44px "Barlow Condensed", sans-serif';
-                ctx.fillText((m.teams?.home?.name || 'Local').toUpperCase(), 290, 585);
-                ctx.fillText((m.teams?.away?.name || 'Visitante').toUpperCase(), 790, 585);
+                ctx.fillText(homeTeamTitle, 290, 585);
+                ctx.fillText(awayTeamTitle, 790, 585);
 
                 const hGoals = (m.scorers?.home || []).join('\n');
                 const aGoals = (m.scorers?.away || []).join('\n');
@@ -1243,6 +1253,7 @@
 
                 rows.forEach((item, i) => {
                     const y = 395 + i * 220;
+                    const rivalUpper = conTildeVelez(item.rival || '').toUpperCase();
                     ctx.fillStyle = '#121721';
                     ctx.fillRect(84, y - 70, 912, 165);
                     ctx.strokeStyle = '#1f293a';
@@ -1258,7 +1269,7 @@
 
                     ctx.fillStyle = '#ffffff';
                     ctx.font = '800 40px "Barlow Condensed", sans-serif';
-                    const cruce = item.cond === 'L' ? `VÉLEZ vs ${item.rival.toUpperCase()}` : `${item.rival.toUpperCase()} vs VÉLEZ`;
+                    const cruce = item.cond === 'L' ? `VÉLEZ vs ${rivalUpper}` : `${rivalUpper} vs VÉLEZ`;
                     ctx.fillText(cruce, 198, y + 48);
 
                     ctx.textAlign = 'right';
@@ -1280,6 +1291,7 @@
 
                 rows.forEach((item, i) => {
                     const y = 405 + i * 275;
+                    const rivalUpper = conTildeVelez(item.rival || '').toUpperCase();
                     const condLabel = item.cond === 'L' ? 'LOCAL' : 'VISITANTE';
                     ctx.fillStyle = '#121721';
                     ctx.fillRect(84, y - 78, 912, 205);
@@ -1300,7 +1312,7 @@
 
                     ctx.fillStyle = '#ffffff';
                     ctx.font = '800 42px "Barlow Condensed", sans-serif';
-                    ctx.fillText(`vs ${item.rival.toUpperCase()}`, 202, y + 66);
+                    ctx.fillText(`vs ${rivalUpper}`, 202, y + 66);
 
                     ctx.textAlign = 'right';
                     ctx.fillStyle = '#e2e8f0';
@@ -1362,7 +1374,7 @@
 
                     ctx.fillStyle = '#ffffff';
                     ctx.font = `${t.isVelez ? '800' : '700'} 29px "Barlow Condensed", sans-serif`;
-                    ctx.fillText((t.name || '').toUpperCase().slice(0, 24), 210, y + 11);
+                    ctx.fillText(conTildeVelez(t.name || '').toUpperCase().slice(0, 24), 210, y + 11);
 
                     ctx.textAlign = 'right';
                     ctx.fillStyle = '#cbd5e1';
@@ -1390,7 +1402,7 @@
                 ctx.fillText('LA PIZARRA TÁCTICA • FORMACIONES', 84, 265);
 
                 const detalleLineup = lineup?.rival
-                    ? `vs ${lineup.rival.toUpperCase()}${lineup.date ? ' • ' + lineup.date : ''}${lineup.score ? ' [' + lineup.score + ']' : ''} • ${formName}`
+                    ? `vs ${conTildeVelez(lineup.rival).toUpperCase()}${lineup.date ? ' • ' + lineup.date : ''}${lineup.score ? ' [' + lineup.score + ']' : ''} • ${formName}`
                     : `Esquema ${formName}`;
                 ctx.fillStyle = '#38bdf8';
                 ctx.font = '700 22px "JetBrains Mono", monospace';
@@ -1632,6 +1644,7 @@
                     if (data.lastMatches) {
                         STATE.lastFiveMatches = data.lastMatches.map(m => ({
                             ...m,
+                            rival: conTildeVelez(m.rival || ''),
                             fecha: limpiarRoundSinEst(m.fecha || ''),
                             comp: traducirEtiquetasEsp(m.comp || '')
                         }));
@@ -1639,6 +1652,7 @@
                     if (data.velezLast2) {
                         STATE.velezLast2 = data.velezLast2.map(m => ({
                             ...m,
+                            rival: conTildeVelez(m.rival || ''),
                             fecha: limpiarRoundSinEst(m.fecha || ''),
                             comp: traducirEtiquetasEsp(m.comp || '')
                         }));
@@ -1660,6 +1674,7 @@
                                 : item.date;
                             return {
                                 ...item,
+                                rival: conTildeVelez(item.rival || ''),
                                 fecha: limpiarRoundSinEst(item.fecha || ''),
                                 comp: traducirEtiquetasEsp(item.comp || ''),
                                 date: dateLocal,
@@ -1669,18 +1684,55 @@
                     }
                     if (data.squad) STATE.squad = data.squad;
                     if (data.clausuraSquad) STATE.clausuraSquad = data.clausuraSquad;
-                    if (data.lastLineup) STATE.lastLineup = data.lastLineup;
-                    if (Array.isArray(data.recentLineups) && data.recentLineups.length > 0) {
-                        STATE.recentLineups = data.recentLineups;
-                    } else if (data.lastLineup && data.lastLineup.starters?.length === 11) {
-                        STATE.recentLineups = [data.lastLineup];
+                    if (data.lastLineup) {
+                        STATE.lastLineup = {
+                            ...data.lastLineup,
+                            rival: conTildeVelez(data.lastLineup.rival || '')
+                        };
                     }
-                    if (data.lastMatchStats) STATE.lastMatchStats = data.lastMatchStats;
-                    if (data.standingsClausura) STATE.standingsClausura = data.standingsClausura;
-                    if (data.standingsGrupoA) STATE.standingsGrupoA = data.standingsGrupoA;
-                    else if (data.standingsClausura) STATE.standingsGrupoA = data.standingsClausura;
-                    if (data.standingsGrupoB) STATE.standingsGrupoB = data.standingsGrupoB;
-                    if (data.standingsAnual) STATE.standingsAnual = data.standingsAnual;
+                    if (Array.isArray(data.recentLineups) && data.recentLineups.length > 0) {
+                        STATE.recentLineups = data.recentLineups.map(l => ({
+                            ...l,
+                            rival: conTildeVelez(l.rival || '')
+                        }));
+                    } else if (data.lastLineup && data.lastLineup.starters?.length === 11) {
+                        STATE.recentLineups = [{
+                            ...data.lastLineup,
+                            rival: conTildeVelez(data.lastLineup.rival || '')
+                        }];
+                    }
+                    if (data.lastMatchStats) {
+                        STATE.lastMatchStats = {
+                            ...data.lastMatchStats,
+                            rival: conTildeVelez(data.lastMatchStats.rival || '')
+                        };
+                    }
+                    if (data.standingsClausura) {
+                        STATE.standingsClausura = data.standingsClausura.map(t => ({
+                            ...t,
+                            name: conTildeVelez(t.name || '')
+                        }));
+                    }
+                    if (data.standingsGrupoA) {
+                        STATE.standingsGrupoA = data.standingsGrupoA.map(t => ({
+                            ...t,
+                            name: conTildeVelez(t.name || '')
+                        }));
+                    } else if (STATE.standingsClausura.length > 0) {
+                        STATE.standingsGrupoA = STATE.standingsClausura;
+                    }
+                    if (data.standingsGrupoB) {
+                        STATE.standingsGrupoB = data.standingsGrupoB.map(t => ({
+                            ...t,
+                            name: conTildeVelez(t.name || '')
+                        }));
+                    }
+                    if (data.standingsAnual) {
+                        STATE.standingsAnual = data.standingsAnual.map(t => ({
+                            ...t,
+                            name: conTildeVelez(t.name || '')
+                        }));
+                    }
 
                     const isLiveNow = data.currentMatch?.type === 'LIVE';
                     syncLivePollingMode(isLiveNow);
@@ -1784,6 +1836,7 @@
             }
 
             container.innerHTML = matchesArray.slice(0, 2).map(m => {
+                const rivalClean = conTildeVelez(m.rival || '');
                 const badgeStyle = m.outcome === 'G'
                     ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
                     : (m.outcome === 'E' ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-rose-500/20 text-rose-300 border-rose-500/40');
@@ -1794,9 +1847,9 @@
                 return `
                     <div class="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-[#121721] border border-pizarra-border">
                         <div class="flex items-center gap-2.5 min-w-0">
-                            ${renderEscudoImg(m.rival, 'w-6 h-6 flex-shrink-0', m.rivalLogo)}
+                            ${renderEscudoImg(rivalClean, 'w-6 h-6 flex-shrink-0', m.rivalLogo)}
                             <div class="truncate">
-                                <div class="text-xs font-bold text-white truncate">vs ${m.rival}</div>
+                                <div class="text-xs font-bold text-white truncate">vs ${rivalClean}</div>
                                 <div class="text-[10px] font-mono text-slate-400">${m.date} • ${condLabel}</div>
                             </div>
                         </div>
@@ -1897,8 +1950,8 @@
 
             if (!statsContent || !lineupContent || !m) return;
 
-            const homeLabel = m.teams?.home?.name || 'Local';
-            const awayLabel = m.teams?.away?.name || 'Visitante';
+            const homeLabel = conTildeVelez(m.teams?.home?.name || 'Local');
+            const awayLabel = conTildeVelez(m.teams?.away?.name || 'Visitante');
             if (homeBtn) homeBtn.textContent = homeLabel;
             if (awayBtn) awayBtn.textContent = awayLabel;
 
@@ -1906,31 +1959,24 @@
             if (statsRows.length === 0) {
                 statsContent.innerHTML = `<div class="text-center text-slate-400 py-4">Sin estadísticas detalladas disponibles para este encuentro.</div>`;
             } else {
-                statsContent.innerHTML = `
-                    <div class="flex items-center justify-between text-[11px] text-slate-400 pb-2 border-b border-pizarra-border/60">
-                        <span class="font-bold text-white truncate max-w-[38%]">${homeLabel}</span>
-                        <span class="uppercase text-[10px]">Métrica</span>
-                        <span class="font-bold text-white truncate max-w-[38%] text-right">${awayLabel}</span>
-                    </div>
-                    ${statsRows.map(s => {
-                        const total = Math.max(0.0001, (Number(s.homeNum) || 0) + (Number(s.awayNum) || 0));
-                        const hPct = Math.round(((Number(s.homeNum) || 0) / total) * 100);
-                        const aPct = 100 - hPct;
-                        return `
-                            <div class="space-y-1">
-                                <div class="flex items-center justify-between gap-2 text-xs">
-                                    <span class="font-bold text-pizarra-electric">${s.home}</span>
-                                    <span class="text-slate-300 text-center">${s.label}</span>
-                                    <span class="font-bold text-slate-200">${s.away}</span>
-                                </div>
-                                <div class="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden flex">
-                                    <div style="width: ${hPct}%" class="bg-[#0055a5] h-full"></div>
-                                    <div style="width: ${aPct}%" class="bg-slate-600 h-full"></div>
-                                </div>
+                statsContent.innerHTML = statsRows.map(s => {
+                    const total = Math.max(0.0001, (Number(s.homeNum) || 0) + (Number(s.awayNum) || 0));
+                    const hPct = Math.round(((Number(s.homeNum) || 0) / total) * 100);
+                    const aPct = 100 - hPct;
+                    return `
+                        <div class="pt-2.5 border-t border-pizarra-border/40 first:pt-0 first:border-t-0">
+                            <div class="flex items-center justify-between text-[11px] font-mono mb-1">
+                                <span class="text-pizarra-electric font-bold">${homeLabel}: ${s.home}</span>
+                                <span class="text-slate-400 uppercase text-[10px]">${s.label}</span>
+                                <span class="text-slate-300 font-bold">${awayLabel}: ${s.away}</span>
                             </div>
-                        `;
-                    }).join('')}
-                `;
+                            <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden flex">
+                                <div style="width: ${hPct}%" class="bg-[#0055a5] h-full transition-all duration-300"></div>
+                                <div style="width: ${aPct}%" class="bg-slate-600 h-full transition-all duration-300"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
             }
 
             const sideData = m.lineups?.[STATE.activeMatchLineupSide] || m.lineups?.home || m.lineups?.away || null;
@@ -1939,7 +1985,8 @@
                 if (lineupMeta) lineupMeta.textContent = '';
                 lineupContent.innerHTML = `<div class="text-center text-slate-400 py-4">Formación no cargada para este partido.</div>`;
             } else {
-                if (lineupTitle) lineupTitle.textContent = `${sideData.teamName || (STATE.activeMatchLineupSide === 'home' ? homeLabel : awayLabel)} • ${sideData.formation || '4-2-3-1'}`;
+                const sideTeamName = conTildeVelez(sideData.teamName || (STATE.activeMatchLineupSide === 'home' ? homeLabel : awayLabel));
+                if (lineupTitle) lineupTitle.textContent = `${sideTeamName} • ${sideData.formation || '4-2-3-1'}`;
                 if (lineupMeta) lineupMeta.textContent = sideData.coach ? `DT: ${sideData.coach}` : 'Alineación oficial';
 
                 const startersHtml = sideData.startXI.map(pl => `
@@ -1994,14 +2041,16 @@
             timelineList.innerHTML = events.map(ev => {
                 const isHomeSide = ev.side === 'home';
                 const sideColor = isHomeSide ? 'border-l-2 border-l-[#0055a5]' : 'border-l-2 border-l-slate-500';
+                const titleClean = conTildeVelez(ev.title || '');
+                const subtitleClean = conTildeVelez(ev.subtitle || '');
                 return `
                     <div class="flex items-center justify-between gap-2.5 px-3 py-1.5 rounded-lg bg-[#0b0e14]/90 border border-pizarra-border/70 ${sideColor} text-xs">
                         <div class="flex items-center gap-2 min-w-0">
                             <span class="px-1.5 py-0.5 rounded bg-slate-800 text-pizarra-electric font-mono font-bold text-[11px] flex-shrink-0">${ev.minute || '--\''}</span>
                             <span class="text-sm flex-shrink-0">${ev.icon || '•'}</span>
                             <div class="min-w-0">
-                                <div class="text-white font-semibold truncate">${ev.title || ''}</div>
-                                ${ev.subtitle ? `<div class="text-[10px] font-mono text-slate-400 truncate">${ev.subtitle}</div>` : ''}
+                                <div class="text-white font-semibold truncate">${titleClean}</div>
+                                ${subtitleClean ? `<div class="text-[10px] font-mono text-slate-400 truncate">${subtitleClean}</div>` : ''}
                             </div>
                         </div>
                     </div>
@@ -2045,10 +2094,13 @@
             const shareLiveBtn = document.getElementById('share-live-match-btn');
 
             const m = cm.match;
+            const homeCleanName = conTildeVelez(m.teams.home.name || 'Local');
+            const awayCleanName = conTildeVelez(m.teams.away.name || 'Visitante');
+
             homeCrest.innerHTML = renderEscudoImg(m.teams.home, 'w-16 h-16 sm:w-20 sm:h-20', m.teams.home.logo);
             awayCrest.innerHTML = renderEscudoImg(m.teams.away, 'w-16 h-16 sm:w-20 sm:h-20', m.teams.away.logo);
-            homeName.textContent = m.teams.home.name;
-            awayName.textContent = m.teams.away.name;
+            homeName.textContent = homeCleanName;
+            awayName.textContent = awayCleanName;
 
             const isNoUpcomingReference = cm.type === 'LAST_REFERENCE' || cm.type === 'FINISHED_24H' || cm.type === 'TBD';
             if (bothTeamsFormBox) {
@@ -2095,8 +2147,8 @@
             if (homeRole) homeRole.textContent = "LOCAL";
             if (awayRole) awayRole.textContent = "VISITANTE";
 
-            const isVelezHome = normalizarTexto(m.teams.home.name).includes('velez');
-            const rivalName = isVelezHome ? m.teams.away.name : m.teams.home.name;
+            const isVelezHome = normalizarTexto(homeCleanName).includes('velez');
+            const rivalName = isVelezHome ? awayCleanName : homeCleanName;
             if (rivalFormTitle) rivalFormTitle.textContent = `Cómo llega ${rivalName}`;
 
             if (cm.type === 'LIVE' || cm.type === 'FINISHED_24H' || cm.type === 'LAST_REFERENCE') {
@@ -2122,7 +2174,6 @@
                     `;
                 }
 
-                // Tanda de penales si el partido se definió por penales
                 const penText = getPenaltyShootoutText(cm, m);
                 if (penaltiesBadge) {
                     if (penText) {
@@ -2144,7 +2195,6 @@
                     scorersBox.classList.add('hidden');
                 }
 
-                // Tanda de penales detallada con ⚽ (convertido) y ❌ roja (errado/atajado)
                 const hShootoutRaw = m.penaltyShootout?.home || [];
                 const aShootoutRaw = m.penaltyShootout?.away || [];
 
@@ -2216,8 +2266,8 @@
 
                 if (possBox && possData) {
                     possBox.classList.remove('hidden');
-                    if (possHomeLabel) possHomeLabel.textContent = `${m.teams.home.name}: ${possData.home}%`;
-                    if (possAwayLabel) possAwayLabel.textContent = `${m.teams.away.name}: ${possData.away}%`;
+                    if (possHomeLabel) possHomeLabel.textContent = `${homeCleanName}: ${possData.home}%`;
+                    if (possAwayLabel) possAwayLabel.textContent = `${awayCleanName}: ${possData.away}%`;
                     if (possHomeBar) possHomeBar.style.width = `${possData.home}%`;
                     if (possAwayBar) possAwayBar.style.width = `${possData.away}%`;
                 } else if (possBox) {
@@ -2276,11 +2326,13 @@
 
             const chronological = [...STATE.lastFiveMatches].reverse();
             streakEl.innerHTML = chronological.map(m => {
+                const rivalClean = conTildeVelez(m.rival || '');
                 const bg = m.outcome === 'G' ? 'bg-emerald-500 text-slate-950' : (m.outcome === 'E' ? 'bg-amber-400 text-slate-950' : 'bg-rose-500 text-white');
-                return `<span title="${m.rival}: ${m.velezGoals}-${m.rivalGoals}" class="w-5 h-5 rounded flex items-center justify-center ${bg}">${m.outcome}</span>`;
+                return `<span title="${rivalClean}: ${m.velezGoals}-${m.rivalGoals}" class="w-5 h-5 rounded flex items-center justify-center ${bg}">${m.outcome}</span>`;
             }).join('');
 
             listEl.innerHTML = STATE.lastFiveMatches.map(m => {
+                const rivalClean = conTildeVelez(m.rival || '');
                 const isHome = m.cond === 'L';
                 const badgeStyle = m.outcome === 'G'
                     ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
@@ -2290,8 +2342,8 @@
                     : '<span class="px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700 text-[10px] font-mono">VISITANTE</span>';
 
                 const matchTitleHtml = isHome
-                    ? `Vélez <span class="text-slate-400 font-normal text-sm">vs</span> ${m.rival}`
-                    : `${m.rival} <span class="text-slate-400 font-normal text-sm">vs</span> Vélez`;
+                    ? `Vélez <span class="text-slate-400 font-normal text-sm">vs</span> ${rivalClean}`
+                    : `${rivalClean} <span class="text-slate-400 font-normal text-sm">vs</span> Vélez`;
 
                 const scoreText = isHome
                     ? `${m.velezGoals} - ${m.rivalGoals}`
@@ -2302,7 +2354,7 @@
                 return `
                     <div class="p-3.5 hover:bg-pizarra-cardHover/50 transition flex items-center justify-between gap-3">
                         <div class="flex items-center gap-3 min-w-0 flex-1">
-                            ${renderEscudoImg(m.rival, 'w-8 h-8 flex-shrink-0', m.rivalLogo)}
+                            ${renderEscudoImg(rivalClean, 'w-8 h-8 flex-shrink-0', m.rivalLogo)}
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-center gap-2 mb-0.5"><span class="font-mono text-[11px] font-bold text-slate-400">${fechaLabel}</span><span class="text-[11px] text-slate-500">• ${m.date}</span>${condBadge}</div>
                                 <div class="font-display text-lg font-bold uppercase text-white truncate">${matchTitleHtml}</div>
@@ -2325,6 +2377,7 @@
             }
 
             listEl.innerHTML = STATE.upcomingMatches.map((m, i) => {
+                const rivalClean = conTildeVelez(m.rival || '');
                 const condText = m.cond === 'L' ? 'LOCAL' : (m.cond === 'V' ? 'VISITANTE' : 'NEUTRAL');
                 const condClass = m.cond === 'L' ? 'bg-pizarra-accent/30 text-pizarra-electric border-pizarra-accent/50' : 'bg-slate-800 text-slate-300 border-slate-700';
                 const highlightNext = i === 0 ? 'bg-[#0055a5]/15 border-l-4 border-l-pizarra-electric' : 'hover:bg-pizarra-cardHover/50';
@@ -2334,10 +2387,10 @@
                 return `
                     <div class="p-3.5 transition flex items-center justify-between gap-3 ${highlightNext}">
                         <div class="flex items-center gap-3 min-w-0 flex-1">
-                            ${renderEscudoImg(m.rival, 'w-8 h-8 flex-shrink-0', m.rivalLogo)}
+                            ${renderEscudoImg(rivalClean, 'w-8 h-8 flex-shrink-0', m.rivalLogo)}
                             <div class="min-w-0 flex-1">
                                 <div class="flex flex-wrap items-center gap-2 mb-0.5"><span class="px-1.5 py-0.5 rounded bg-[#0b0e14] border border-pizarra-border font-mono text-[10px] font-bold text-pizarra-electric">${fechaLabel}</span><span class="text-[11px] text-slate-400">${compLabel}</span><span class="px-1.5 py-0.2 rounded border text-[10px] font-mono ${condClass}">${condText}</span></div>
-                                <div class="font-display text-lg font-bold uppercase text-white truncate">vs ${m.rival}</div>
+                                <div class="font-display text-lg font-bold uppercase text-white truncate">vs ${rivalClean}</div>
                                 <div class="text-[11px] text-slate-400 truncate">📍 ${m.stadium}</div>
                             </div>
                         </div>
@@ -2401,12 +2454,13 @@
             const hasOfficialCupNotes = teams.some(t => t.cupType === 'LIBERTADORES' || t.cupType === 'SUDAMERICANA');
 
             tbody.innerHTML = teams.map((t, idx) => {
+                const teamNameClean = conTildeVelez(t.name || '');
                 const pos = idx + 1;
                 let rowStyle = 'hover:bg-pizarra-cardHover/60 text-slate-300';
                 let posBadge = `<span class="font-mono text-xs text-slate-400">${pos}</span>`;
                 let cupTag = '';
 
-                const normTeam = normalizarTexto(t.name);
+                const normTeam = normalizarTexto(teamNameClean);
                 let manualCup = null;
                 if (tab === 'ANUAL') {
                     for (const [clave, cfg] of Object.entries(CLASIFICADOS_MANUALES_ANUAL)) {
@@ -2452,8 +2506,8 @@
                     <tr class="${rowStyle} transition-colors">
                         <td class="py-2.5 px-3 text-center">${posBadge}</td>
                         <td class="py-2.5 px-3 flex items-center gap-2.5">
-                            ${renderEscudoImg(t.name, 'w-5 h-5 flex-shrink-0', t.logo)}
-                            <span class="${t.isVelez ? 'text-white font-bold' : ''}">${t.name}</span>
+                            ${renderEscudoImg(teamNameClean, 'w-5 h-5 flex-shrink-0', t.logo)}
+                            <span class="${t.isVelez ? 'text-white font-bold' : ''}">${teamNameClean}</span>
                             ${cupTag}
                         </td>
                         <td class="py-2.5 px-2 text-center font-mono font-bold text-white bg-white/[0.04]">${t.pts}</td>
@@ -2651,7 +2705,8 @@
 
             if (statsRivalEl && statsBodyEl) {
                 if (lms && (lms.possession !== null || lms.totalShots !== null)) {
-                    statsRivalEl.textContent = `vs ${lms.rival} (${lms.date})`;
+                    const rivalClean = conTildeVelez(lms.rival || 'Rival');
+                    statsRivalEl.textContent = `vs ${rivalClean} (${lms.date})`;
 
                     const possVelez = lms.possession !== null ? Math.round(lms.possession) : 50;
                     const possRival = lms.oppPossession !== null ? Math.round(lms.oppPossession) : (100 - possVelez);
@@ -2664,7 +2719,7 @@
                         <div>
                             <div class="flex justify-between text-[11px] font-mono mb-1">
                                 <span class="text-pizarra-electric font-bold">Posesión Vélez: ${possVelez}%</span>
-                                <span class="text-slate-400">${lms.rival}: ${possRival}%</span>
+                                <span class="text-slate-400">${rivalClean}: ${possRival}%</span>
                             </div>
                             <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden flex">
                                 <div style="width: ${possVelez}%" class="bg-[#0055a5] h-full"></div>
@@ -2687,7 +2742,7 @@
                         </div>
                     `;
                 } else {
-                    statsRivalEl.textContent = STATE.lastLineup?.rival ? `vs ${STATE.lastLineup.rival}` : '';
+                    statsRivalEl.textContent = STATE.lastLineup?.rival ? `vs ${conTildeVelez(STATE.lastLineup.rival)}` : '';
                     statsBodyEl.innerHTML = `<p class="text-slate-400">Estadísticas detalladas de posesión y tiros no disponibles para este encuentro.</p>`;
                 }
             }
@@ -2709,7 +2764,7 @@
 
             selector.innerHTML = lineups.map((item, idx) => {
                 const scorePart = item.score ? ` [${item.score}]` : '';
-                return `<option value="${idx}" ${idx === STATE.selectedLineupIdx ? 'selected' : ''}>vs ${item.rival} • ${item.date}${scorePart}</option>`;
+                return `<option value="${idx}" ${idx === STATE.selectedLineupIdx ? 'selected' : ''}>vs ${conTildeVelez(item.rival)} • ${item.date}${scorePart}</option>`;
             }).join('');
         }
 
