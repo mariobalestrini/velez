@@ -583,7 +583,7 @@
             return (scorersList || []).filter(item => {
                 const str = String(item || '');
                 const minMatch = str.match(/\b(\d{2,3})'/);
-                if (minMatch && Number(minMatch[1]) >= 120) return false;
+                if (minMatch && Number(minMatch[1]) >= 118) return false;
                 return true;
             });
         }
@@ -1800,7 +1800,8 @@
                 const mapShootoutSide = (arr, isHomeSide) => {
                     if (Array.isArray(arr) && arr.length > 0) {
                         return arr.map(t => {
-                            const icon = t.scored
+                            const isMissed = t.scored === false || /err|miss|fail|no goal|saved/i.test(String(t.status || t.detail || ''));
+                            const icon = !isMissed
                                 ? '⚽'
                                 : '<span class="text-rose-500 font-extrabold">❌</span>';
                             return isHomeSide
@@ -1810,13 +1811,15 @@
                     }
                     const fallbackList = (m.scorers?.[isHomeSide ? 'home' : 'away'] || []).filter(g => {
                         const minMatch = String(g).match(/\b(\d{2,3})'/);
-                        return minMatch && Number(minMatch[1]) >= 120;
+                        return minMatch && Number(minMatch[1]) >= 118;
                     });
                     return fallbackList.map(g => {
+                        const isMissed = /err|miss|fail|no goal|saved|❌/i.test(String(g));
                         const cleanName = String(g).replace(/\s*\d+'\s*\(P\)/i, '').trim();
+                        const icon = !isMissed ? '⚽' : '<span class="text-rose-500 font-extrabold">❌</span>';
                         return isHomeSide
-                            ? `<div><span class="text-white font-semibold">${cleanName}</span> ⚽</div>`
-                            : `<div>⚽ <span class="text-white font-semibold">${cleanName}</span></div>`;
+                            ? `<div><span class="text-white font-semibold">${cleanName}</span> ${icon}</div>`
+                            : `<div>${icon} <span class="text-white font-semibold">${cleanName}</span></div>`;
                     });
                 };
 
