@@ -200,9 +200,18 @@
                     </div>
                 </div>
 
-                <!-- GOLEADORES, TANDA DE PENALES, TARJETAS Y POSESIÓN -->
-                <div class="space-y-2">
-                    <div id="live-scorers-box" class="hidden pt-3 border-t border-pizarra-border/60 grid grid-cols-2 gap-4 text-xs font-mono leading-relaxed">
+                <!-- SOLAPAS DEL PARTIDO: GOLES / ESTADÍSTICAS / FORMACIONES -->
+                <div id="match-detail-tabs-wrapper" class="hidden pt-3 border-t border-pizarra-border/70">
+                    <div class="flex items-center justify-center gap-1.5 bg-[#0b0e14] p-1 rounded-xl border border-pizarra-border max-w-md mx-auto text-xs font-mono font-bold uppercase">
+                        <button type="button" onclick="switchMatchDetailTab('GOALS')" id="match-tab-GOALS" class="flex-1 py-1.5 px-3 rounded-lg bg-pizarra-accent text-white transition">Goles</button>
+                        <button type="button" onclick="switchMatchDetailTab('STATS')" id="match-tab-STATS" class="flex-1 py-1.5 px-3 rounded-lg text-slate-400 hover:text-white transition">Estadísticas</button>
+                        <button type="button" onclick="switchMatchDetailTab('LINEUPS')" id="match-tab-LINEUPS" class="flex-1 py-1.5 px-3 rounded-lg text-slate-400 hover:text-white transition">Formaciones</button>
+                    </div>
+                </div>
+
+                <!-- PANEL 1: GOLES, TANDA DE PENALES, TARJETAS, POSESIÓN Y MINUTO A MINUTO -->
+                <div id="match-panel-GOALS" class="space-y-2">
+                    <div id="live-scorers-box" class="hidden pt-2 grid grid-cols-2 gap-4 text-xs font-mono leading-relaxed">
                         <div id="live-scorers-home" class="text-right space-y-1 text-slate-300 pr-2 border-r border-pizarra-border/50 min-w-0"></div>
                         <div id="live-scorers-away" class="text-left space-y-1 text-slate-300 pl-2 min-w-0"></div>
                     </div>
@@ -247,6 +256,32 @@
                             <span class="text-[10px] font-mono text-slate-400">Actualización automática</span>
                         </div>
                         <div id="live-timeline-list" class="max-h-56 overflow-y-auto space-y-1.5 pr-1"></div>
+                    </div>
+                </div>
+
+                <!-- PANEL 2: ESTADÍSTICAS DETALLADAS DEL PARTIDO -->
+                <div id="match-panel-STATS" class="hidden max-w-2xl mx-auto w-full pt-2">
+                    <div id="match-stats-tab-content" class="bg-[#0b0e14]/90 rounded-xl border border-pizarra-border p-4 space-y-3 text-xs font-mono">
+                        <div class="text-center text-slate-400 py-4">Sincronizando estadísticas del partido...</div>
+                    </div>
+                </div>
+
+                <!-- PANEL 3: FORMACIONES DEL PARTIDO -->
+                <div id="match-panel-LINEUPS" class="hidden max-w-3xl mx-auto w-full pt-2">
+                    <div class="bg-[#0b0e14]/90 rounded-xl border border-pizarra-border p-4 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-pizarra-border pb-3">
+                            <div>
+                                <div id="match-lineup-team-title" class="font-display text-lg font-bold uppercase text-white">Formación</div>
+                                <div id="match-lineup-coach-meta" class="text-[11px] font-mono text-pizarra-electric"></div>
+                            </div>
+                            <div class="flex bg-[#121721] p-1 rounded-lg border border-pizarra-border text-xs font-mono">
+                                <button type="button" onclick="switchMatchLineupSide('home')" id="match-lineup-side-home" class="px-3 py-1 rounded bg-pizarra-accent text-white transition">Local</button>
+                                <button type="button" onclick="switchMatchLineupSide('away')" id="match-lineup-side-away" class="px-3 py-1 rounded text-slate-400 hover:text-white transition">Visitante</button>
+                            </div>
+                        </div>
+                        <div id="match-lineup-tab-content" class="space-y-3 text-xs font-mono">
+                            <div class="text-center text-slate-400 py-4">Sincronizando formaciones del partido...</div>
+                        </div>
                     </div>
                 </div>
 
@@ -578,6 +613,7 @@
 
         function traducirEtiquetasEsp(texto = '') {
             return String(texto || '')
+                .replace(/\bRound of 64\b/gi, '32avos de Final')
                 .replace(/\bRound of 32\b/gi, 'Dieciseisavos de Final')
                 .replace(/\bRound of 16\b/gi, 'Octavos de Final')
                 .replace(/\bQuarter-?finals?\b/gi, 'Cuartos de Final')
@@ -597,7 +633,7 @@
         }
 
         function isPlayoffRoundLabel(text = '') {
-            return /round of 32|dieciseisavos|round of 16|octavos|quarter|cuartos|semi|final|play-?off|eliminaci[oó]n/i.test(String(text));
+            return /64|32avos|round of 32|dieciseisavos|round of 16|octavos|quarter|cuartos|semi|final|play-?off|eliminaci[oó]n/i.test(String(text));
         }
 
         function limpiarRoundSinEst(roundStr) {
@@ -771,6 +807,8 @@
             countdown: 15,
             isLiveMatch: false,
             livePollingTimer: null,
+            activeMatchDetailTab: 'GOALS',
+            activeMatchLineupSide: 'home',
             activeTournamentName: 'Torneo Clausura',
             grupoAName: 'Grupo A',
             grupoBName: 'Grupo B',
@@ -1813,6 +1851,127 @@
             return null;
         }
 
+        function switchMatchDetailTab(tabName) {
+            STATE.activeMatchDetailTab = tabName;
+            ['GOALS', 'STATS', 'LINEUPS'].forEach(t => {
+                const btn = document.getElementById(`match-tab-${t}`);
+                const panel = document.getElementById(`match-panel-${t}`);
+                if (btn) {
+                    btn.className = t === tabName
+                        ? 'flex-1 py-1.5 px-3 rounded-lg bg-pizarra-accent text-white transition'
+                        : 'flex-1 py-1.5 px-3 rounded-lg text-slate-400 hover:text-white transition';
+                }
+                if (panel) {
+                    panel.classList.toggle('hidden', t !== tabName);
+                }
+            });
+            renderMatchStatsAndLineupsPanels();
+        }
+
+        function switchMatchLineupSide(side) {
+            STATE.activeMatchLineupSide = side === 'away' ? 'away' : 'home';
+            const homeBtn = document.getElementById('match-lineup-side-home');
+            const awayBtn = document.getElementById('match-lineup-side-away');
+            if (homeBtn) {
+                homeBtn.className = STATE.activeMatchLineupSide === 'home'
+                    ? 'px-3 py-1 rounded bg-pizarra-accent text-white transition'
+                    : 'px-3 py-1 rounded text-slate-400 hover:text-white transition';
+            }
+            if (awayBtn) {
+                awayBtn.className = STATE.activeMatchLineupSide === 'away'
+                    ? 'px-3 py-1 rounded bg-pizarra-accent text-white transition'
+                    : 'px-3 py-1 rounded text-slate-400 hover:text-white transition';
+            }
+            renderMatchStatsAndLineupsPanels();
+        }
+
+        function renderMatchStatsAndLineupsPanels() {
+            const cm = STATE.currentMatchData;
+            const m = cm?.match;
+            const statsContent = document.getElementById('match-stats-tab-content');
+            const lineupContent = document.getElementById('match-lineup-tab-content');
+            const lineupTitle = document.getElementById('match-lineup-team-title');
+            const lineupMeta = document.getElementById('match-lineup-coach-meta');
+            const homeBtn = document.getElementById('match-lineup-side-home');
+            const awayBtn = document.getElementById('match-lineup-side-away');
+
+            if (!statsContent || !lineupContent || !m) return;
+
+            const homeLabel = m.teams?.home?.name || 'Local';
+            const awayLabel = m.teams?.away?.name || 'Visitante';
+            if (homeBtn) homeBtn.textContent = homeLabel;
+            if (awayBtn) awayBtn.textContent = awayLabel;
+
+            const statsRows = Array.isArray(m.statistics) ? m.statistics : [];
+            if (statsRows.length === 0) {
+                statsContent.innerHTML = `<div class="text-center text-slate-400 py-4">Sin estadísticas detalladas disponibles para este encuentro.</div>`;
+            } else {
+                statsContent.innerHTML = `
+                    <div class="flex items-center justify-between text-[11px] text-slate-400 pb-2 border-b border-pizarra-border/60">
+                        <span class="font-bold text-white truncate max-w-[38%]">${homeLabel}</span>
+                        <span class="uppercase text-[10px]">Métrica</span>
+                        <span class="font-bold text-white truncate max-w-[38%] text-right">${awayLabel}</span>
+                    </div>
+                    ${statsRows.map(s => {
+                        const total = Math.max(0.0001, (Number(s.homeNum) || 0) + (Number(s.awayNum) || 0));
+                        const hPct = Math.round(((Number(s.homeNum) || 0) / total) * 100);
+                        const aPct = 100 - hPct;
+                        return `
+                            <div class="space-y-1">
+                                <div class="flex items-center justify-between gap-2 text-xs">
+                                    <span class="font-bold text-pizarra-electric">${s.home}</span>
+                                    <span class="text-slate-300 text-center">${s.label}</span>
+                                    <span class="font-bold text-slate-200">${s.away}</span>
+                                </div>
+                                <div class="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden flex">
+                                    <div style="width: ${hPct}%" class="bg-[#0055a5] h-full"></div>
+                                    <div style="width: ${aPct}%" class="bg-slate-600 h-full"></div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                `;
+            }
+
+            const sideData = m.lineups?.[STATE.activeMatchLineupSide] || m.lineups?.home || m.lineups?.away || null;
+            if (!sideData || !Array.isArray(sideData.startXI) || sideData.startXI.length === 0) {
+                if (lineupTitle) lineupTitle.textContent = 'Formación';
+                if (lineupMeta) lineupMeta.textContent = '';
+                lineupContent.innerHTML = `<div class="text-center text-slate-400 py-4">Formación no cargada para este partido.</div>`;
+            } else {
+                if (lineupTitle) lineupTitle.textContent = `${sideData.teamName || (STATE.activeMatchLineupSide === 'home' ? homeLabel : awayLabel)} • ${sideData.formation || '4-2-3-1'}`;
+                if (lineupMeta) lineupMeta.textContent = sideData.coach ? `DT: ${sideData.coach}` : 'Alineación oficial';
+
+                const startersHtml = sideData.startXI.map(pl => `
+                    <div class="flex items-center gap-2 p-2 rounded-lg bg-[#121721] border border-pizarra-border/80">
+                        <span class="w-6 h-6 rounded-full bg-[#0055a5]/40 border border-[#0055a5] flex items-center justify-center text-[11px] font-bold text-white flex-shrink-0">${pl.number}</span>
+                        <span class="text-white font-semibold truncate flex-1">${pl.name}</span>
+                        ${pl.pos ? `<span class="text-[10px] text-slate-400 uppercase">${pl.pos}</span>` : ''}
+                    </div>
+                `).join('');
+
+                const subsHtml = (sideData.substitutes || []).length > 0
+                    ? `<div class="pt-3 border-t border-pizarra-border/60">
+                        <div class="text-[11px] uppercase text-slate-400 mb-2">Suplentes</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                            ${sideData.substitutes.map(pl => `
+                                <div class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[#121721]/60 border border-pizarra-border/50 text-[11px]">
+                                    <span class="font-bold text-slate-400">${pl.number}</span>
+                                    <span class="text-slate-200 truncate">${pl.name}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>`
+                    : '';
+
+                lineupContent.innerHTML = `
+                    <div class="text-[11px] uppercase text-pizarra-electric">Titulares (${sideData.startXI.length})</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${startersHtml}</div>
+                    ${subsHtml}
+                `;
+            }
+        }
+
         function renderLiveTimeline(cm, m) {
             const timelineBox = document.getElementById('live-timeline-box');
             const timelineList = document.getElementById('live-timeline-list');
@@ -1868,6 +2027,7 @@
             const stadium = document.getElementById('match-stadium');
             const rivalFormTitle = document.getElementById('rival-form-title');
             const bothTeamsFormBox = document.getElementById('both-teams-form-box');
+            const tabsWrapper = document.getElementById('match-detail-tabs-wrapper');
             const scorersBox = document.getElementById('live-scorers-box');
             const scorersHome = document.getElementById('live-scorers-home');
             const scorersAway = document.getElementById('live-scorers-away');
@@ -1901,7 +2061,14 @@
                 shareLiveBtn.classList.toggle('inline-flex', showShareForMatch);
             }
 
+            const showMatchTabs = cm.type === 'LIVE' || cm.type === 'FINISHED_24H' || cm.type === 'LAST_REFERENCE';
+            if (tabsWrapper) {
+                tabsWrapper.classList.toggle('hidden', !showMatchTabs);
+            }
+
             if (cm.type === 'TBD') {
+                if (tabsWrapper) tabsWrapper.classList.add('hidden');
+                switchMatchDetailTab('GOALS');
                 if (scorersBox) scorersBox.classList.add('hidden');
                 if (shootoutBox) shootoutBox.classList.add('hidden');
                 if (cardsBox) cardsBox.classList.add('hidden');
@@ -1995,7 +2162,7 @@
                     }
                     const fallbackList = (m.scorers?.[isHomeSide ? 'home' : 'away'] || []).filter(g => {
                         const minMatch = String(g).match(/\b(\d{2,3})'/);
-                        return minMatch && Number(minMatch[1]) >= 120;
+                        return minMatch && Number(minMatch[1]) >= 118;
                     });
                     return fallbackList.map(g => {
                         const isMissed = /err|miss|fail|no goal|saved|❌/i.test(String(g));
@@ -2058,7 +2225,10 @@
                 }
 
                 renderLiveTimeline(cm, m);
+                renderMatchStatsAndLineupsPanels();
             } else {
+                if (tabsWrapper) tabsWrapper.classList.add('hidden');
+                switchMatchDetailTab('GOALS');
                 if (scorersBox) scorersBox.classList.add('hidden');
                 if (shootoutBox) shootoutBox.classList.add('hidden');
                 if (cardsBox) cardsBox.classList.add('hidden');
