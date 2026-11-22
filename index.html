@@ -1,2380 +1,406 @@
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LA V AZULADA | Estadísticas en Vivo & Pizarra Táctica de Vélez Sarsfield</title>
-    <!-- Favicon & Ícono Pantalla de Inicio iPhone / Android -->
-    <link rel="icon" href="/favicon.ico?v=3" sizes="any">
-    <link rel="icon" type="image/png" sizes="32x32" href="/escudo-velez.png?v=3">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="La V Azulada">
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Diccionario propio de posiciones tácticas del plantel -->
-    <script src="./posiciones.js"></script>
-    <!-- Efemérides históricas de Vélez Sarsfield -->
-    <script src="./efemerides.js"></script>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        pizarra: {
-                            bg: '#0b0e14',
-                            card: '#121721',
-                            cardHover: '#181f2c',
-                            border: '#1f293a',
-                            accent: '#0055a5',
-                            electric: '#38bdf8',
-                            accentLight: '#1e78d6'
-                        }
-                    },
-                    fontFamily: {
-                        display: ['"Barlow Condensed"', 'sans-serif'],
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['"JetBrains Mono"', 'monospace'],
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body {
-            background-color: #0b0e14;
-            color: #e2e8f0;
-            background-image: 
-                radial-gradient(circle at 12% 0%, rgba(0, 85, 165, 0.18) 0%, transparent 45%),
-                radial-gradient(circle at 88% 100%, rgba(56, 189, 248, 0.08) 0%, transparent 40%);
-        }
-        .tactical-grid {
-            background-size: 26px 26px;
-            background-image: 
-                linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-        }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #0b0e14; }
-        ::-webkit-scrollbar-thumb { background: #1f293a; border-radius: 9999px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>La V Azulada — Club Atlético Vélez Sarsfield</title>
+  <style>
+    :root {
+      --bg: #081224;
+      --card: #0f1f3d;
+      --card-2: #15294f;
+      --accent: #38bdf8;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: rgba(255, 255, 255, 0.09);
+      --win: #16a34a;
+      --draw: #d97706;
+      --loss: #dc2626;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(180deg, #060e1c 0%, var(--bg) 100%);
+      color: var(--text);
+      line-height: 1.45;
+      padding: 20px;
+    }
+    .container { max-width: 1120px; margin: 0 auto; }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 22px;
+    }
+    h1 { font-size: 1.6rem; letter-spacing: 0.4px; }
+    .sub { color: var(--muted); font-size: 0.9rem; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; margin-bottom: 20px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .card h2 { font-size: 1.1rem; margin-bottom: 12px; color: var(--accent); }
+    .match-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: var(--card-2);
+      padding: 14px;
+      border-radius: 10px;
+      margin: 10px 0;
+    }
+    .team-col { display: flex; flex-direction: column; align-items: center; text-align: center; flex: 1; }
+    .team-col img { width: 48px; height: 48px; object-fit: contain; margin-bottom: 6px; }
+    .score-box { font-size: 1.6rem; font-weight: 700; min-width: 90px; text-align: center; }
+    .pen-note { font-size: 0.8rem; color: var(--accent); margin-top: 4px; text-align: center; }
+    .meta-line { font-size: 0.85rem; color: var(--muted); margin-top: 6px; }
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+    .list-item:last-child { border-bottom: none; }
+    .badge {
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.78rem;
+      color: #fff;
+    }
+    .G { background: var(--win); }
+    .E { background: var(--draw); }
+    .P { background: var(--loss); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+    th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-weight: 600; }
+    .velez-row { background: rgba(56, 189, 248, 0.14); font-weight: 700; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .tab-btn {
+      background: var(--card-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .tab-btn.active { background: var(--accent); color: #061021; font-weight: 700; }
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+    .stat-pill { background: var(--card-2); padding: 10px; border-radius: 8px; text-align: center; }
+    .stat-val { font-size: 1.2rem; font-weight: 700; display: block; }
+    .stat-lbl { font-size: 0.78rem; color: var(--muted); }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col font-sans antialiased selection:bg-[#0055a5] selection:text-white">
-
-    <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
-
-    <!-- BANNER FLOTANTE PARA AGREGAR ACCESO DIRECTO EN CELULARES (iOS / ANDROID) -->
-    <div id="pwa-install-banner" class="hidden fixed bottom-3 left-3 right-3 z-50 mx-auto max-w-md bg-[#121721]/95 backdrop-blur-md border-2 border-[#0055a5] rounded-2xl p-3.5 shadow-[0_12px_35px_rgba(0,0,0,0.85)] transition-all duration-300">
-        <div class="flex items-start gap-3">
-            <img src="./escudo-velez.png" alt="Vélez" class="w-11 h-11 object-contain flex-shrink-0 mt-0.5">
-            <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between gap-2">
-                    <span class="font-display text-base font-extrabold uppercase tracking-wide text-white">Instalá La V Azulada</span>
-                    <button onclick="dismissInstallBanner()" aria-label="Cerrar" class="text-slate-400 hover:text-white p-1 -mr-1 -mt-1">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </div>
-                <p id="pwa-install-instructions" class="text-xs text-slate-300 leading-snug mt-0.5"></p>
-            </div>
-        </div>
-        <div id="pwa-ios-arrow" class="hidden flex justify-center mt-1.5 -mb-1 text-pizarra-electric animate-bounce">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
-        </div>
-    </div>
-
-    <!-- CABECERA 'LA V AZULADA' -->
-    <header class="sticky top-0 z-40 bg-[#0b0e14]/95 backdrop-blur-md border-b border-pizarra-border">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
-            <div class="flex items-center gap-3">
-                <div id="header-velez-crest" class="w-10 h-11 sm:w-11 sm:h-12 flex-shrink-0 flex items-center justify-center drop-shadow-[0_0_12px_rgba(0,85,165,0.65)]"></div>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <h1 class="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-white uppercase leading-none">
-                            LA <span class="text-[#0066cc] drop-shadow-[0_0_10px_rgba(0,85,165,0.85)]">V</span> AZULADA
-                        </h1>
-                        <span class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider bg-pizarra-accent/25 text-pizarra-electric border border-pizarra-accent/50 rounded">
-                            C.A. Vélez Sarsfield • 1910
-                        </span>
-                    </div>
-                    <p class="text-xs text-slate-400 mt-0.5">Estadísticas en Vivo & Pizarra Táctica</p>
-                </div>
-            </div>
-
-            <div class="flex flex-wrap items-center gap-2 sm:gap-3 ml-auto">
-                <div class="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-pizarra-card border border-pizarra-border text-xs font-mono text-slate-400">
-                    <span>Últ. act:</span>
-                    <span id="last-updated-time" class="text-white font-bold">--:--:--</span>
-                </div>
-                <div id="polling-status-pill" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700 text-xs font-mono">
-                    <span id="polling-status-dot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
-                    <span id="polling-status-label" class="font-bold text-slate-300 tracking-wide">SIN PARTIDO EN VIVO</span>
-                </div>
-                <a href="./fixture.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-xs font-mono font-bold text-pizarra-electric hover:text-white transition">
-                    <span>Fixture</span>
-                </a>
-                <button onclick="manualRefresh()" title="Actualizar datos" class="p-2 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-white transition active:scale-95">
-                    <svg id="refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>La V Azulada</h1>
+        <div class="sub" id="status-sub">Conectando con API-Football vía Render...</div>
+      </div>
+      <div class="sub" id="tournament-label">Temporada 2026</div>
     </header>
 
-    <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-5 space-y-6">
+    <div class="grid-2">
+      <section class="card">
+        <h2>Partido</h2>
+        <div id="current-match-container">Cargando partido...</div>
+      </section>
 
-        <!-- TARJETA AUTOMÁTICA DE EFEMÉRIDE FORTINERA (SOLO VISIBLE EN FECHAS HISTÓRICAS) -->
-        <section id="efemeride-section" class="hidden relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0e192b] via-[#121721] to-[#0d1f36] border border-[#0055a5]/70 shadow-2xl">
-            <div class="px-4 py-2 bg-[#0055a5]/25 border-b border-[#0055a5]/40 flex flex-wrap items-center justify-between gap-2 text-xs">
-                <div class="flex items-center gap-2">
-                    <span id="efemeride-badge" class="px-2 py-0.5 rounded bg-[#0055a5] text-white font-mono font-bold uppercase tracking-wider text-[10px]">UN DÍA COMO HOY</span>
-                    <span id="efemeride-date-label" class="font-mono text-pizarra-electric font-bold"></span>
-                </div>
-                <button onclick="shareSectionAsPng('EFEMERIDE')" title="Compartir efeméride en historia" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-200 hover:text-pizarra-electric transition">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                    <span class="text-[10px] font-mono font-bold uppercase">Compartir</span>
-                </button>
-            </div>
-            <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div class="flex items-start sm:items-center gap-3.5 flex-1 min-w-0 w-full">
-                    <div id="efemeride-visual-slot" class="w-14 h-14 sm:w-16 sm:h-16 flex-shrink-0 flex items-center justify-center rounded-xl bg-[#0b0e14]/85 border border-[#0055a5]/40 p-2 drop-shadow-[0_0_12px_rgba(0,85,165,0.7)]"></div>
-                    <div class="flex-1 min-w-0 w-full">
-                        <div id="efemeride-years-pill" class="inline-block text-[11px] font-mono font-bold text-amber-300 uppercase tracking-wide mb-0.5"></div>
-                        <h2 id="efemeride-title" class="font-display text-xl sm:text-2xl font-extrabold uppercase tracking-wide text-white leading-tight"></h2>
-                        <p id="efemeride-desc" class="text-xs sm:text-sm text-slate-300 mt-1 w-full max-w-none leading-relaxed"></p>
-                    </div>
-                </div>
-            </div>
-        </section>
+      <section class="card">
+        <h2>Estadísticas del último partido</h2>
+        <div id="last-stats-container">Cargando estadísticas...</div>
+      </section>
+    </div>
 
-        <!-- PREVIA OFICIAL / PARTIDO EN VIVO / RESULTADO 24HS / ÚLTIMO PARTIDO / A CONFIRMAR -->
-        <section class="relative overflow-hidden rounded-2xl bg-pizarra-card border border-pizarra-border tactical-grid shadow-2xl">
-            <div class="px-4 py-2.5 bg-[#0e131c] border-b border-pizarra-border flex flex-wrap items-center justify-between gap-2 text-xs">
-                <div class="flex flex-wrap items-center gap-2">
-                    <span id="match-badge-type" class="px-2 py-0.5 rounded bg-sky-500/20 text-pizarra-electric border border-sky-500/40 font-bold uppercase tracking-wider text-[11px]">PRÓXIMO PARTIDO OFICIAL</span>
-                    <span id="match-league-info" class="text-slate-300 font-medium">Liga Profesional</span>
-                </div>
-                <div class="flex flex-wrap items-center gap-3 text-[11px] font-mono text-slate-300">
-                    <span>📍 <span id="match-stadium" class="text-white">Estadio José Amalfitani (Liniers)</span></span>
-                    <span class="hidden sm:inline text-slate-600">|</span>
-                    <span>📺 <span class="text-pizarra-electric font-bold">ESPN Premium / TNT Sports</span></span>
-                    <button id="share-live-match-btn" onclick="shareSectionAsPng('LIVE_MATCH')" title="Compartir historia" class="hidden items-center gap-1 px-2.5 py-1 rounded-md bg-[#121721] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                        <span class="text-[10px] font-bold uppercase">Compartir</span>
-                    </button>
-                </div>
-            </div>
+    <div class="grid-2">
+      <section class="card">
+        <h2>Últimos partidos</h2>
+        <div id="last-matches-container">Cargando...</div>
+      </section>
 
-            <div class="p-5 sm:p-7 space-y-6">
-                <div class="grid grid-cols-3 items-center gap-2 sm:gap-4 text-center">
-                    <div class="flex flex-col items-center">
-                        <div id="match-home-crest" class="w-16 h-16 sm:w-20 sm:h-20 mb-2 flex items-center justify-center drop-shadow-[0_0_16px_rgba(0,85,165,0.55)]"></div>
-                        <h2 id="match-home-name" class="font-display text-xl sm:text-3xl font-extrabold uppercase tracking-wide text-white">Vélez Sarsfield</h2>
-                        <span id="match-home-role" class="mt-1 px-2.5 py-0.5 rounded bg-pizarra-accent/25 border border-pizarra-accent/50 text-[11px] text-pizarra-electric font-mono font-bold">LOCAL</span>
-                    </div>
+      <section class="card">
+        <h2>Próximos partidos</h2>
+        <div id="upcoming-matches-container">Cargando...</div>
+      </section>
+    </div>
 
-                    <div class="flex flex-col items-center justify-center">
-                        <span id="match-status-title" class="text-xs sm:text-sm font-display uppercase tracking-wider text-pizarra-electric font-bold mb-1">CARGANDO FECHA...</span>
-                        <div id="match-center-box" class="bg-[#0b0e14]/95 px-4 sm:px-7 py-2.5 rounded-2xl border border-pizarra-border shadow-inner">
-                            <span class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">--:--</span>
-                            <span id="match-center-tz-label" class="block text-[10px] font-mono text-pizarra-electric font-bold tracking-widest uppercase">HORA LOCAL</span>
-                        </div>
-                        <div id="match-penalties-badge" class="hidden mt-2 px-3 py-0.5 rounded-lg bg-sky-500/15 border border-sky-400/40 font-mono text-[11px] font-bold text-sky-300"></div>
-                        <div id="prev-countdown-pill" class="mt-2.5 px-3 py-1 rounded-full bg-pizarra-accent/20 border border-pizarra-accent/40 flex items-center gap-1.5">
-                            <span id="prev-countdown-dot" class="w-1.5 h-1.5 rounded-full bg-pizarra-electric animate-pulse"></span>
-                            <span id="prev-countdown" class="font-mono text-[11px] sm:text-xs font-bold text-sky-200">Faltan: --d --h --m --s</span>
-                        </div>
-                    </div>
+    <section class="card" style="margin-bottom: 20px;">
+      <h2>Posiciones</h2>
+      <div class="tabs">
+        <button class="tab-btn active" data-table="clausura">Posiciones Vélez</button>
+        <button class="tab-btn" data-table="grupoA" id="tab-grupo-a">Grupo A</button>
+        <button class="tab-btn" data-table="grupoB" id="tab-grupo-b">Grupo B</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Equipo</th>
+              <th>PTS</th>
+              <th>PJ</th>
+              <th>PG</th>
+              <th>PE</th>
+              <th>PP</th>
+              <th>GF</th>
+              <th>GC</th>
+              <th>DG</th>
+            </tr>
+          </thead>
+          <tbody id="standings-tbody">
+            <tr><td colspan="10">Cargando tabla...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-                    <div class="flex flex-col items-center">
-                        <div id="match-away-crest" class="w-16 h-16 sm:w-20 sm:h-20 mb-2 flex items-center justify-center drop-shadow-[0_0_14px_rgba(56,189,248,0.35)]"></div>
-                        <h2 id="match-away-name" class="font-display text-xl sm:text-3xl font-extrabold uppercase tracking-wide text-slate-100">A confirmar</h2>
-                        <span id="match-away-role" class="mt-1 px-2.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-[11px] text-slate-300 font-mono font-bold">VISITANTE</span>
-                    </div>
-                </div>
+    <section class="card">
+      <h2>Plantel</h2>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Jugador</th>
+              <th>Posición</th>
+              <th>PJ</th>
+              <th>Goles</th>
+              <th>TA</th>
+              <th>TR</th>
+            </tr>
+          </thead>
+          <tbody id="squad-tbody">
+            <tr><td colspan="7">Cargando plantel...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
 
-                <!-- GOLEADORES, TARJETAS Y POSESIÓN -->
-                <div class="space-y-2">
-                    <div id="live-scorers-box" class="hidden pt-3 border-t border-pizarra-border/60 grid grid-cols-2 gap-4 text-xs font-mono leading-relaxed">
-                        <div id="live-scorers-home" class="text-right space-y-1 text-slate-300 pr-2 border-r border-pizarra-border/50 min-w-0"></div>
-                        <div id="live-scorers-away" class="text-left space-y-1 text-slate-300 pl-2 min-w-0"></div>
-                    </div>
+  <script>
+    const BACKEND_URL = 'https://velez-backend.onrender.com';
+    let latestData = null;
+    let activeTableKey = 'clausura';
 
-                    <!-- TARJETAS AMARILLAS Y ROJAS EN VIVO DEL PARTIDO EN CURSO -->
-                    <div id="live-cards-box" class="hidden mt-2 pt-2.5 border-t border-pizarra-border/40 grid grid-cols-2 gap-4 text-xs font-mono leading-relaxed">
-                        <div id="live-cards-home" class="text-right space-y-1 text-slate-300 pr-2 border-r border-pizarra-border/50 min-w-0"></div>
-                        <div id="live-cards-away" class="text-left space-y-1 text-slate-300 pl-2 min-w-0"></div>
-                    </div>
+    function formatPenaltiesText(pen) {
+      if (!pen) return '';
+      const h = pen.home;
+      const a = pen.away;
+      if (h === null || h === undefined || a === null || a === undefined) return '';
+      if (Number(h) === 0 && Number(a) === 0) return '';
+      return `Penales: ${h} - ${a}`;
+    }
 
-                    <!-- POSESIÓN EN VIVO O DEL ÚLTIMO PARTIDO FINALIZADO -->
-                    <div id="live-possession-box" class="hidden mt-2 pt-2.5 border-t border-pizarra-border/40 max-w-md mx-auto w-full">
-                        <div class="flex items-center justify-between text-[11px] font-mono mb-1">
-                            <span id="live-poss-home-label" class="text-pizarra-electric font-bold">Local: --%</span>
-                            <span class="text-slate-400 uppercase text-[10px]">Posesión</span>
-                            <span id="live-poss-away-label" class="text-slate-300 font-bold">Visitante: --%</span>
-                        </div>
-                        <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden flex">
-                            <div id="live-poss-home-bar" style="width: 50%" class="bg-[#0055a5] h-full transition-all duration-300"></div>
-                            <div id="live-poss-away-bar" style="width: 50%" class="bg-slate-600 h-full transition-all duration-300"></div>
-                        </div>
-                    </div>
-                </div>
+    function renderCurrentMatch(data) {
+      const container = document.getElementById('current-match-container');
+      const cm = data.currentMatch;
+      if (!cm || !cm.match) {
+        container.innerHTML = '<div class="meta-line">Sin información de partido disponible.</div>';
+        return;
+      }
 
-                <!-- CÓMO LLEGAN AMBOS EQUIPOS (SOLO CUANDO HAY PRÓXIMO PARTIDO PROGRAMADO) -->
-                <div id="both-teams-form-box" class="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-5 border-t border-pizarra-border/80">
-                    <div class="bg-[#0b0e14]/90 rounded-xl border border-pizarra-border p-4 space-y-3.5">
-                        <div class="flex items-center justify-between border-b border-pizarra-border pb-2.5">
-                            <h3 class="font-display text-base sm:text-lg font-bold uppercase text-white tracking-wide">Cómo llega El Fortín</h3>
-                            <span class="font-mono text-[11px] text-emerald-400 font-bold">Últimos 2 encuentros</span>
-                        </div>
-                        <div>
-                            <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-2">Últimos partidos disputados</div>
-                            <div id="prev-velez-last2" class="space-y-2"></div>
-                        </div>
-                    </div>
+      const m = cm.match;
+      const home = m.teams?.home || {};
+      const away = m.teams?.away || {};
+      const isUpcoming = cm.type === 'NEXT' || m.fixture?.status?.short === 'NS';
+      const scoreText = isUpcoming
+        ? 'vs'
+        : `${m.goals?.home ?? 0} - ${m.goals?.away ?? 0}`;
 
-                    <div class="bg-[#0b0e14]/90 rounded-xl border border-pizarra-border p-4 space-y-3.5">
-                        <div class="flex items-center justify-between border-b border-pizarra-border pb-2.5">
-                            <h3 id="rival-form-title" class="font-display text-base sm:text-lg font-bold uppercase text-white tracking-wide">Rival de Turno</h3>
-                            <span class="font-mono text-[11px] text-slate-300 font-bold">Últimos 2 encuentros</span>
-                        </div>
-                        <div>
-                            <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-2">Últimos partidos disputados</div>
-                            <div id="prev-rival-last2" class="space-y-2"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+      const penFromObj = cm.penalties || m.score?.penalty;
+      const penText = !isUpcoming ? formatPenaltiesText(penFromObj) : '';
 
-        <!-- ÚLTIMOS 5 PARTIDOS Y PRÓXIMOS ENCUENTROS -->
-        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-6 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden flex flex-col">
-                <div class="p-4 border-b border-pizarra-border flex flex-wrap items-center justify-between gap-2 bg-[#0e131c]">
-                    <h3 class="font-display text-xl font-bold uppercase tracking-wide text-white flex items-center gap-2">
-                        <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
-                        Últimos 5 Partidos Disputados
-                    </h3>
-                    <div class="flex items-center gap-2">
-                        <div id="form-streak-badges" class="flex items-center gap-1 font-mono text-xs font-bold"></div>
-                        <button onclick="shareSectionAsPng('LAST_FIVE')" title="Compartir historia" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                            <span class="text-[10px] font-mono font-bold uppercase">Compartir</span>
-                        </button>
-                    </div>
-                </div>
-                <div id="last-five-list" class="divide-y divide-pizarra-border/70 flex-1"></div>
-            </div>
+      const homeScorers = (m.scorers?.home || []).join(', ');
+      const awayScorers = (m.scorers?.away || []).join(', ');
+      const possText = m.possession ? `Posesión: ${m.possession.home}% - ${m.possession.away}%` : '';
+      const dateStr = m.fixture?.date
+        ? new Date(m.fixture.date).toLocaleString('es-AR', {
+            weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false
+          })
+        : '';
 
-            <div class="lg:col-span-6 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden flex flex-col">
-                <div class="p-4 border-b border-pizarra-border flex items-center justify-between gap-2 bg-[#0e131c]">
-                    <h3 class="font-display text-xl font-bold uppercase tracking-wide text-white flex items-center gap-2">
-                        <span class="w-1.5 h-5 bg-pizarra-electric rounded-full"></span>
-                        Próximos Partidos de Vélez
-                    </h3>
-                    <button onclick="shareSectionAsPng('UPCOMING')" title="Compartir historia" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                        <span class="text-[10px] font-mono font-bold uppercase">Compartir</span>
-                    </button>
-                </div>
-                <div id="upcoming-matches-list" class="divide-y divide-pizarra-border/70 flex-1"></div>
-            </div>
-        </section>
-
-        <!-- TABLAS DE POSICIONES (GRUPO A, GRUPO B Y ANUAL CLASIFICACIÓN A COPAS) -->
-        <section class="bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden">
-            <div class="p-4 border-b border-pizarra-border flex flex-wrap items-center justify-between gap-3 bg-[#0e131c]">
-                <div>
-                    <h3 class="font-display text-xl sm:text-2xl font-bold uppercase tracking-wide text-white flex items-center gap-2">
-                        <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
-                        TABLAS DE PRIMERA DIVISIÓN
-                    </h3>
-                    <p id="standings-subtitle" class="text-xs text-slate-400">Datos oficiales de fase regular • Clasificación a Copas (sin playoffs)</p>
-                </div>
-
-                <div class="flex flex-wrap items-center gap-2">
-                    <div class="flex flex-wrap bg-[#0b0e14] p-1 rounded-xl border border-pizarra-border text-xs font-semibold gap-1">
-                        <button onclick="switchTableTab('GRUPO_A')" id="tab-GRUPO_A" class="px-3.5 py-1.5 rounded-lg bg-pizarra-accent text-white transition">Grupo A</button>
-                        <button onclick="switchTableTab('GRUPO_B')" id="tab-GRUPO_B" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Grupo B</button>
-                        <button onclick="switchTableTab('ANUAL')" id="tab-ANUAL" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Tabla anual (Copas)</button>
-                    </div>
-                    <button onclick="shareSectionAsPng('STANDINGS')" title="Compartir tabla en historia" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                        <span class="text-[10px] font-mono font-bold uppercase">Compartir</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                    <thead>
-                        <tr id="standings-thead" class="bg-[#0b0e14]/80 text-slate-400 font-mono text-[11px] uppercase border-b border-pizarra-border"></tr>
-                    </thead>
-                    <tbody id="standings-tbody" class="divide-y divide-pizarra-border/60"></tbody>
-                </table>
-            </div>
-
-            <div class="px-4 py-2.5 bg-[#0e131c] border-t border-pizarra-border flex flex-wrap items-center gap-4 text-[11px] text-slate-400">
-                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span><span>Clasificación a Copa Libertadores</span></div>
-                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-amber-400"></span><span>Clasificación a Copa Sudamericana</span></div>
-                <div class="flex items-center gap-1.5 ml-auto"><span class="w-2.5 h-2.5 rounded-sm bg-[#0055a5]"></span><span class="text-white font-semibold">Vélez Sarsfield</span></div>
-            </div>
-        </section>
-
-        <!-- PLANTILLA COMPLETA DE VÉLEZ CON BANDERAS DE NACIONALIDAD Y ESTADÍSTICAS DEL CLAUSURA -->
-        <section class="bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden">
-            <div class="p-4 border-b border-pizarra-border bg-[#0e131c] flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h3 class="font-display text-xl sm:text-2xl font-bold uppercase tracking-wide text-white flex items-center gap-2">
-                        <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
-                        PLANTILLA OFICIAL & ESTADÍSTICAS
-                    </h3>
-                    <p id="squad-tournament-caption" class="text-xs text-slate-400">Dorsales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas del Torneo Clausura</p>
-                </div>
-
-                <div class="flex flex-wrap items-center gap-2">
-                    <div class="flex bg-[#0b0e14] p-1 rounded-lg border border-pizarra-border text-xs font-semibold overflow-x-auto">
-                        <button onclick="filterSquadPos('TODOS')" id="pos-btn-TODOS" class="px-2.5 py-1 rounded bg-pizarra-accent text-white transition">Todos</button>
-                        <button onclick="filterSquadPos('ARQ')" id="pos-btn-ARQ" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition">Arqueros</button>
-                        <button onclick="filterSquadPos('DEF')" id="pos-btn-DEF" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition">Defensores</button>
-                        <button onclick="filterSquadPos('MED')" id="pos-btn-MED" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition">Mediocampistas</button>
-                        <button onclick="filterSquadPos('DEL')" id="pos-btn-DEL" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition">Delanteros</button>
-                    </div>
-
-                    <div class="relative">
-                        <input type="text" id="squad-search" oninput="renderSquadTable()" placeholder="Buscar jugador..." class="bg-[#0b0e14] border border-pizarra-border rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pizarra-electric w-44 sm:w-52">
-                        <svg class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    </div>
-                </div>
-            </div>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                    <thead>
-                        <tr class="bg-[#0b0e14]/85 text-slate-400 font-mono text-[11px] uppercase border-b border-pizarra-border select-none">
-                            <th onclick="sortSquadBy('number')" class="py-3 px-3 text-center cursor-pointer hover:text-white transition">Dorsal ↕</th>
-                            <th onclick="sortSquadBy('name')" class="py-3 px-3 cursor-pointer hover:text-white transition">Jugador ↕</th>
-                            <th onclick="sortSquadBy('group')" class="py-3 px-2 text-center cursor-pointer hover:text-white transition">Puesto ↕</th>
-                            <th onclick="sortSquadBy('age')" class="py-3 px-2 text-center cursor-pointer hover:text-white transition">Edad ↕</th>
-                            <th onclick="sortSquadBy('pj')" class="py-3 px-2 text-center cursor-pointer hover:text-white transition">PJ ↕</th>
-                            <th onclick="sortSquadBy('goals')" class="py-3 px-2 text-center text-emerald-400 cursor-pointer hover:text-emerald-300 transition">Goles ↕</th>
-                            <th onclick="sortSquadBy('cleanSheets')" class="py-3 px-2 text-center text-pizarra-electric cursor-pointer hover:text-sky-300 transition">Vallas Invictas ↕</th>
-                            <th onclick="sortSquadBy('yellowCards')" class="py-3 px-2 text-center text-amber-400 cursor-pointer hover:text-amber-300 transition">🟨 TA ↕</th>
-                            <th onclick="sortSquadBy('redCards')" class="py-3 px-3 text-center text-rose-400 cursor-pointer hover:text-rose-300 transition">🟥 TR ↕</th>
-                        </tr>
-                    </thead>
-                    <tbody id="full-squad-tbody" class="divide-y divide-pizarra-border/60"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- PIZARRA TÁCTICA (SELECTOR DE FORMACIONES DE LOS ÚLTIMOS 5 PARTIDOS + RENDIMIENTO Y XI) -->
-        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-7 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden flex flex-col">
-                <div class="p-4 border-b border-pizarra-border flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 bg-[#0e131c]">
-                    <div class="min-w-0">
-                        <h3 class="font-display text-xl font-bold uppercase tracking-wide text-white flex items-center gap-2">
-                            <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
-                            La Pizarra Táctica • Formaciones
-                        </h3>
-                        <p id="lineup-match-subtitle" class="text-[11px] font-mono text-pizarra-electric mt-0.5 truncate">Sincronizando formaciones de los últimos 5 partidos...</p>
-                    </div>
-                    <div class="flex items-center gap-2 flex-shrink-0">
-                        <select id="formation-selector" onchange="renderPitch(this.value)" class="bg-[#0b0e14] border border-pizarra-border text-xs font-mono text-white rounded-lg px-3 py-1.5 focus:outline-none focus:border-pizarra-electric max-w-[190px] sm:max-w-[230px] truncate">
-                            <option value="0">Último XI Oficial</option>
-                        </select>
-                        <button onclick="shareSectionAsPng('FORMATION')" title="Compartir formación en historia" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                            <span class="text-[10px] font-mono font-bold uppercase">Compartir</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="p-4 sm:p-6 bg-[#0b0e14] flex-1 flex items-center justify-center tactical-grid">
-                    <div class="relative w-full max-w-md aspect-[3/4] rounded-xl overflow-hidden border-2 border-[#1f293a] bg-[#0d1520] shadow-2xl">
-                        <svg viewBox="0 0 300 400" class="w-full h-full stroke-slate-700/80 fill-none" stroke-width="1.5">
-                            <rect x="0" y="0" width="300" height="400" fill="#0c131d" stroke="none"/>
-                            <rect x="0" y="0" width="300" height="50" fill="#101926" stroke="none"/>
-                            <rect x="0" y="100" width="300" height="50" fill="#101926" stroke="none"/>
-                            <rect x="0" y="200" width="300" height="50" fill="#101926" stroke="none"/>
-                            <rect x="0" y="300" width="300" height="50" fill="#101926" stroke="none"/>
-                            <rect x="12" y="12" width="276" height="376" rx="2"/>
-                            <line x1="12" y1="200" x2="288" y2="200"/>
-                            <circle cx="150" cy="200" r="36"/>
-                            <circle cx="150" cy="200" r="2" fill="#38bdf8"/>
-                            <rect x="75" y="12" width="150" height="58"/>
-                            <rect x="112" y="12" width="76" height="22"/>
-                            <path d="M120,70 Q150,88 180,70"/>
-                            <rect x="75" y="330" width="150" height="58"/>
-                            <rect x="112" y="366" width="76" height="22"/>
-                            <path d="M120,330 Q150,312 180,330"/>
-                        </svg>
-                        <div id="pitch-players-layer" class="absolute inset-0"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="lg:col-span-5 bg-pizarra-card rounded-2xl border border-pizarra-border p-5 flex flex-col justify-between space-y-4">
-                <div>
-                    <div class="flex items-center justify-between gap-2 border-b border-pizarra-border pb-3 mb-3.5">
-                        <h4 class="font-display text-xl font-bold uppercase text-white">Rendimiento & XI</h4>
-                        <div class="flex items-center gap-2">
-                            <span id="tactical-formation-badge" class="px-2 py-0.5 rounded bg-pizarra-accent/20 text-pizarra-electric font-mono text-xs border border-pizarra-accent/40">4-2-3-1</span>
-                            <button onclick="shareSectionAsPng('PERFORMANCE_XI')" title="Compartir historia" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                                <span class="text-[10px] font-mono font-bold uppercase">Compartir</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="space-y-2.5 text-xs text-slate-300 leading-relaxed">
-                        <!-- 1. BALANCE DE GOLES -->
-                        <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
-                            <div class="font-display uppercase text-sm font-bold text-pizarra-electric mb-0.5">1. Balance de Goles (Torneo)</div>
-                            <p id="tactical-card-1">Sincronizando goles a favor y en contra oficiales del certamen...</p>
-                        </div>
-                        <!-- 2. GOLEADOR DE VÉLEZ EN EL TORNEO -->
-                        <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
-                            <div class="font-display uppercase text-sm font-bold text-emerald-400 mb-0.5">2. Goleador de Vélez en el Torneo</div>
-                            <p id="tactical-card-scorers">Calculando máximo artillero de Vélez en el certamen...</p>
-                        </div>
-                        <!-- 3. DISCIPLINA • MÁS AMARILLAS -->
-                        <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
-                            <div class="font-display uppercase text-sm font-bold text-amber-400 mb-0.5">3. Disciplina • Más Amarillas</div>
-                            <p id="tactical-card-yellows">Calculando jugador con más tarjetas amarillas en el plantel...</p>
-                        </div>
-                        <!-- 4. DISCIPLINA • MÁS ROJAS -->
-                        <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
-                            <div class="font-display uppercase text-sm font-bold text-rose-400 mb-0.5">4. Disciplina • Más Rojas</div>
-                            <p id="tactical-card-reds">Calculando expulsiones registradas en el plantel...</p>
-                        </div>
-                        <!-- 5. ÚLTIMO PARTIDO -->
-                        <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border space-y-2">
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="font-display uppercase text-sm font-bold text-sky-300">5. Último Partido</span>
-                                <span id="last-match-stats-rival" class="font-mono text-[11px] text-slate-400">vs Rival</span>
-                            </div>
-                            <div id="last-match-stats-body" class="space-y-2">
-                                <p class="text-slate-400">Sincronizando posesión y remates...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-3 gap-2 pt-3 border-t border-pizarra-border text-center">
-                    <div class="p-2.5 rounded-xl bg-[#0b0e14] border border-pizarra-border"><span id="kpi-total-goals" class="block font-display text-2xl font-extrabold text-emerald-400">--</span><span class="text-[10px] font-mono uppercase text-slate-400">Goles Torneo</span></div>
-                    <div class="p-2.5 rounded-xl bg-[#0b0e14] border border-pizarra-border"><span id="kpi-clean-sheets" class="block font-display text-2xl font-extrabold text-pizarra-electric">--</span><span class="text-[10px] font-mono uppercase text-slate-400">Vallas Invictas</span></div>
-                    <div class="p-2.5 rounded-xl bg-[#0b0e14] border border-pizarra-border"><span id="kpi-total-cards" class="block font-display text-2xl font-extrabold text-amber-400">--</span><span class="text-[10px] font-mono uppercase text-slate-400">Tarjetas</span></div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="mt-8 border-t border-pizarra-border bg-[#090c11] py-4 px-4 text-xs text-slate-500">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-            <span class="font-mono text-slate-300 font-semibold">lavazulada.com</span>
-            <div class="flex flex-wrap items-center gap-4 font-mono text-[11px] text-slate-400">
-                <div class="flex items-center gap-3">
-                    <a href="https://x.com/lavazulada" target="_blank" rel="noopener noreferrer" aria-label="X de La V Azulada" class="inline-flex items-center gap-1.5 text-slate-300 hover:text-pizarra-electric transition">
-                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                        </svg>
-                        <span>@lavazulada</span>
-                    </a>
-                    <span class="text-slate-600">•</span>
-                    <a href="https://www.instagram.com/lavazulada/" target="_blank" rel="noopener noreferrer" aria-label="Instagram de La V Azulada" class="inline-flex items-center gap-1.5 text-slate-300 hover:text-pizarra-electric transition">
-                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                        </svg>
-                        <span>@lavazulada</span>
-                    </a>
-                </div>
-                <a href="mailto:hola@lavazulada.com" class="text-slate-200 hover:text-pizarra-electric transition">hola@lavazulada.com</a>
-            </div>
+      container.innerHTML = `
+        <div class="meta-line">${m.league?.name || ''} · ${m.league?.round || ''} · ${dateStr}</div>
+        <div class="match-box">
+          <div class="team-col">
+            ${home.logo ? `<img src="${home.logo}" alt="${home.name}" />` : ''}
+            <strong>${home.name || 'Local'}</strong>
+            ${homeScorers ? `<div class="meta-line">${homeScorers}</div>` : ''}
+          </div>
+          <div>
+            <div class="score-box">${scoreText}</div>
+            ${penText ? `<div class="pen-note">${penText}</div>` : ''}
+            <div class="pen-note">${m.fixture?.status?.short === 'LIVE' ? (m.fixture?.status?.elapsed || 'EN VIVO') : (m.fixture?.status?.short || '')}</div>
+          </div>
+          <div class="team-col">
+            ${away.logo ? `<img src="${away.logo}" alt="${away.name}" />` : ''}
+            <strong>${away.name || 'Visitante'}</strong>
+            ${awayScorers ? `<div class="meta-line">${awayScorers}</div>` : ''}
+          </div>
         </div>
-    </footer>
-
-    <!-- SCRIPT DE CONSUMO DE DATOS EN VIVO DESDE EL BACKEND -->
-    <script>
-        const MI_ESCUDO_VELEZ = './escudo-velez.png';
-
-        const ESCUDO_GENERICO_GRIS = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 110'><path d='M10,8 H90 V60 C90,86 50,104 50,104 C50,104 10,86 10,60 Z' fill='%232a3240' stroke='%234a5568' stroke-width='5'/><path d='M24,26 H76 V56 C76,74 50,88 50,88 C50,88 24,74 24,56 Z' fill='%234a5568' opacity='0.55'/><text x='50' y='59' font-family='sans-serif' font-weight='bold' font-size='16' fill='%2394a3b8' text-anchor='middle'>?</text></svg>";
-
-        const MAPA_SLUGS_ESCUDOS = {
-            'velez': 'velez', 'belgrano': 'belgrano', 'river': 'river', 'boca': 'boca',
-            'talleres': 'talleres', 'racing': 'racing', 'huracan': 'huracan',
-            'independiente': 'independiente', 'union': 'union', 'lanus': 'lanus',
-            'estudiantes': 'estudiantes', 'platense': 'platense', 'tigre': 'tigre',
-            'riestra': 'riestra', 'san lorenzo': 'san-lorenzo', 'gimnasia': 'gimnasia',
-            'banfield': 'banfield', 'argentinos': 'argentinos', 'rosario central': 'rosario-central',
-            'newells': 'newells', 'defensa': 'defensa', 'godoy cruz': 'godoy-cruz',
-            'instituto': 'instituto', 'sarmiento': 'sarmiento', 'central cordoba': 'central-cordoba',
-            'atletico tucuman': 'atletico-tucuman', 'barracas': 'barracas', 'independiente rivadavia': 'independiente-rivadavia'
-        };
-
-        const CLASIFICADOS_MANUALES_ANUAL = {
-            'belgrano': { cupType: 'LIBERTADORES', cupNote: 'Campeón Apertura' }
-        };
-
-        const SLOTS_CANCHA = {
-            '4-2-3-1': {
-                1:  { x: 50, y: 90 },
-                2:  { x: 84, y: 73 },
-                3:  { x: 62, y: 76 },
-                4:  { x: 38, y: 76 },
-                5:  { x: 16, y: 73 },
-                6:  { x: 62, y: 57 },
-                7:  { x: 38, y: 57 },
-                8:  { x: 82, y: 38 },
-                9:  { x: 50, y: 36 },
-                10: { x: 18, y: 38 },
-                11: { x: 50, y: 16 }
-            },
-            '4-3-3': {
-                1:  { x: 50, y: 90 },
-                2:  { x: 84, y: 73 },
-                3:  { x: 62, y: 76 },
-                4:  { x: 38, y: 76 },
-                5:  { x: 16, y: 73 },
-                6:  { x: 72, y: 48 },
-                7:  { x: 28, y: 48 },
-                8:  { x: 80, y: 24 },
-                9:  { x: 50, y: 58 },
-                10: { x: 20, y: 24 },
-                11: { x: 50, y: 16 }
-            }
-        };
-
-        function normalizarTexto(texto) {
-            return (texto || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').trim();
-        }
-
-        function isPlayoffRoundLabel(text = '') {
-            return /round of 16|octavos|quarter|cuartos|semi|final|play-?off|eliminaci[oó]n/i.test(String(text));
-        }
-
-        function isClausuraMatchOrStat(item = {}) {
-            const compStr = normalizarTexto(
-                item.comp || item.competition || item.tournament || item.league?.name || item.league || ''
-            );
-            const roundStr = normalizarTexto(item.fecha || item.round || item.league?.round || '');
-            if (!compStr && !roundStr) return true;
-            if (/apertura|copa argentina|libertadores|sudamericana|amistoso|friendly|reserva|proyeccion/i.test(compStr)) {
-                return false;
-            }
-            if (/clausura|liga profesional|torneo/i.test(compStr) || /fecha\s*\d+|interzonal|clausura/i.test(roundStr)) {
-                return true;
-            }
-            return true;
-        }
-
-        function limpiarRoundSinEst(roundStr) {
-            if (!roundStr) return '';
-            return String(roundStr)
-                .replace(/\b\d{1,2}\/\d{1,2}\s*-\s*\d{1,2}:\d{2}\s*(?:AM|PM)?\s*(?:EST|EDT|ART|UTC[^\s)]*)?/gi, '')
-                .replace(/\b\d{1,2}:\d{2}\s*(?:AM|PM)?\s*(?:EST|EDT|ART|UTC[^\s)]*)?/gi, '')
-                .replace(/\s*[•|-]?\s*(?:MF|FT)\s*-\s*Pens\b/gi, '')
-                .replace(/\s*-\s*Pens\b/gi, '')
-                .replace(/\s*[•|-]\s*$/g, '')
-                .trim();
-        }
-
-        function getUserTimeZone() {
-            try {
-                return Intl.DateTimeFormat().resolvedOptions().timeZone || undefined;
-            } catch (e) {
-                return undefined;
-            }
-        }
-
-        function formatLocalTime(dateOrMs, options = { hour: '2-digit', minute: '2-digit', hour12: false }) {
-            const d = typeof dateOrMs === 'number' ? new Date(dateOrMs) : new Date(dateOrMs);
-            if (isNaN(d.getTime())) return '';
-            const tz = getUserTimeZone();
-            return d.toLocaleTimeString(undefined, tz ? { ...options, timeZone: tz } : options);
-        }
-
-        function formatLocalDate(dateOrMs, options = { weekday: 'short', day: 'numeric', month: 'short' }) {
-            const d = typeof dateOrMs === 'number' ? new Date(dateOrMs) : new Date(dateOrMs);
-            if (isNaN(d.getTime())) return '';
-            const tz = getUserTimeZone();
-            return d.toLocaleDateString(undefined, tz ? { ...options, timeZone: tz } : options);
-        }
-
-        function getShortZoneLabel(dateOrMs = Date.now()) {
-            const d = typeof dateOrMs === 'number' ? new Date(dateOrMs) : new Date(dateOrMs);
-            if (isNaN(d.getTime())) return 'HORA';
-            const tz = getUserTimeZone();
-            try {
-                const parts = new Intl.DateTimeFormat(undefined, {
-                    timeZone: tz,
-                    timeZoneName: 'short'
-                }).formatToParts(d);
-                const tzPart = parts.find(p => p.type === 'timeZoneName')?.value;
-                return tzPart || 'HORA';
-            } catch (e) {
-                return 'HORA';
-            }
-        }
-
-        function obtenerPuestoDeMapa(player) {
-            const mapa = window.POSICIONES_VELEZ || {};
-            const fullName = normalizarTexto(player.name || '');
-            const shortName = normalizarTexto(player.shortName || '');
-
-            if (mapa[fullName]) return Number(mapa[fullName]);
-            if (mapa[shortName]) return Number(mapa[shortName]);
-
-            const sortedKeys = Object.keys(mapa).sort((a, b) => b.length - a.length);
-            for (const key of sortedKeys) {
-                const normKey = normalizarTexto(key);
-                if (normKey && (fullName.includes(normKey) || shortName.includes(normKey))) {
-                    return Number(mapa[key]);
-                }
-            }
-
-            if (player.group === 'ARQ') return 1;
-            if (player.group === 'DEF') return 3;
-            if (player.group === 'DEL') return 11;
-            return 7;
-        }
-
-        function asignarSlotsEnCancha(startersList) {
-            const ocupados = new Set();
-            const asignados = [];
-
-            const jugadoresConSlot = startersList.map(p => ({
-                player: p,
-                desiredSlot: obtenerPuestoDeMapa(p),
-                normName: normalizarTexto(p.name || p.shortName || '')
-            }));
-
-            const hasMagallon = jugadoresConSlot.some(j => j.normName.includes('magallon'));
-            if (hasMagallon) {
-                jugadoresConSlot.forEach(j => {
-                    if (j.normName.includes('elias gomez') || j.normName.includes('e. gomez')) {
-                        j.desiredSlot = 5;
-                    }
-                });
-            }
-
-            const pendientes = [];
-            jugadoresConSlot.forEach(item => {
-                const slot = item.desiredSlot;
-                if (slot >= 1 && slot <= 11 && !ocupados.has(slot)) {
-                    ocupados.add(slot);
-                    asignados.push({ player: item.player, slot });
-                } else {
-                    pendientes.push(item);
-                }
-            });
-
-            const ordenAlternativo = {
-                1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-                2: [2, 3, 8, 6, 4, 5, 7, 9, 10, 11, 1],
-                3: [3, 4, 2, 5, 6, 7, 8, 9, 10, 11, 1],
-                4: [4, 5, 3, 2, 7, 6, 10, 9, 8, 11, 1],
-                5: [5, 4, 10, 7, 3, 2, 6, 9, 8, 11, 1],
-                6: [6, 7, 8, 9, 3, 2, 10, 4, 5, 11, 1],
-                7: [7, 6, 10, 9, 4, 5, 8, 3, 2, 11, 1],
-                8: [8, 9, 10, 6, 7, 11, 2, 3, 4, 5, 1],
-                9: [9, 8, 10, 7, 6, 11, 3, 4, 2, 5, 1],
-                10: [10, 9, 8, 7, 6, 11, 5, 4, 3, 2, 1],
-                11: [11, 9, 8, 10, 6, 7, 3, 4, 2, 5, 1]
-            };
-
-            pendientes.forEach(item => {
-                const candidatos = ordenAlternativo[item.desiredSlot] || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-                const libre = candidatos.find(s => !ocupados.has(s)) || 1;
-                ocupados.add(libre);
-                asignados.push({ player: item.player, slot: libre });
-            });
-
-            return asignados;
-        }
-
-        function obtenerEscudoEquipo(item, explicitLogoUrl = '') {
-            const nombre = typeof item === 'object' ? (item?.name || item?.rival || '') : (item || '');
-            const norm = normalizarTexto(nombre);
-
-            if (norm.includes('velez')) {
-                return MI_ESCUDO_VELEZ;
-            }
-
-            if (explicitLogoUrl && explicitLogoUrl.startsWith('http')) return explicitLogoUrl;
-            if (!item) return ESCUDO_GENERICO_GRIS;
-            if (typeof item === 'object') {
-                if (item.logo && item.logo.startsWith('http')) return item.logo;
-                if (item.rivalLogo && item.rivalLogo.startsWith('http')) return item.rivalLogo;
-            }
-            if (typeof item === 'string' && item.startsWith('http')) return item;
-
-            if (!norm || norm.includes('confirmar') || norm === 'tbd') return ESCUDO_GENERICO_GRIS;
-
-            let slug = '';
-            for (const [clave, s] of Object.entries(MAPA_SLUGS_ESCUDOS)) {
-                if (norm.includes(clave)) { slug = s; break; }
-            }
-            if (!slug) slug = norm.replace(/\s+/g, '-');
-            return slug ? `./escudos/${slug}.png` : ESCUDO_GENERICO_GRIS;
-        }
-
-        function renderEscudoImg(item, sizeClasses = 'w-16 h-16', explicitLogoUrl = '') {
-            const src = obtenerEscudoEquipo(item, explicitLogoUrl);
-            return `<img src="${src}" onerror="this.onerror=null;this.src='${ESCUDO_GENERICO_GRIS}';" alt="Escudo" class="${sizeClasses} object-contain select-none">`;
-        }
-
-        const STATE = {
-            pollingIntervalSec: 15,
-            countdown: 15,
-            isLiveMatch: false,
-            livePollingTimer: null,
-            activeTournamentName: 'Torneo Clausura',
-            grupoAName: 'Grupo A',
-            grupoBName: 'Grupo B',
-            activeTableTab: 'GRUPO_A',
-            squadFilterGroup: 'TODOS',
-            squadSortCol: 'number',
-            squadSortAsc: true,
-            selectedLineupIdx: 0,
-            todayEfemeride: null,
-            squad: [],
-            clausuraSquad: [],
-            lastFiveMatches: [],
-            velezLast2: [],
-            rivalLast2: [],
-            upcomingMatches: [],
-            currentMatchData: null,
-            lastLineup: null,
-            recentLineups: [],
-            lastMatchStats: null,
-            standingsClausura: [],
-            standingsGrupoA: [],
-            standingsGrupoB: [],
-            standingsAnual: []
-        };
-
-        // --- SILUETAS E IMÁGENES PERSONALIZADAS PARA EFEMÉRIDES ---
-        function getEfemerideSilhouetteSvgDataUrl(iconKey) {
-            const k = normalizarTexto(iconKey || '');
-            let pathMarkup = '';
-
-            if (k.includes('libertadores')) {
-                pathMarkup = `
-                    <path d="M32 16 H68 V34 C68 48 59 57 50 60 C41 57 32 48 32 34 Z" fill="#38bdf8" fill-opacity="0.9" stroke="#e0f2fe" stroke-width="2.5"/>
-                    <path d="M32 22 H19 C19 36 25 43 33 44" fill="none" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round"/>
-                    <path d="M68 22 H81 C81 36 75 43 67 44" fill="none" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round"/>
-                    <rect x="45" y="60" width="10" height="14" fill="#0284c7"/>
-                    <rect x="34" y="74" width="32" height="6" rx="2" fill="#38bdf8"/>
-                    <rect x="28" y="80" width="44" height="8" rx="2" fill="#0055a5" stroke="#38bdf8" stroke-width="1.5"/>
-                `;
-            } else if (k.includes('intercontinental') || k.includes('mundo')) {
-                pathMarkup = `
-                    <path d="M36 16 H64 L60 36 C68 42 71 52 65 62 L58 70 H42 L35 62 C29 52 32 42 40 36 Z" fill="#fde047" fill-opacity="0.92" stroke="#fef9c3" stroke-width="2.5"/>
-                    <rect x="43" y="70" width="14" height="6" fill="#eab308"/>
-                    <rect x="31" y="76" width="38" height="10" rx="2" fill="#0055a5" stroke="#fde047" stroke-width="1.8"/>
-                `;
-            } else if (k.includes('supercopa')) {
-                pathMarkup = `
-                    <path d="M28 18 H72 L64 44 C61 52 56 56 50 58 C44 56 39 52 36 44 Z" fill="#38bdf8" fill-opacity="0.88" stroke="#bae6fd" stroke-width="2.5"/>
-                    <path d="M50 58 V74 M36 74 H64 L68 86 H32 Z" fill="#0055a5" stroke="#38bdf8" stroke-width="2.5" stroke-linejoin="round"/>
-                `;
-            } else if (k.includes('estadio') || k.includes('amalfitani')) {
-                pathMarkup = `
-                    <path d="M16 68 V36 L34 26 V58 M34 58 L54 22 L72 28 V68 Z" fill="#0055a5" fill-opacity="0.85" stroke="#38bdf8" stroke-width="2.5" stroke-linejoin="round"/>
-                    <rect x="14" y="68" width="72" height="12" rx="3" fill="#38bdf8" fill-opacity="0.85"/>
-                `;
-            } else {
-                pathMarkup = `
-                    <path d="M30 18 H70 V40 C70 52 61 60 50 62 C39 60 30 52 30 40 Z" fill="#38bdf8" fill-opacity="0.88" stroke="#e0f2fe" stroke-width="2.5"/>
-                    <path d="M30 24 H18 C18 35 23 41 31 42 M70 24 H82 C82 35 77 41 69 42" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
-                    <rect x="45" y="62" width="10" height="12" fill="#0284c7"/>
-                    <rect x="32" y="74" width="36" height="9" rx="2" fill="#0055a5" stroke="#38bdf8" stroke-width="1.8"/>
-                `;
-            }
-
-            const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>${pathMarkup}</svg>`;
-            return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-        }
-
-        function getEfemerideVisualSrc(ef) {
-            if (!ef) return MI_ESCUDO_VELEZ;
-            if (ef.image && typeof ef.image === 'string' && ef.image.trim()) {
-                return ef.image.trim();
-            }
-            if (ef.icon && typeof ef.icon === 'string' && ef.icon.trim()) {
-                return getEfemerideSilhouetteSvgDataUrl(ef.icon.trim());
-            }
-            return MI_ESCUDO_VELEZ;
-        }
-
-        // --- DETECCIÓN AUTOMÁTICA DE EFEMÉRIDES POR FECHA DE ARGENTINA ---
-        function getArgentinaTodayEfemeride() {
-            const dict = window.EFEMERIDES_VELEZ || {};
-            const now = new Date();
-            const fmt = new Intl.DateTimeFormat('en-CA', {
-                timeZone: 'America/Argentina/Buenos_Aires',
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            });
-            const [curYearStr, monthStr, dayStr] = fmt.format(now).split('-');
-            const key = `${monthStr}-${dayStr}`;
-            const item = dict[key];
-            if (!item) return null;
-
-            const curYear = Number(curYearStr);
-            const yearsAgo = item.year ? Math.max(0, curYear - Number(item.year)) : null;
-            const dateDisplay = now.toLocaleDateString('es-AR', {
-                day: 'numeric',
-                month: 'long',
-                timeZone: 'America/Argentina/Buenos_Aires'
-            });
-
-            return {
-                key,
-                year: item.year,
-                yearsAgo,
-                icon: item.icon || '',
-                image: item.image || '',
-                badge: item.badge || 'UN DÍA COMO HOY',
-                title: item.title || '',
-                description: item.description || '',
-                dateDisplay: `${dateDisplay} de ${item.year}`
-            };
-        }
-
-        function renderEfemerideBanner() {
-            const sec = document.getElementById('efemeride-section');
-            if (!sec) return;
-
-            const ef = getArgentinaTodayEfemeride();
-            STATE.todayEfemeride = ef;
-
-            if (!ef) {
-                sec.classList.add('hidden');
-                return;
-            }
-
-            sec.classList.remove('hidden');
-            const visualSlot = document.getElementById('efemeride-visual-slot');
-            const badgeEl = document.getElementById('efemeride-badge');
-            const dateEl = document.getElementById('efemeride-date-label');
-            const yearsEl = document.getElementById('efemeride-years-pill');
-            const titleEl = document.getElementById('efemeride-title');
-            const descEl = document.getElementById('efemeride-desc');
-
-            if (visualSlot) {
-                const visualSrc = getEfemerideVisualSrc(ef);
-                visualSlot.innerHTML = `<img src="${visualSrc}" onerror="this.onerror=null;this.src='${MI_ESCUDO_VELEZ}';" alt="${ef.title || 'Vélez'}" class="w-full h-full object-contain select-none">`;
-            }
-            if (badgeEl) badgeEl.textContent = ef.badge;
-            if (dateEl) dateEl.textContent = ef.dateDisplay.toUpperCase();
-            if (yearsEl) {
-                yearsEl.textContent = ef.yearsAgo > 0
-                    ? `• SE CUMPLEN ${ef.yearsAgo} ${ef.yearsAgo === 1 ? 'AÑO' : 'AÑOS'}`
-                    : '• EFEMÉRIDE FORTINERA';
-            }
-            if (titleEl) titleEl.textContent = ef.title;
-            if (descEl) descEl.textContent = ef.description;
-        }
-
-        // --- GENERACIÓN DE PLACA PNG FORMATO HISTORIA (1080x1920) PARA COMPARTIR ---
-        function loadCanvasImage(src) {
-            return new Promise((resolve) => {
-                if (!src) return resolve(null);
-                const img = new Image();
-                if (/^https?:\/\//i.test(src)) {
-                    img.crossOrigin = 'anonymous';
-                }
-                img.onload = () => resolve(img);
-                img.onerror = () => resolve(null);
-                img.src = src;
-            });
-        }
-
-        async function exportCanvasAsPng(canvas, filename) {
-            try {
-                const blob = await new Promise((resolve, reject) => {
-                    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('No se pudo crear el PNG'))), 'image/png', 1);
-                });
-                const file = new File([blob], filename, { type: 'image/png' });
-
-                if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
-                    await navigator.share({
-                        files: [file],
-                        title: 'lavazulada.com • @lavazulada'
-                    });
-                    showToast('lavazulada.com', 'Historia lista para compartir.');
-                    return;
-                }
-
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-                setTimeout(() => URL.revokeObjectURL(url), 4000);
-                showToast('lavazulada.com', `Historia ${filename} descargada.`);
-            } catch (err) {
-                if (err && err.name === 'AbortError') return;
-                showToast('lavazulada.com', 'No se pudo generar la imagen en este momento.');
-            }
-        }
-
-        function drawWrappedCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 6) {
-            const words = String(text || '').split(/\s+/);
-            let line = '';
-            let linesCount = 0;
-
-            for (let n = 0; n < words.length; n++) {
-                const testLine = line ? `${line} ${words[n]}` : words[n];
-                const metrics = ctx.measureText(testLine);
-                if (metrics.width > maxWidth && n > 0) {
-                    ctx.fillText(line, x, y + linesCount * lineHeight);
-                    linesCount++;
-                    line = words[n];
-                    if (linesCount >= maxLines - 1) break;
-                } else {
-                    line = testLine;
-                }
-            }
-            if (line && linesCount < maxLines) {
-                ctx.fillText(line, x, y + linesCount * lineHeight);
-            }
-        }
-
-        async function shareSectionAsPng(sectionKey) {
-            if (document.fonts && document.fonts.ready) {
-                try { await document.fonts.ready; } catch (e) {}
-            }
-
-            const canvas = document.createElement('canvas');
-            canvas.width = 1080;
-            canvas.height = 1920;
-            const ctx = canvas.getContext('2d');
-
-            ctx.fillStyle = '#0b0e14';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            const gradTop = ctx.createRadialGradient(260, 180, 30, 260, 180, 820);
-            gradTop.addColorStop(0, 'rgba(0, 85, 165, 0.36)');
-            gradTop.addColorStop(1, 'rgba(11, 14, 20, 0)');
-            ctx.fillStyle = gradTop;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.strokeStyle = '#1f293a';
-            ctx.lineWidth = 4;
-            ctx.strokeRect(36, 36, canvas.width - 72, canvas.height - 72);
-
-            const logoImg = await loadCanvasImage('./logolva.png') || await loadCanvasImage('./escudo-velez.png');
-            if (logoImg) {
-                ctx.drawImage(logoImg, 84, 86, 84, 84);
-            }
-
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '800 44px "Barlow Condensed", sans-serif';
-            ctx.fillText('lavazulada.com', 190, 128);
-
-            ctx.fillStyle = '#38bdf8';
-            ctx.font = '700 22px "JetBrains Mono", monospace';
-            ctx.fillText('X / IG: @lavazulada', 190, 162);
-
-            ctx.strokeStyle = '#1f293a';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(84, 204);
-            ctx.lineTo(canvas.width - 84, 204);
-            ctx.stroke();
-
-            if (sectionKey === 'EFEMERIDE') {
-                const ef = STATE.todayEfemeride;
-                if (!ef) return;
-
-                const efImg = await loadCanvasImage(getEfemerideVisualSrc(ef)) || await loadCanvasImage('./escudo-velez.png');
-                ctx.textAlign = 'center';
-
-                ctx.fillStyle = '#38bdf8';
-                ctx.font = '700 28px "JetBrains Mono", monospace';
-                ctx.fillText(ef.badge.toUpperCase(), 540, 315);
-
-                ctx.fillStyle = '#fde68a';
-                ctx.font = '700 32px "JetBrains Mono", monospace';
-                ctx.fillText(ef.dateDisplay.toUpperCase(), 540, 370);
-
-                if (efImg) {
-                    ctx.drawImage(efImg, 435, 430, 210, 210);
-                }
-
-                if (ef.yearsAgo > 0) {
-                    ctx.fillStyle = '#0055a5';
-                    ctx.fillRect(260, 755, 560, 64);
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = '800 34px "Barlow Condensed", sans-serif';
-                    ctx.fillText(`SE CUMPLEN ${ef.yearsAgo} ${ef.yearsAgo === 1 ? 'AÑO' : 'AÑOS'}`, 540, 798);
-                }
-
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '800 66px "Barlow Condensed", sans-serif';
-                drawWrappedCanvasText(ctx, ef.title.toUpperCase(), 540, 920, 880, 76, 3);
-
-                ctx.fillStyle = '#cbd5e1';
-                ctx.font = '500 32px Inter, sans-serif';
-                drawWrappedCanvasText(ctx, ef.description, 540, 1180, 860, 48, 6);
-
-                ctx.textAlign = 'left';
-            } else if (sectionKey === 'LIVE_MATCH') {
-                const cm = STATE.currentMatchData;
-                const m = cm?.match;
-                if (!m || (cm.type !== 'LIVE' && cm.type !== 'FINISHED_24H' && cm.type !== 'LAST_REFERENCE')) return;
-
-                const isLive = cm.type === 'LIVE';
-                ctx.fillStyle = isLive ? '#ef4444' : '#10b981';
-                ctx.font = '700 28px "JetBrains Mono", monospace';
-                ctx.textAlign = 'center';
-                const statusLabel = isLive
-                    ? `EN VIVO • ${m.fixture?.status?.elapsed || 'EN JUEGO'}`
-                    : (cm.type === 'LAST_REFERENCE' ? 'ÚLTIMO PARTIDO DISPUTADO' : 'RESULTADO FINAL');
-                ctx.fillText(statusLabel, 540, 295);
-
-                ctx.fillStyle = '#121721';
-                ctx.fillRect(290, 345, 500, 165);
-                ctx.strokeStyle = '#0055a5';
-                ctx.lineWidth = 3;
-                ctx.strokeRect(290, 345, 500, 165);
-
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '800 108px "Barlow Condensed", sans-serif';
-                ctx.fillText(`${m.goals?.home ?? 0} - ${m.goals?.away ?? 0}`, 540, 464);
-
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '800 54px "Barlow Condensed", sans-serif';
-                ctx.fillText((m.teams?.home?.name || 'Local').toUpperCase(), 290, 610);
-                ctx.fillText((m.teams?.away?.name || 'Visitante').toUpperCase(), 790, 610);
-
-                const hGoals = (m.scorers?.home || []).join('\n');
-                const aGoals = (m.scorers?.away || []).join('\n');
-                ctx.font = '600 26px "JetBrains Mono", monospace';
-                ctx.fillStyle = '#e2e8f0';
-                if (hGoals) {
-                    hGoals.split('\n').forEach((line, idx) => ctx.fillText(`⚽ ${line}`, 290, 690 + idx * 42));
-                }
-                if (aGoals) {
-                    aGoals.split('\n').forEach((line, idx) => ctx.fillText(`⚽ ${line}`, 790, 690 + idx * 42));
-                }
-
-                if (isLive) {
-                    const hCards = [...(m.cards?.home?.red || []).map(x => `🟥 ${x}`), ...(m.cards?.home?.yellow || []).map(x => `🟨 ${x}`)];
-                    const aCards = [...(m.cards?.away?.red || []).map(x => `🟥 ${x}`), ...(m.cards?.away?.yellow || []).map(x => `🟨 ${x}`)];
-                    ctx.font = '600 24px "JetBrains Mono", monospace';
-                    ctx.fillStyle = '#fde68a';
-                    hCards.forEach((line, idx) => ctx.fillText(line, 290, 960 + idx * 40));
-                    aCards.forEach((line, idx) => ctx.fillText(line, 790, 960 + idx * 40));
-                }
-                ctx.textAlign = 'left';
-            } else if (sectionKey === 'LAST_FIVE') {
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '800 48px "Barlow Condensed", sans-serif';
-                ctx.fillText('ÚLTIMOS 5 PARTIDOS DISPUTADOS', 84, 292);
-
-                const rows = (STATE.lastFiveMatches || []).slice(0, 5);
-                rows.forEach((item, i) => {
-                    const y = 395 + i * 220;
-                    ctx.fillStyle = '#121721';
-                    ctx.fillRect(84, y - 70, 912, 165);
-                    ctx.strokeStyle = '#1f293a';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(84, y - 70, 912, 165);
-
-                    ctx.fillStyle = '#94a3b8';
-                    ctx.font = '600 22px "JetBrains Mono", monospace';
-                    ctx.fillText(`${item.date} • ${item.cond === 'L' ? 'LOCAL' : 'VISITANTE'}`, 116, y - 22);
-
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = '800 42px "Barlow Condensed", sans-serif';
-                    const cruce = item.cond === 'L' ? `VÉLEZ vs ${item.rival.toUpperCase()}` : `${item.rival.toUpperCase()} vs VÉLEZ`;
-                    ctx.fillText(cruce, 116, y + 48);
-
-                    ctx.textAlign = 'right';
-                    ctx.fillStyle = '#38bdf8';
-                    ctx.font = '700 34px "JetBrains Mono", monospace';
-                    const marcador = item.cond === 'L' ? `${item.velezGoals} - ${item.rivalGoals}` : `${item.rivalGoals} - ${item.velezGoals}`;
-                    ctx.fillText(`${marcador}  [${item.outcome}]`, 964, y + 25);
-                    ctx.textAlign = 'left';
-                });
-            } else if (sectionKey === 'UPCOMING') {
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '800 48px "Barlow Condensed", sans-serif';
-                ctx.fillText('PRÓXIMOS PARTIDOS DE VÉLEZ', 84, 292);
-
-                const rows = (STATE.upcomingMatches || []).slice(0, 4);
-                rows.forEach((item, i) => {
-                    const y = 405 + i * 275;
-                    const condLabel = item.cond === 'L' ? 'LOCAL' : 'VISITANTE';
-                    ctx.fillStyle = '#121721';
-                    ctx.fillRect(84, y - 78, 912, 205);
-                    ctx.strokeStyle = '#1f293a';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(84, y - 78, 912, 205);
-
-                    ctx.fillStyle = '#94a3b8';
-                    ctx.font = '600 20px "JetBrains Mono", monospace';
-                    ctx.fillText((item.fecha || 'PRÓXIMO').slice(0, 32), 116, y - 34);
-
-                    ctx.fillStyle = '#38bdf8';
-                    ctx.font = '700 18px "JetBrains Mono", monospace';
-                    ctx.fillText(condLabel, 116, y + 2);
-
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = '800 44px "Barlow Condensed", sans-serif';
-                    ctx.fillText(`vs ${item.rival.toUpperCase()}`, 116, y + 66);
-
-                    ctx.textAlign = 'right';
-                    ctx.fillStyle = '#e2e8f0';
-                    ctx.font = '700 26px "JetBrains Mono", monospace';
-                    ctx.fillText(`${item.date}`, 964, y - 16);
-                    ctx.fillStyle = '#38bdf8';
-                    ctx.fillText(`${item.timeLocal}`, 964, y + 26);
-                    ctx.textAlign = 'left';
-                });
-            } else if (sectionKey === 'STANDINGS') {
-                const tab = STATE.activeTableTab;
-                let sourceList = [];
-                let tabTitle = '';
-                if (tab === 'GRUPO_A') {
-                    sourceList = STATE.standingsGrupoA.length > 0 ? STATE.standingsGrupoA : STATE.standingsClausura;
-                    tabTitle = (STATE.grupoAName || 'GRUPO A').toUpperCase();
-                } else if (tab === 'GRUPO_B') {
-                    sourceList = STATE.standingsGrupoB;
-                    tabTitle = (STATE.grupoBName || 'GRUPO B').toUpperCase();
-                } else {
-                    sourceList = STATE.standingsAnual;
-                    tabTitle = 'TABLA ANUAL (COPAS)';
-                }
-
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '800 46px "Barlow Condensed", sans-serif';
-                ctx.fillText(`TABLAS DE PRIMERA DIVISIÓN • ${tabTitle}`, 84, 276);
-
-                ctx.fillStyle = '#94a3b8';
-                ctx.font = '700 18px "JetBrains Mono", monospace';
-                ctx.fillText('#', 106, 324);
-                ctx.fillText('EQUIPO', 175, 324);
-                ctx.textAlign = 'right';
-                ctx.fillText('PJ', 775, 324);
-                ctx.fillText('DG', 865, 324);
-                ctx.fillStyle = '#ffffff';
-                ctx.fillText('PTS', 964, 324);
-                ctx.textAlign = 'left';
-
-                const sortedTeams = [...(sourceList || [])].sort((a, b) => b.pts - a.pts || b.dg - a.dg || (b.gf || 0) - (a.gf || 0)).slice(0, 15);
-                sortedTeams.forEach((t, idx) => {
-                    const y = 375 + idx * 86;
-                    ctx.fillStyle = t.isVelez ? 'rgba(0, 85, 165, 0.35)' : '#121721';
-                    ctx.fillRect(84, y - 32, 912, 70);
-                    ctx.strokeStyle = t.isVelez ? '#38bdf8' : '#1f293a';
-                    ctx.lineWidth = t.isVelez ? 2.5 : 1.5;
-                    ctx.strokeRect(84, y - 32, 912, 70);
-
-                    ctx.fillStyle = t.isVelez ? '#38bdf8' : '#94a3b8';
-                    ctx.font = '700 22px "JetBrains Mono", monospace';
-                    ctx.fillText(String(idx + 1), 106, y + 11);
-
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = `${t.isVelez ? '800' : '700'} 29px "Barlow Condensed", sans-serif`;
-                    ctx.fillText((t.name || '').toUpperCase().slice(0, 26), 175, y + 11);
-
-                    ctx.textAlign = 'right';
-                    ctx.fillStyle = '#cbd5e1';
-                    ctx.font = '600 20px "JetBrains Mono", monospace';
-                    ctx.fillText(String(t.pj ?? 0), 775, y + 10);
-
-                    const dgVal = t.dg ?? 0;
-                    ctx.fillStyle = dgVal >= 0 ? '#34d399' : '#fb7185';
-                    ctx.fillText(dgVal > 0 ? `+${dgVal}` : String(dgVal), 865, y + 10);
-
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = '800 24px "JetBrains Mono", monospace';
-                    ctx.fillText(String(t.pts ?? 0), 964, y + 11);
-                    ctx.textAlign = 'left';
-                });
-            } else if (sectionKey === 'FORMATION') {
-                const lineups = STATE.recentLineups || [];
-                const lineup = lineups[STATE.selectedLineupIdx] || STATE.lastLineup;
-                const formName = lineup?.formation || '4-2-3-1';
-                const schemeKey = formName.includes('4-3-3') ? '4-3-3' : '4-2-3-1';
-                const slotCoords = SLOTS_CANCHA[schemeKey];
-
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '800 44px "Barlow Condensed", sans-serif';
-                ctx.fillText('LA PIZARRA TÁCTICA • FORMACIONES', 84, 265);
-
-                const detalleLineup = lineup?.rival
-                    ? `vs ${lineup.rival.toUpperCase()}${lineup.date ? ' • ' + lineup.date : ''}${lineup.score ? ' [' + lineup.score + ']' : ''} • ${formName}`
-                    : `Esquema ${formName}`;
-                ctx.fillStyle = '#38bdf8';
-                ctx.font = '700 22px "JetBrains Mono", monospace';
-                ctx.fillText(detalleLineup, 84, 304);
-
-                const px = 150;
-                const py = 340;
-                const pw = 780;
-                const ph = 1310;
-
-                ctx.fillStyle = '#0c131d';
-                ctx.fillRect(px, py, pw, ph);
-                for (let f = 0; f < 8; f += 2) {
-                    ctx.fillStyle = '#101926';
-                    ctx.fillRect(px, py + (ph / 8) * f, pw, ph / 8);
-                }
-
-                ctx.strokeStyle = '#334155';
-                ctx.lineWidth = 4;
-                ctx.strokeRect(px + 24, py + 24, pw - 48, ph - 48);
-
-                const midY = py + ph / 2;
-                ctx.beginPath();
-                ctx.moveTo(px + 24, midY);
-                ctx.lineTo(px + pw - 24, midY);
-                ctx.stroke();
-
-                ctx.beginPath();
-                ctx.arc(px + pw / 2, midY, 105, 0, Math.PI * 2);
-                ctx.stroke();
-
-                ctx.strokeRect(px + pw * 0.25, py + 24, pw * 0.5, 165);
-                ctx.strokeRect(px + pw * 0.25, py + ph - 189, pw * 0.5, 165);
-
-                const starters = (lineup && Array.isArray(lineup.starters) && lineup.starters.length === 11)
-                    ? lineup.starters
-                    : (STATE.squad && STATE.squad.length >= 11
-                        ? [...STATE.squad].sort((a, b) => (b.pj || 0) - (a.pj || 0)).slice(0, 11)
-                        : []);
-
-                const asignaciones = asignarSlotsEnCancha(starters);
-                ctx.textAlign = 'center';
-                asignaciones.forEach(({ player: p, slot }) => {
-                    const pos = slotCoords[slot] || { x: 50, y: 50 };
-                    const cx = px + (pos.x / 100) * pw;
-                    const cy = py + (pos.y / 100) * ph;
-                    const shortLabel = (p.shortName || p.name || '').split(' ').pop();
-
-                    ctx.fillStyle = '#0055a5';
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, 34, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.strokeStyle = '#ffffff';
-                    ctx.lineWidth = 4;
-                    ctx.stroke();
-
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = '800 28px "Barlow Condensed", sans-serif';
-                    ctx.fillText(String(p.number || '-'), cx, cy + 10);
-
-                    ctx.fillStyle = 'rgba(11, 14, 20, 0.92)';
-                    const pillW = Math.max(110, shortLabel.length * 14 + 28);
-                    ctx.fillRect(cx - pillW / 2, cy + 42, pillW, 34);
-
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = '600 20px Inter, sans-serif';
-                    ctx.fillText(shortLabel, cx, cy + 66);
-                });
-                ctx.textAlign = 'left';
-            } else if (sectionKey === 'PERFORMANCE_XI') {
-                const formName = document.getElementById('tactical-formation-badge')?.textContent || '4-2-3-1';
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '800 48px "Barlow Condensed", sans-serif';
-                ctx.fillText(`RENDIMIENTO & XI • ${formName}`, 84, 292);
-
-                const items = [
-                    { label: 'BALANCE DE GOLES', text: document.getElementById('tactical-card-1')?.textContent || '' },
-                    { label: 'GOLEADOR EN EL TORNEO', text: document.getElementById('tactical-card-scorers')?.textContent || '' },
-                    { label: 'MÁS AMARILLAS', text: document.getElementById('tactical-card-yellows')?.textContent || '' },
-                    { label: 'MÁS ROJAS', text: document.getElementById('tactical-card-reds')?.textContent || '' }
-                ];
-
-                items.forEach((box, i) => {
-                    const y = 400 + i * 265;
-                    ctx.fillStyle = '#121721';
-                    ctx.fillRect(84, y - 70, 912, 205);
-                    ctx.strokeStyle = '#1f293a';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(84, y - 70, 912, 205);
-
-                    ctx.fillStyle = '#38bdf8';
-                    ctx.font = '700 20px "JetBrains Mono", monospace';
-                    ctx.fillText(box.label, 116, y - 24);
-
-                    ctx.fillStyle = '#e2e8f0';
-                    ctx.font = '500 24px Inter, sans-serif';
-                    const rawText = box.text || '';
-                    const line1 = rawText.slice(0, 56);
-                    const line2 = rawText.slice(56, 112);
-                    ctx.fillText(line1, 116, y + 24);
-                    if (line2) ctx.fillText(line2, 116, y + 60);
-                });
-            }
-
-            ctx.strokeStyle = '#1f293a';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(84, canvas.height - 155);
-            ctx.lineTo(canvas.width - 84, canvas.height - 155);
-            ctx.stroke();
-
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '700 26px "JetBrains Mono", monospace';
-            ctx.fillText('lavazulada.com', 84, canvas.height - 96);
-
-            ctx.fillStyle = '#38bdf8';
-            ctx.font = '600 22px "JetBrains Mono", monospace';
-            ctx.textAlign = 'right';
-            ctx.fillText('X / Instagram: @lavazulada', canvas.width - 84, canvas.height - 96);
-            ctx.textAlign = 'left';
-
-            const cleanNameMap = {
-                EFEMERIDE: 'lavazulada-historia-efemeride.png',
-                LIVE_MATCH: 'lavazulada-historia-partido.png',
-                LAST_FIVE: 'lavazulada-historia-ultimos5.png',
-                UPCOMING: 'lavazulada-historia-proximos.png',
-                STANDINGS: 'lavazulada-historia-posiciones.png',
-                FORMATION: 'lavazulada-historia-formacion.png',
-                PERFORMANCE_XI: 'lavazulada-historia-rendimiento.png'
-            };
-            await exportCanvasAsPng(canvas, cleanNameMap[sectionKey] || 'lavazulada-historia.png');
-        }
-
-        function initMobileInstallPrompt() {
-            const banner = document.getElementById('pwa-install-banner');
-            const instructions = document.getElementById('pwa-install-instructions');
-            const iosArrow = document.getElementById('pwa-ios-arrow');
-            if (!banner || !instructions) return;
-
-            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-            if (isStandalone) return;
-
-            const dismissedAt = Number(localStorage.getItem('velez_pwa_dismissed') || 0);
-            if (dismissedAt && (Date.now() - dismissedAt) < 15 * 24 * 60 * 60 * 1000) return;
-
-            const ua = window.navigator.userAgent || '';
-            const isIOS = /iPhone|iPad|iPod/i.test(ua);
-            const isAndroid = /Android/i.test(ua);
-
-            if (!isIOS && !isAndroid) return;
-
-            if (isIOS) {
-                instructions.innerHTML = `Tocá el ícono <strong class="text-pizarra-electric">Compartir</strong> abajo y elegí <strong class="text-white">"Agregar a pantalla de inicio"</strong> para tener el escudo de Vélez en tu teléfono.`;
-                if (iosArrow) iosArrow.classList.remove('hidden');
-            } else {
-                instructions.innerHTML = `Tocá el menú <strong class="text-pizarra-electric">(⋮)</strong> arriba a la derecha y elegí <strong class="text-white">"Agregar a pantalla de inicio"</strong>.`;
-            }
-
-            setTimeout(() => {
-                banner.classList.remove('hidden');
-            }, 2500);
-        }
-
-        function dismissInstallBanner() {
-            const banner = document.getElementById('pwa-install-banner');
-            if (banner) banner.classList.add('hidden');
-            localStorage.setItem('velez_pwa_dismissed', String(Date.now()));
-        }
-
-        function showToast(title, message) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `pointer-events-auto max-w-xs w-full p-3 rounded-xl border shadow-2xl backdrop-blur-md transition-all duration-300 transform translate-y-2 opacity-0 border-[#0055a5] bg-[#0e1726] text-sky-200`;
-            toast.innerHTML = `<div class="font-display font-bold uppercase tracking-wide text-sm">${title}</div><div class="text-xs opacity-90 mt-0.5">${message}</div>`;
-            container.appendChild(toast);
-            requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-2');
-                setTimeout(() => toast.remove(), 300);
-            }, 3500);
-        }
-
-        function registrarMarcaDeTiempoActualizacion() {
-            const ahora = new Date();
-            const horaStr = formatLocalTime(ahora, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-            const el = document.getElementById('last-updated-time');
-            if (el) el.textContent = horaStr;
-        }
-
-        function syncLivePollingMode(isLive) {
-            const pill = document.getElementById('polling-status-pill');
-            const dot = document.getElementById('polling-status-dot');
-            const label = document.getElementById('polling-status-label');
-
-            STATE.isLiveMatch = Boolean(isLive);
-
-            if (STATE.isLiveMatch) {
-                if (pill) pill.className = 'flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-500/15 border border-red-500/40 text-xs font-mono';
-                if (dot) dot.className = 'relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 animate-ping';
-                if (label) {
-                    label.className = 'font-bold text-red-400 tracking-wide';
-                    label.textContent = 'EN VIVO AUTO';
-                }
-                if (!STATE.livePollingTimer) {
-                    STATE.countdown = STATE.pollingIntervalSec;
-                    STATE.livePollingTimer = setInterval(() => {
-                        fetchBackendData(false);
-                    }, STATE.pollingIntervalSec * 1000);
-                }
-            } else {
-                if (STATE.livePollingTimer) {
-                    clearInterval(STATE.livePollingTimer);
-                    STATE.livePollingTimer = null;
-                }
-                if (pill) pill.className = 'flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700 text-xs font-mono';
-                if (dot) dot.className = 'relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400';
-                if (label) {
-                    label.className = 'font-bold text-slate-300 tracking-wide';
-                    label.textContent = 'SIN PARTIDO EN VIVO';
-                }
-            }
-        }
-
-        const BACKEND_URL = 'https://velez-backend.onrender.com';
-
-        async function fetchBackendData(isManual = false) {
-            const icon = document.getElementById('refresh-icon');
-            if (icon) icon.classList.add('animate-spin');
-
-            try {
-                const res = await fetch(`${BACKEND_URL}/api/velez-data`);
-                if (res.ok) {
-                    const data = await res.json();
-                    
-                    if (data.activeTournamentName) STATE.activeTournamentName = data.activeTournamentName;
-                    if (data.grupoAName) STATE.grupoAName = data.grupoAName;
-                    if (data.grupoBName) STATE.grupoBName = data.grupoBName;
-                    if (data.currentMatch) STATE.currentMatchData = data.currentMatch;
-                    if (data.lastMatches) STATE.lastFiveMatches = data.lastMatches;
-                    if (data.velezLast2) STATE.velezLast2 = data.velezLast2;
-                    else if (data.lastMatches) STATE.velezLast2 = data.lastMatches.slice(0, 2);
-
-                    if (data.rivalLast2) STATE.rivalLast2 = data.rivalLast2;
-                    else if (data.rivalLastMatches) STATE.rivalLast2 = data.rivalLastMatches.slice(0, 2);
-
-                    if (data.upcomingMatches) {
-                        STATE.upcomingMatches = data.upcomingMatches.map(item => {
-                            const rawMs = item.timestamp || (item.isoDate ? new Date(item.isoDate).getTime() : NaN);
-                            const timeLocal = !isNaN(rawMs)
-                                ? `${formatLocalTime(rawMs)} ${getShortZoneLabel(rawMs)}`.trim()
-                                : limpiarRoundSinEst((item.timeART || '').replace(/\s*ART\s*/i, '')).trim();
-                            const dateLocal = !isNaN(rawMs)
-                                ? formatLocalDate(rawMs)
-                                : item.date;
-                            return {
-                                ...item,
-                                date: dateLocal,
-                                timeLocal
-                            };
-                        });
-                    }
-                    if (data.squad) STATE.squad = data.squad;
-                    if (data.clausuraSquad) STATE.clausuraSquad = data.clausuraSquad;
-                    if (data.lastLineup) STATE.lastLineup = data.lastLineup;
-                    if (Array.isArray(data.recentLineups) && data.recentLineups.length > 0) {
-                        STATE.recentLineups = data.recentLineups;
-                    } else if (data.lastLineup && data.lastLineup.starters?.length === 11) {
-                        STATE.recentLineups = [data.lastLineup];
-                    }
-                    if (data.lastMatchStats) STATE.lastMatchStats = data.lastMatchStats;
-                    if (data.standingsClausura) STATE.standingsClausura = data.standingsClausura;
-                    if (data.standingsGrupoA) STATE.standingsGrupoA = data.standingsGrupoA;
-                    else if (data.standingsClausura) STATE.standingsGrupoA = data.standingsClausura;
-                    if (data.standingsGrupoB) STATE.standingsGrupoB = data.standingsGrupoB;
-                    if (data.standingsAnual) STATE.standingsAnual = data.standingsAnual;
-
-                    const isLiveNow = data.currentMatch?.type === 'LIVE';
-                    syncLivePollingMode(isLiveNow);
-                }
-            } catch (err) {
-                console.error("Error sincronizando backend:", err);
-                syncLivePollingMode(false);
-            } finally {
-                registrarMarcaDeTiempoActualizacion();
-                renderAll();
-                if (icon) setTimeout(() => icon.classList.remove('animate-spin'), 450);
-                if (isManual) showToast('lavazulada.com', 'Datos sincronizados con éxito.');
-            }
-        }
-
-        function manualRefresh() {
-            if (STATE.isLiveMatch) {
-                STATE.countdown = STATE.pollingIntervalSec;
-            }
-            fetchBackendData(true);
-        }
-
-        function updateMatchCountdown() {
-            const cdEl = document.getElementById('prev-countdown');
-            const dotEl = document.getElementById('prev-countdown-dot');
-            if (!cdEl) return;
-
-            const cm = STATE.currentMatchData;
-            if (!cm || !cm.match) {
-                cdEl.textContent = 'Sincronizando...';
-                return;
-            }
-
-            if (cm.type === 'LIVE') {
-                if (dotEl) dotEl.className = 'w-1.5 h-1.5 rounded-full bg-red-500 animate-ping';
-                cdEl.textContent = '🔴 EN JUEGO AHORA';
-                return;
-            }
-
-            if (cm.type === 'FINISHED_24H') {
-                if (dotEl) dotEl.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400';
-                cdEl.textContent = 'PARTIDO FINALIZADO (ÚLTIMAS 24HS)';
-                return;
-            }
-
-            if (cm.type === 'LAST_REFERENCE') {
-                if (dotEl) dotEl.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400';
-                cdEl.textContent = 'ÚLTIMO PARTIDO • PRÓXIMA FECHA A CONFIRMAR';
-                return;
-            }
-
-            if (cm.type === 'TBD') {
-                if (dotEl) dotEl.className = 'w-1.5 h-1.5 rounded-full bg-slate-400';
-                cdEl.textContent = 'FECHA Y HORARIO A CONFIRMAR';
-                return;
-            }
-
-            if (dotEl) dotEl.className = 'w-1.5 h-1.5 rounded-full bg-pizarra-electric animate-pulse';
-
-            const rawDate = cm.isoDate || cm.match.fixture?.date;
-            const targetMs = cm.timestamp || cm.match.fixture?.timestampMs || (rawDate ? new Date(rawDate).getTime() : NaN);
-
-            if (isNaN(targetMs)) {
-                cdEl.textContent = 'Horario a confirmar';
-                return;
-            }
-
-            const diff = targetMs - Date.now();
-            if (diff <= 0) {
-                cdEl.textContent = 'Partido próximo a iniciar';
-                if (!STATE.isLiveMatch && diff > -60000) {
-                    fetchBackendData(false);
-                }
-                return;
-            }
-
-            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-            const m = Math.floor((diff / 1000 / 60) % 60);
-            const s = Math.floor((diff / 1000) % 60);
-
-            const pad = (n) => String(n).padStart(2, '0');
-            cdEl.textContent = `Faltan: ${pad(d)}d ${pad(h)}h ${pad(m)}m ${pad(s)}s`;
-        }
-
-        setInterval(() => {
-            if (STATE.isLiveMatch) {
-                STATE.countdown = STATE.countdown > 1 ? STATE.countdown - 1 : STATE.pollingIntervalSec;
-            }
-
-            updateMatchCountdown();
-        }, 1000);
-
-        function renderMiniFormList(containerId, matchesArray, emptyMsg = 'Sin registros recientes disponibles') {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-
-            if (!matchesArray || matchesArray.length === 0) {
-                container.innerHTML = `<div class="text-xs text-slate-500 font-mono py-2">${emptyMsg}</div>`;
-                return;
-            }
-
-            container.innerHTML = matchesArray.slice(0, 2).map(m => {
-                const badgeStyle = m.outcome === 'G'
-                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                    : (m.outcome === 'E' ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-rose-500/20 text-rose-300 border-rose-500/40');
-                const condLabel = m.cond === 'L' ? 'Local' : 'Visitante';
-                const gTeam = m.teamGoals ?? m.velezGoals ?? 0;
-                const gOpp = m.oppGoals ?? m.rivalGoals ?? 0;
-
-                return `
-                    <div class="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-[#121721] border border-pizarra-border">
-                        <div class="flex items-center gap-2.5 min-w-0">
-                            ${renderEscudoImg(m.rival, 'w-6 h-6 flex-shrink-0', m.rivalLogo)}
-                            <div class="truncate">
-                                <div class="text-xs font-bold text-white truncate">vs ${m.rival}</div>
-                                <div class="text-[10px] font-mono text-slate-400">${m.date} • ${condLabel}</div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 flex-shrink-0">
-                            <span class="px-2 py-0.5 rounded bg-[#0b0e14] border border-pizarra-border font-mono text-xs font-bold text-white">${gTeam} - ${gOpp}</span>
-                            <span class="w-6 h-6 rounded border font-mono font-bold text-xs flex items-center justify-center ${badgeStyle}">${m.outcome}</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function getPenaltyShootoutText(cm, m) {
-            const penObj = m?.score?.penalty || m?.penalty || cm?.penalties || cm?.penaltyShootout || null;
-            if (penObj && penObj.home !== null && penObj.home !== undefined && penObj.away !== null && penObj.away !== undefined) {
-                return `Penales: ${penObj.home} - ${penObj.away}`;
-            }
-            if (typeof cm?.penaltyText === 'string' && cm.penaltyText.trim()) {
-                return cm.penaltyText.trim();
-            }
-            if (typeof cm?.resultDetail === 'string' && /penal/i.test(cm.resultDetail)) {
-                return cm.resultDetail.trim();
-            }
-            const statusLong = String(m?.fixture?.status?.long || '');
-            const statusShort = String(m?.fixture?.status?.short || '');
-            if (statusShort === 'PEN' || /penalt/i.test(statusLong)) {
-                const matchNums = statusLong.match(/(\d+)\s*[-–]\s*(\d+)/);
-                if (matchNums) {
-                    return `Penales: ${matchNums[1]} - ${matchNums[2]}`;
-                }
-                return 'Definido por penales';
-            }
-            return '';
-        }
-
-        function getFinishedMatchPossession(cm, m) {
-            if (m?.possession && typeof m.possession.home === 'number' && typeof m.possession.away === 'number') {
-                return {
-                    home: Math.max(0, Math.min(100, Math.round(m.possession.home))),
-                    away: Math.max(0, Math.min(100, Math.round(m.possession.away)))
-                };
-            }
-            const lms = STATE.lastMatchStats;
-            if (lms && lms.possession !== null && lms.possession !== undefined) {
-                const isVelezHome = normalizarTexto(m?.teams?.home?.name || '').includes('velez');
-                const vPct = Math.max(0, Math.min(100, Math.round(Number(lms.possession))));
-                const rPct = lms.oppPossession !== null && lms.oppPossession !== undefined
-                    ? Math.max(0, Math.min(100, Math.round(Number(lms.oppPossession))))
-                    : (100 - vPct);
-                return isVelezHome ? { home: vPct, away: rPct } : { home: rPct, away: vPct };
-            }
-            return null;
-        }
-
-        function renderMatchCenter() {
-            const cm = STATE.currentMatchData;
-            if (!cm || !cm.match) return;
-
-            const badge = document.getElementById('match-badge-type');
-            const homeCrest = document.getElementById('match-home-crest');
-            const awayCrest = document.getElementById('match-away-crest');
-            const homeName = document.getElementById('match-home-name');
-            const awayName = document.getElementById('match-away-name');
-            const homeRole = document.getElementById('match-home-role');
-            const awayRole = document.getElementById('match-away-role');
-            const statusTitle = document.getElementById('match-status-title');
-            const centerBox = document.getElementById('match-center-box');
-            const penaltiesBadge = document.getElementById('match-penalties-badge');
-            const leagueInfo = document.getElementById('match-league-info');
-            const stadium = document.getElementById('match-stadium');
-            const rivalFormTitle = document.getElementById('rival-form-title');
-            const bothTeamsFormBox = document.getElementById('both-teams-form-box');
-            const scorersBox = document.getElementById('live-scorers-box');
-            const scorersHome = document.getElementById('live-scorers-home');
-            const scorersAway = document.getElementById('live-scorers-away');
-            const cardsBox = document.getElementById('live-cards-box');
-            const cardsHome = document.getElementById('live-cards-home');
-            const cardsAway = document.getElementById('live-cards-away');
-            const possBox = document.getElementById('live-possession-box');
-            const possHomeLabel = document.getElementById('live-poss-home-label');
-            const possAwayLabel = document.getElementById('live-poss-away-label');
-            const possHomeBar = document.getElementById('live-poss-home-bar');
-            const possAwayBar = document.getElementById('live-poss-away-bar');
-            const shareLiveBtn = document.getElementById('share-live-match-btn');
-
-            const m = cm.match;
-            homeCrest.innerHTML = renderEscudoImg(m.teams.home, 'w-16 h-16 sm:w-20 sm:h-20', m.teams.home.logo);
-            awayCrest.innerHTML = renderEscudoImg(m.teams.away, 'w-16 h-16 sm:w-20 sm:h-20', m.teams.away.logo);
-            homeName.textContent = m.teams.home.name;
-            awayName.textContent = m.teams.away.name;
-
-            const isNoUpcomingReference = cm.type === 'LAST_REFERENCE' || cm.type === 'FINISHED_24H' || cm.type === 'TBD';
-            if (bothTeamsFormBox) {
-                bothTeamsFormBox.classList.toggle('hidden', isNoUpcomingReference);
-            }
-
-            const showShareForMatch = cm.type === 'LIVE' || cm.type === 'FINISHED_24H' || cm.type === 'LAST_REFERENCE';
-            if (shareLiveBtn) {
-                shareLiveBtn.classList.toggle('hidden', !showShareForMatch);
-                shareLiveBtn.classList.toggle('inline-flex', showShareForMatch);
-            }
-
-            if (cm.type === 'TBD') {
-                if (scorersBox) scorersBox.classList.add('hidden');
-                if (cardsBox) cardsBox.classList.add('hidden');
-                if (possBox) possBox.classList.add('hidden');
-                if (penaltiesBadge) penaltiesBadge.classList.add('hidden');
-                badge.textContent = "PRÓXIMO ENCUENTRO";
-                badge.className = "px-2 py-0.5 rounded bg-slate-700/60 text-slate-300 border border-slate-600 font-bold uppercase tracking-wider text-[11px]";
-                if (homeRole) homeRole.textContent = "C.A.V.S.";
-                if (awayRole) awayRole.textContent = "RIVAL";
-                statusTitle.textContent = "FECHA A CONFIRMAR";
-                centerBox.innerHTML = `
-                    <span class="font-display text-2xl sm:text-4xl font-extrabold text-slate-300 tracking-tight uppercase">A CONFIRMAR</span>
-                    <span class="block text-[10px] font-mono text-slate-400 font-bold tracking-widest uppercase mt-0.5">HORARIO PENDIENTE</span>
-                `;
-                stadium.textContent = 'A confirmar';
-                leagueInfo.textContent = `${STATE.activeTournamentName} • Próxima instancia`;
-                if (rivalFormTitle) rivalFormTitle.textContent = 'Rival a confirmar';
-
-                updateMatchCountdown();
-                return;
-            }
-
-            if (homeRole) homeRole.textContent = "LOCAL";
-            if (awayRole) awayRole.textContent = "VISITANTE";
-
-            const isVelezHome = normalizarTexto(m.teams.home.name).includes('velez');
-            const rivalName = isVelezHome ? m.teams.away.name : m.teams.home.name;
-            if (rivalFormTitle) rivalFormTitle.textContent = `Cómo llega ${rivalName}`;
-
-            if (cm.type === 'LIVE' || cm.type === 'FINISHED_24H' || cm.type === 'LAST_REFERENCE') {
-                if (cm.type === 'LIVE') {
-                    const clockStr = m.fixture.status.elapsed || m.fixture.status.long || 'EN JUEGO';
-                    badge.textContent = `🔴 EN VIVO • ${clockStr}`;
-                    badge.className = "px-2 py-0.5 rounded bg-red-600 text-white font-bold uppercase tracking-wider text-[11px] animate-pulse";
-                    statusTitle.textContent = `TIEMPO DE JUEGO: ${clockStr}`;
-                    centerBox.innerHTML = `
-                        <span class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">${m.goals.home ?? 0} - ${m.goals.away ?? 0}</span>
-                        <span class="block text-[10px] font-mono text-red-400 font-bold tracking-widest uppercase">MARCADOR EN VIVO</span>
-                    `;
-                } else {
-                    badge.textContent = cm.type === 'LAST_REFERENCE' ? "ÚLTIMO PARTIDO DISPUTADO" : "ÚLTIMO PARTIDO • FINALIZADO";
-                    badge.className = "px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold uppercase tracking-wider text-[11px]";
-                    const matchDateObj = new Date(cm.isoDate || m.fixture.date);
-                    statusTitle.textContent = !isNaN(matchDateObj.getTime())
-                        ? formatLocalDate(matchDateObj, { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase()
-                        : 'RESULTADO FINAL';
-                    centerBox.innerHTML = `
-                        <span class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">${m.goals.home ?? 0} - ${m.goals.away ?? 0}</span>
-                        <span class="block text-[10px] font-mono text-emerald-400 font-bold tracking-widest uppercase">RESULTADO FINAL</span>
-                    `;
-                }
-
-                // Tanda de penales si el partido se definió por penales
-                const penText = getPenaltyShootoutText(cm, m);
-                if (penaltiesBadge) {
-                    if (penText) {
-                        penaltiesBadge.textContent = penText;
-                        penaltiesBadge.classList.remove('hidden');
-                    } else {
-                        penaltiesBadge.textContent = '';
-                        penaltiesBadge.classList.add('hidden');
-                    }
-                }
-
-                const hScorers = m.scorers?.home || [];
-                const aScorers = m.scorers?.away || [];
-                if (scorersBox && (hScorers.length > 0 || aScorers.length > 0)) {
-                    scorersBox.classList.remove('hidden');
-                    scorersHome.innerHTML = hScorers.map(g => `<div><span class="text-white font-semibold">${g}</span> ⚽</div>`).join('');
-                    scorersAway.innerHTML = aScorers.map(g => `<div>⚽ <span class="text-white font-semibold">${g}</span></div>`).join('');
-                } else if (scorersBox) {
-                    scorersBox.classList.add('hidden');
-                }
-
-                if (cm.type === 'LIVE' && cardsBox && cardsHome && cardsAway) {
-                    const hy = m.cards?.home?.yellow || [];
-                    const hr = m.cards?.home?.red || [];
-                    const ay = m.cards?.away?.yellow || [];
-                    const ar = m.cards?.away?.red || [];
-
-                    if (hy.length > 0 || hr.length > 0 || ay.length > 0 || ar.length > 0) {
-                        cardsBox.classList.remove('hidden');
-                        cardsHome.innerHTML = [
-                            ...hr.map(c => `<div><span class="text-rose-300 font-semibold">${c}</span> 🟥</div>`),
-                            ...hy.map(c => `<div><span class="text-amber-300 font-semibold">${c}</span> 🟨</div>`)
-                        ].join('');
-                        cardsAway.innerHTML = [
-                            ...ar.map(c => `<div>🟥 <span class="text-rose-300 font-semibold">${c}</span></div>`),
-                            ...ay.map(c => `<div>🟨 <span class="text-amber-300 font-semibold">${c}</span></div>`)
-                        ].join('');
-                    } else {
-                        cardsBox.classList.add('hidden');
-                    }
-                } else if (cardsBox) {
-                    cardsBox.classList.add('hidden');
-                }
-
-                // Posesión de pelota en partido en vivo o en el último partido finalizado
-                const possData = cm.type === 'LIVE'
-                    ? (m.possession && typeof m.possession.home === 'number' && typeof m.possession.away === 'number'
-                        ? { home: Math.max(0, Math.min(100, Math.round(m.possession.home))), away: Math.max(0, Math.min(100, Math.round(m.possession.away))) }
-                        : null)
-                    : getFinishedMatchPossession(cm, m);
-
-                if (possBox && possData) {
-                    possBox.classList.remove('hidden');
-                    if (possHomeLabel) possHomeLabel.textContent = `${m.teams.home.name}: ${possData.home}%`;
-                    if (possAwayLabel) possAwayLabel.textContent = `${m.teams.away.name}: ${possData.away}%`;
-                    if (possHomeBar) possHomeBar.style.width = `${possData.home}%`;
-                    if (possAwayBar) possAwayBar.style.width = `${possData.away}%`;
-                } else if (possBox) {
-                    possBox.classList.add('hidden');
-                }
-            } else {
-                if (scorersBox) scorersBox.classList.add('hidden');
-                if (cardsBox) cardsBox.classList.add('hidden');
-                if (possBox) possBox.classList.add('hidden');
-                if (penaltiesBadge) penaltiesBadge.classList.add('hidden');
-                badge.textContent = "PRÓXIMO PARTIDO OFICIAL";
-                badge.className = "px-2 py-0.5 rounded bg-sky-500/20 text-pizarra-electric border border-sky-500/40 font-bold uppercase tracking-wider text-[11px]";
-                const matchDateObj = new Date(cm.isoDate || m.fixture.date);
-                if (!isNaN(matchDateObj.getTime())) {
-                    statusTitle.textContent = formatLocalDate(matchDateObj, { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
-                    const horaStr = formatLocalTime(matchDateObj);
-                    const tzShort = getShortZoneLabel(matchDateObj);
-                    centerBox.innerHTML = `
-                        <span class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">${horaStr}</span>
-                        <span class="block text-[10px] font-mono text-pizarra-electric font-bold tracking-widest uppercase">${tzShort}</span>
-                    `;
-                }
-            }
-
-            if (m.fixture.venue && m.fixture.venue.name) stadium.textContent = m.fixture.venue.name;
-            if (m.league && m.league.name) {
-                const cleanLeague = limpiarRoundSinEst(m.league.name || '');
-                const cleanRound = limpiarRoundSinEst(m.league.round || '');
-                leagueInfo.textContent = cleanRound ? `${cleanLeague} • ${cleanRound}` : cleanLeague;
-            }
-
-            updateMatchCountdown();
-
-            if (!isNoUpcomingReference) {
-                const vLast2 = cm.velezForm || cm.velezLastMatches || STATE.velezLast2 || STATE.lastFiveMatches.slice(0, 2);
-                const rLast2 = cm.rivalForm || cm.rivalLastMatches || STATE.rivalLast2 || [];
-                renderMiniFormList('prev-velez-last2', vLast2);
-                renderMiniFormList('prev-rival-last2', rLast2);
-            }
-        }
-
-        function renderLastFiveMatches() {
-            const streakEl = document.getElementById('form-streak-badges');
-            const listEl = document.getElementById('last-five-list');
-            if (!STATE.lastFiveMatches || STATE.lastFiveMatches.length === 0) {
-                listEl.innerHTML = `<div class="p-6 text-center text-slate-500 text-xs">Sincronizando últimos encuentros...</div>`;
-                return;
-            }
-
-            const chronological = [...STATE.lastFiveMatches].reverse();
-            streakEl.innerHTML = chronological.map(m => {
-                const bg = m.outcome === 'G' ? 'bg-emerald-500 text-slate-950' : (m.outcome === 'E' ? 'bg-amber-400 text-slate-950' : 'bg-rose-500 text-white');
-                return `<span title="${m.rival}: ${m.velezGoals}-${m.rivalGoals}" class="w-5 h-5 rounded flex items-center justify-center ${bg}">${m.outcome}</span>`;
-            }).join('');
-
-            listEl.innerHTML = STATE.lastFiveMatches.map(m => {
-                const isHome = m.cond === 'L';
-                const badgeStyle = m.outcome === 'G'
-                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                    : (m.outcome === 'E' ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-rose-500/20 text-rose-300 border-rose-500/40');
-                const condBadge = isHome
-                    ? '<span class="px-1.5 py-0.2 rounded bg-pizarra-accent/30 text-pizarra-electric border border-pizarra-accent/50 text-[10px] font-mono">LOCAL</span>'
-                    : '<span class="px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700 text-[10px] font-mono">VISITANTE</span>';
-
-                const matchTitleHtml = isHome
-                    ? `Vélez <span class="text-slate-400 font-normal text-sm">vs</span> ${m.rival}`
-                    : `${m.rival} <span class="text-slate-400 font-normal text-sm">vs</span> Vélez`;
-
-                const scoreText = isHome
-                    ? `${m.velezGoals} - ${m.rivalGoals}`
-                    : `${m.rivalGoals} - ${m.velezGoals}`;
-
-                return `
-                    <div class="p-3.5 hover:bg-pizarra-cardHover/50 transition flex items-center justify-between gap-3">
-                        <div class="flex items-center gap-3 min-w-0 flex-1">
-                            ${renderEscudoImg(m.rival, 'w-8 h-8 flex-shrink-0', m.rivalLogo)}
-                            <div class="min-w-0 flex-1">
-                                <div class="flex items-center gap-2 mb-0.5"><span class="font-mono text-[11px] font-bold text-slate-400">${m.fecha}</span><span class="text-[11px] text-slate-500">• ${m.date}</span>${condBadge}</div>
-                                <div class="font-display text-lg font-bold uppercase text-white truncate">${matchTitleHtml}</div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 flex-shrink-0">
-                            <div class="px-3 py-1.5 rounded-lg bg-[#0b0e14] border border-pizarra-border font-mono font-bold text-sm text-white">${scoreText}</div>
-                            <span class="w-7 h-7 rounded-lg border font-mono font-bold text-xs flex items-center justify-center ${badgeStyle}">${m.outcome}</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderUpcomingMatches() {
-            const listEl = document.getElementById('upcoming-matches-list');
-            if (!STATE.upcomingMatches || STATE.upcomingMatches.length === 0) {
-                listEl.innerHTML = `<div class="p-6 text-center text-slate-500 text-xs">No hay partidos futuros confirmados en el calendario oficial.</div>`;
-                return;
-            }
-
-            listEl.innerHTML = STATE.upcomingMatches.map((m, i) => {
-                const condText = m.cond === 'L' ? 'LOCAL' : (m.cond === 'V' ? 'VISITANTE' : 'NEUTRAL');
-                const condClass = m.cond === 'L' ? 'bg-pizarra-accent/30 text-pizarra-electric border-pizarra-accent/50' : 'bg-slate-800 text-slate-300 border-slate-700';
-                const highlightNext = i === 0 ? 'bg-[#0055a5]/15 border-l-4 border-l-pizarra-electric' : 'hover:bg-pizarra-cardHover/50';
-                const displayTime = m.timeLocal || limpiarRoundSinEst((m.timeART || '').replace(/\s*ART\s*/i, '')).trim();
-                return `
-                    <div class="p-3.5 transition flex items-center justify-between gap-3 ${highlightNext}">
-                        <div class="flex items-center gap-3 min-w-0 flex-1">
-                            ${renderEscudoImg(m.rival, 'w-8 h-8 flex-shrink-0', m.rivalLogo)}
-                            <div class="min-w-0 flex-1">
-                                <div class="flex flex-wrap items-center gap-2 mb-0.5"><span class="px-1.5 py-0.5 rounded bg-[#0b0e14] border border-pizarra-border font-mono text-[10px] font-bold text-pizarra-electric">${m.fecha}</span><span class="text-[11px] text-slate-400">${m.comp}</span><span class="px-1.5 py-0.2 rounded border text-[10px] font-mono ${condClass}">${condText}</span></div>
-                                <div class="font-display text-lg font-bold uppercase text-white truncate">vs ${m.rival}</div>
-                                <div class="text-[11px] text-slate-400 truncate">📍 ${m.stadium}</div>
-                            </div>
-                        </div>
-                        <div class="text-right flex-shrink-0 bg-[#0b0e14] px-3 py-1.5 rounded-xl border border-pizarra-border">
-                            <div class="font-display text-sm font-bold uppercase text-white">${m.date}</div>
-                            <div class="font-mono text-xs font-bold text-pizarra-electric">${displayTime}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function switchTableTab(tab) {
-            STATE.activeTableTab = tab;
-            ['GRUPO_A', 'GRUPO_B', 'ANUAL'].forEach(t => {
-                const el = document.getElementById(`tab-${t}`);
-                if (el) el.className = t === tab ? 'px-3.5 py-1.5 rounded-lg bg-pizarra-accent text-white transition' : 'px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
-            });
-            renderStandingsTable();
-        }
-
-        function renderStandingsTable() {
-            const thead = document.getElementById('standings-thead');
-            const tbody = document.getElementById('standings-tbody');
-            const tabBtnA = document.getElementById('tab-GRUPO_A');
-            const tabBtnB = document.getElementById('tab-GRUPO_B');
-            const tab = STATE.activeTableTab;
-
-            if (tabBtnA) tabBtnA.textContent = STATE.grupoAName || 'Grupo A';
-            if (tabBtnB) tabBtnB.textContent = STATE.grupoBName || 'Grupo B';
-
-            let sourceList = [];
-            let titleCol = '';
-            if (tab === 'GRUPO_A') {
-                sourceList = STATE.standingsGrupoA.length > 0 ? STATE.standingsGrupoA : STATE.standingsClausura;
-                titleCol = `Equipo (${STATE.grupoAName || 'Grupo A'})`;
-            } else if (tab === 'GRUPO_B') {
-                sourceList = STATE.standingsGrupoB;
-                titleCol = `Equipo (${STATE.grupoBName || 'Grupo B'})`;
-            } else {
-                sourceList = STATE.standingsAnual;
-                titleCol = 'Equipo (Tabla anual Apertura + Clausura)';
-            }
-
-            const filteredSource = (sourceList || []).filter(t => {
-                const roundMeta = t.round || t.stage || t.description || '';
-                return !isPlayoffRoundLabel(roundMeta);
-            });
-
-            if (!filteredSource || filteredSource.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-500 text-xs">Sincronizando tabla de posiciones...</td></tr>`;
-                return;
-            }
-
-            const teams = [...filteredSource].sort((a, b) => b.pts - a.pts || b.dg - a.dg || (b.gf || 0) - (a.gf || 0));
-            thead.innerHTML = `<th class="py-2.5 px-3 text-center w-12">#</th><th class="py-2.5 px-3">${titleCol}</th><th class="py-2.5 px-2 text-center font-bold text-white">Pts</th><th class="py-2.5 px-2 text-center">PJ</th><th class="py-2.5 px-2 text-center">PG</th><th class="py-2.5 px-2 text-center">PE</th><th class="py-2.5 px-2 text-center">PP</th><th class="py-2.5 px-3 text-center">DG</th>`;
-
-            const hasOfficialCupNotes = teams.some(t => t.cupType === 'LIBERTADORES' || t.cupType === 'SUDAMERICANA');
-
-            tbody.innerHTML = teams.map((t, idx) => {
-                const pos = idx + 1;
-                let rowStyle = 'hover:bg-pizarra-cardHover/60 text-slate-300';
-                let posBadge = `<span class="font-mono text-xs text-slate-400">${pos}</span>`;
-                let cupTag = '';
-
-                const normTeam = normalizarTexto(t.name);
-                let manualCup = null;
-                if (tab === 'ANUAL') {
-                    for (const [clave, cfg] of Object.entries(CLASIFICADOS_MANUALES_ANUAL)) {
-                        if (normTeam.includes(clave)) {
-                            manualCup = cfg;
-                            break;
-                        }
-                    }
-                }
-
-                let effectiveCup = t.cupType || manualCup?.cupType || null;
-                if (tab === 'ANUAL' && !effectiveCup && !hasOfficialCupNotes) {
-                    if (pos <= 3) effectiveCup = 'LIBERTADORES';
-                    else if (pos <= 9) effectiveCup = 'SUDAMERICANA';
-                }
-
-                const effectiveNote = t.cupNote || manualCup?.cupNote || (effectiveCup === 'LIBERTADORES' ? 'Copa Libertadores' : 'Copa Sudamericana');
-
-                if (tab === 'ANUAL' || t.cupType) {
-                    if (effectiveCup === 'LIBERTADORES') {
-                        rowStyle = 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-100 border-l-4 border-l-emerald-500';
-                        posBadge = `<span class="inline-flex items-center justify-center w-6 h-6 rounded bg-emerald-500 text-slate-950 font-mono font-extrabold text-xs shadow">${pos}</span>`;
-                        cupTag = `<span class="ml-auto px-1.5 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-mono text-[9px] uppercase tracking-wider hidden sm:inline-block">${effectiveNote}</span>`;
-                    } else if (effectiveCup === 'SUDAMERICANA') {
-                        rowStyle = 'bg-amber-400/15 hover:bg-amber-400/25 text-amber-100 border-l-4 border-l-amber-400';
-                        posBadge = `<span class="inline-flex items-center justify-center w-6 h-6 rounded bg-amber-400 text-slate-950 font-mono font-extrabold text-xs shadow">${pos}</span>`;
-                        cupTag = `<span class="ml-auto px-1.5 py-0.5 rounded bg-amber-400/20 border border-amber-400/40 text-amber-300 font-mono text-[9px] uppercase tracking-wider hidden sm:inline-block">${effectiveNote}</span>`;
-                    }
-                }
-
-                if (t.isVelez) {
-                    if ((tab === 'ANUAL' || t.cupType) && effectiveCup === 'LIBERTADORES') {
-                        rowStyle = 'bg-emerald-500/30 hover:bg-emerald-500/35 text-white font-bold border-l-4 border-l-emerald-400 ring-1 ring-inset ring-emerald-400/50';
-                    } else if ((tab === 'ANUAL' || t.cupType) && effectiveCup === 'SUDAMERICANA') {
-                        rowStyle = 'bg-amber-400/30 hover:bg-amber-400/35 text-white font-bold border-l-4 border-l-amber-300 ring-1 ring-inset ring-amber-300/50';
-                    } else {
-                        rowStyle = 'bg-[#0055a5]/30 font-bold text-white border-l-4 border-l-pizarra-electric';
-                        posBadge = `<span class="inline-flex items-center justify-center w-6 h-6 rounded bg-pizarra-accent text-white font-mono font-extrabold text-xs">${pos}</span>`;
-                    }
-                }
-
-                return `
-                    <tr class="${rowStyle} transition-colors">
-                        <td class="py-2.5 px-3 text-center">${posBadge}</td>
-                        <td class="py-2.5 px-3 flex items-center gap-2.5">
-                            ${renderEscudoImg(t.name, 'w-5 h-5 flex-shrink-0', t.logo)}
-                            <span class="${t.isVelez ? 'text-white font-bold' : ''}">${t.name}</span>
-                            ${cupTag}
-                        </td>
-                        <td class="py-2.5 px-2 text-center font-mono font-bold text-white bg-white/[0.04]">${t.pts}</td>
-                        <td class="py-2.5 px-2 text-center font-mono opacity-85">${t.pj}</td>
-                        <td class="py-2.5 px-2 text-center font-mono opacity-85">${t.pg}</td>
-                        <td class="py-2.5 px-2 text-center font-mono opacity-85">${t.pe}</td>
-                        <td class="py-2.5 px-2 text-center font-mono opacity-85">${t.pp}</td>
-                        <td class="py-2.5 px-3 text-center font-mono font-semibold ${t.dg >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${t.dg > 0 ? '+' + t.dg : t.dg}</td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function filterSquadPos(group) {
-            STATE.squadFilterGroup = group;
-            ['TODOS', 'ARQ', 'DEF', 'MED', 'DEL'].forEach(g => {
-                const btn = document.getElementById(`pos-btn-${g}`);
-                if (btn) btn.className = g === group ? 'px-2.5 py-1 rounded bg-pizarra-accent text-white transition' : 'px-2.5 py-1 rounded text-slate-400 hover:text-white transition';
-            });
-            renderSquadTable();
-        }
-
-        function sortSquadBy(col) {
-            if (STATE.squadSortCol === col) STATE.squadSortAsc = !STATE.squadSortAsc;
-            else { STATE.squadSortCol = col; STATE.squadSortAsc = (col === 'number' || col === 'name' || col === 'group'); }
-            renderSquadTable();
-        }
-
-        function getVelezGroupLabel() {
-            const inGroupA = (STATE.standingsGrupoA || []).some(t => t.isVelez);
-            if (inGroupA) return STATE.grupoAName || 'Grupo A';
-            const inGroupB = (STATE.standingsGrupoB || []).some(t => t.isVelez);
-            if (inGroupB) return STATE.grupoBName || 'Grupo B';
-            return STATE.grupoAName || 'Grupo A';
-        }
-
-        // Obtiene las estadísticas de jugadores correspondientes exclusivamente al Torneo Clausura
-        function getClausuraSquadList() {
-            if (Array.isArray(STATE.clausuraSquad) && STATE.clausuraSquad.length > 0) {
-                return STATE.clausuraSquad;
-            }
-            const base = STATE.squad || [];
-            const velezStanding = STATE.standingsClausura.find(t => t.isVelez);
-            const maxClausuraPj = velezStanding && typeof velezStanding.pj === 'number' ? velezStanding.pj : null;
-
-            return base.map(p => {
-                const clausuraStats = p.clausura || p.statsClausura || p.torneoClausura || null;
-                if (clausuraStats) {
-                    return {
-                        ...p,
-                        pj: clausuraStats.pj ?? p.pj ?? 0,
-                        goals: clausuraStats.goals ?? p.goals ?? 0,
-                        cleanSheets: clausuraStats.cleanSheets ?? p.cleanSheets ?? 0,
-                        yellowCards: clausuraStats.yellowCards ?? p.yellowCards ?? 0,
-                        redCards: clausuraStats.redCards ?? p.redCards ?? 0
-                    };
-                }
-                const rawPj = Number(p.pj || 0);
-                const cappedPj = maxClausuraPj !== null ? Math.min(rawPj, maxClausuraPj) : rawPj;
-                return {
-                    ...p,
-                    pj: cappedPj
-                };
-            });
-        }
-
-        function renderSquadTable() {
-            const captionEl = document.getElementById('squad-tournament-caption');
-            const velezGroupLabel = getVelezGroupLabel();
-            if (captionEl) {
-                captionEl.textContent = `Dorsales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas del Torneo Clausura (${velezGroupLabel})`;
-            }
-
-            const searchQuery = (document.getElementById('squad-search')?.value || '').toLowerCase().trim();
-            const clausuraList = getClausuraSquadList();
-            let list = [...clausuraList];
-            if (STATE.squadFilterGroup !== 'TODOS') list = list.filter(p => p.group === STATE.squadFilterGroup);
-            if (searchQuery) list = list.filter(p => p.name.toLowerCase().includes(searchQuery) || (p.posLabel || '').toLowerCase().includes(searchQuery));
-
-            const col = STATE.squadSortCol, dir = STATE.squadSortAsc ? 1 : -1;
-            list.sort((a, b) => {
-                const rawA = col === 'number' ? (a.number ?? a.dorsal ?? a.num ?? 999) : (a[col] ?? -1);
-                const rawB = col === 'number' ? (b.number ?? b.dorsal ?? b.num ?? 999) : (b[col] ?? -1);
-                if (typeof rawA === 'string') return rawA.localeCompare(String(rawB)) * dir;
-                return (Number(rawA) - Number(rawB)) * dir;
-            });
-
-            const tbody = document.getElementById('full-squad-tbody');
-            if (!list || list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-500 text-xs">Sincronizando plantilla del plantel oficial...</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = list.map(p => {
-                const dorsalVal = p.number || p.dorsal || p.num || '-';
-                const groupBadgeColors = { 'ARQ': 'bg-sky-500/20 text-pizarra-electric border-sky-500/40', 'DEF': 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40', 'MED': 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40', 'DEL': 'bg-amber-500/20 text-amber-300 border-amber-500/40' };
-                const cleanSheetCell = p.group === 'ARQ' ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-mono font-bold text-xs bg-sky-500/20 text-pizarra-electric border border-sky-500/40">🧤 ${p.cleanSheets ?? 0}</span>` : `<span class="font-mono text-slate-600">—</span>`;
-                const flagSrc = p.flagUrl || `https://flagcdn.com/w80/${p.countryCode || 'ar'}.png`;
-                const countryTitle = p.countryName || 'Argentina';
-
-                return `
-                    <tr class="hover:bg-pizarra-cardHover/60 transition-colors">
-                        <td class="py-2.5 px-3 text-center"><span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#0055a5]/30 border border-[#0055a5] font-mono text-xs font-bold text-white">${dorsalVal}</span></td>
-                        <td class="py-2.5 px-3 flex items-center gap-2.5">
-                            <img src="${flagSrc}" title="${countryTitle}" alt="${countryTitle}" onerror="this.onerror=null;this.src='https://flagcdn.com/w80/ar.png';" class="w-6 h-4 rounded-[3px] object-cover border border-slate-600/80 shadow-sm flex-shrink-0">
-                            <div class="font-semibold text-white">${p.name}</div>
-                        </td>
-                        <td class="py-2.5 px-2 text-center"><span class="px-2 py-0.5 rounded border font-mono text-[11px] font-bold ${groupBadgeColors[p.group] || 'bg-slate-800 text-slate-300'}">${p.group}</span></td>
-                        <td class="py-2.5 px-2 text-center font-mono text-slate-400">${p.age || '-'}</td>
-                        <td class="py-2.5 px-2 text-center font-mono text-slate-200 font-medium">${p.pj || 0}</td>
-                        <td class="py-2.5 px-2 text-center font-mono font-bold ${p.goals > 0 ? 'text-emerald-400' : 'text-slate-500'}">${p.goals || 0}</td>
-                        <td class="py-2.5 px-2 text-center">${cleanSheetCell}</td>
-                        <td class="py-2.5 px-2 text-center font-mono font-bold ${p.yellowCards > 0 ? 'text-amber-400' : 'text-slate-500'}">${p.yellowCards || 0}</td>
-                        <td class="py-2.5 px-3 text-center font-mono font-bold ${p.redCards > 0 ? 'text-rose-400' : 'text-slate-500'}">${p.redCards || 0}</td>
-                    </tr>
-                `;
-            }).join('');
-
-            const velezStanding = STATE.standingsClausura.find(t => t.isVelez);
-            const velezGoalsFor = velezStanding && typeof velezStanding.gf === 'number'
-                ? velezStanding.gf
-                : clausuraList.reduce((acc, p) => acc + (Number(p.goals) || 0), 0);
-
-            const totalCleanSheets = clausuraList.filter(p => p.group === 'ARQ').reduce((acc, p) => acc + (Number(p.cleanSheets) || 0), 0);
-            const totalCards = clausuraList.reduce((acc, p) => acc + (Number(p.yellowCards) || 0) + (Number(p.redCards) || 0), 0);
-
-            const kpiG = document.getElementById('kpi-total-goals');
-            const kpiCS = document.getElementById('kpi-clean-sheets');
-            const kpiC = document.getElementById('kpi-total-cards');
-            if (kpiG) kpiG.textContent = velezGoalsFor;
-            if (kpiCS) kpiCS.textContent = totalCleanSheets;
-            if (kpiC) kpiC.textContent = totalCards;
-
-            const card1 = document.getElementById('tactical-card-1');
-            if (card1 && velezStanding) {
-                const pj = velezStanding.pj || 0;
-                const gf = velezStanding.gf || 0;
-                const gc = velezStanding.gc || 0;
-                const avgGf = pj > 0 ? (gf / pj).toFixed(2) : '0.00';
-                const avgGc = pj > 0 ? (gc / pj).toFixed(2) : '0.00';
-                card1.innerHTML = `En <strong class="text-white">${pj} fechas</strong> del ${STATE.activeTournamentName}, Vélez convirtió <strong class="text-emerald-400">${gf} goles</strong> (${avgGf} p/p) y recibió <strong class="text-slate-200">${gc}</strong> (${avgGc} p/p).`;
-            }
-
-            const cardScorers = document.getElementById('tactical-card-scorers');
-            if (cardScorers) {
-                const withGoals = [...clausuraList]
-                    .filter(p => (Number(p.goals) || 0) > 0)
-                    .sort((a, b) => (Number(b.goals) || 0) - (Number(a.goals) || 0));
-
-                if (withGoals.length > 0) {
-                    const maxG = Number(withGoals[0].goals);
-                    const leaders = withGoals.filter(p => Number(p.goals) === maxG);
-                    const namesStr = leaders.map(p => `<strong class="text-white">${p.name}</strong>`).join(', ');
-                    cardScorers.innerHTML = `${leaders.length > 1 ? 'Máximos goleadores de Vélez' : 'Máximo goleador de Vélez'} en el ${STATE.activeTournamentName}: ${namesStr} con <strong class="text-emerald-400">${maxG} ${maxG === 1 ? 'gol' : 'goles'}</strong>.`;
-                } else {
-                    cardScorers.innerHTML = `Vélez aún no registra goleadores individuales en el ${STATE.activeTournamentName}.`;
-                }
-            }
-
-            const cardYellows = document.getElementById('tactical-card-yellows');
-            if (cardYellows) {
-                const withYellows = [...clausuraList]
-                    .filter(p => (Number(p.yellowCards) || 0) > 0)
-                    .sort((a, b) => (Number(b.yellowCards) || 0) - (Number(a.yellowCards) || 0));
-
-                if (withYellows.length > 0) {
-                    const maxY = Number(withYellows[0].yellowCards);
-                    const leaders = withYellows.filter(p => Number(p.yellowCards) === maxY);
-                    const namesStr = leaders.map(p => `<strong class="text-white">${p.name}</strong>`).join(', ');
-                    cardYellows.innerHTML = `${leaders.length > 1 ? 'Jugadores' : 'Jugador'} de Vélez con más amonestaciones: ${namesStr} con <strong class="text-amber-400">${maxY} ${maxY === 1 ? 'amarilla' : 'amarillas'}</strong>.`;
-                } else {
-                    cardYellows.innerHTML = `Sin jugadores de Vélez amonestados en el certamen.`;
-                }
-            }
-
-            const cardReds = document.getElementById('tactical-card-reds');
-            if (cardReds) {
-                const withReds = [...clausuraList]
-                    .filter(p => (Number(p.redCards) || 0) > 0)
-                    .sort((a, b) => (Number(b.redCards) || 0) - (Number(a.redCards) || 0));
-
-                if (withReds.length > 0) {
-                    const maxR = Number(withReds[0].redCards);
-                    const leaders = withReds.filter(p => Number(p.redCards) === maxR);
-                    const namesStr = leaders.map(p => `<strong class="text-white">${p.name}</strong>`).join(', ');
-                    cardReds.innerHTML = `${leaders.length > 1 ? 'Jugadores' : 'Jugador'} de Vélez con más expulsiones: ${namesStr} con <strong class="text-rose-400">${maxR} ${maxR === 1 ? 'roja' : 'rojas'}</strong>.`;
-                } else {
-                    cardReds.innerHTML = `Vélez no registra jugadores expulsados en el ${STATE.activeTournamentName}.`;
-                }
-            }
-
-            const statsRivalEl = document.getElementById('last-match-stats-rival');
-            const statsBodyEl = document.getElementById('last-match-stats-body');
-            const lms = STATE.lastMatchStats;
-
-            if (statsRivalEl && statsBodyEl) {
-                if (lms && (lms.possession !== null || lms.totalShots !== null)) {
-                    statsRivalEl.textContent = `vs ${lms.rival} (${lms.date})`;
-
-                    const possVelez = lms.possession !== null ? Math.round(lms.possession) : 50;
-                    const possRival = lms.oppPossession !== null ? Math.round(lms.oppPossession) : (100 - possVelez);
-
-                    const onTarget = lms.shotsOnTarget ?? 0;
-                    const offTarget = lms.shotsOffTarget ?? 0;
-                    const totalS = lms.totalShots ?? (onTarget + offTarget);
-
-                    statsBodyEl.innerHTML = `
-                        <div>
-                            <div class="flex justify-between text-[11px] font-mono mb-1">
-                                <span class="text-pizarra-electric font-bold">Posesión Vélez: ${possVelez}%</span>
-                                <span class="text-slate-400">${lms.rival}: ${possRival}%</span>
-                            </div>
-                            <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden flex">
-                                <div style="width: ${possVelez}%" class="bg-[#0055a5] h-full"></div>
-                                <div style="width: ${possRival}%" class="bg-slate-600 h-full"></div>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-1.5 pt-1 text-center font-mono">
-                            <div class="p-1.5 rounded-lg bg-[#121721] border border-pizarra-border">
-                                <span class="block text-sm font-bold text-white">${totalS}</span>
-                                <span class="text-[9px] text-slate-400 uppercase">Tiros Tot.</span>
-                            </div>
-                            <div class="p-1.5 rounded-lg bg-[#121721] border border-pizarra-border">
-                                <span class="block text-sm font-bold text-emerald-400">${onTarget}</span>
-                                <span class="text-[9px] text-slate-400 uppercase">Al Arco</span>
-                            </div>
-                            <div class="p-1.5 rounded-lg bg-[#121721] border border-pizarra-border">
-                                <span class="block text-sm font-bold text-rose-400">${offTarget}</span>
-                                <span class="text-[9px] text-slate-400 uppercase">Afuera</span>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    statsRivalEl.textContent = STATE.lastLineup?.rival ? `vs ${STATE.lastLineup.rival}` : '';
-                    statsBodyEl.innerHTML = `<p class="text-slate-400">Estadísticas detalladas de posesión y tiros no disponibles para este encuentro.</p>`;
-                }
-            }
-        }
-
-        function populateLineupSelector() {
-            const selector = document.getElementById('formation-selector');
-            if (!selector) return;
-
-            const lineups = STATE.recentLineups || [];
-            if (lineups.length === 0) {
-                selector.innerHTML = `<option value="0">Último XI Oficial</option>`;
-                return;
-            }
-
-            if (STATE.selectedLineupIdx >= lineups.length) {
-                STATE.selectedLineupIdx = 0;
-            }
-
-            selector.innerHTML = lineups.map((item, idx) => {
-                const scorePart = item.score ? ` [${item.score}]` : '';
-                return `<option value="${idx}" ${idx === STATE.selectedLineupIdx ? 'selected' : ''}>vs ${item.rival} • ${item.date}${scorePart}</option>`;
-            }).join('');
-        }
-
-        function renderPitch(selectedValue = null) {
-            const layer = document.getElementById('pitch-players-layer');
-            const subtitle = document.getElementById('lineup-match-subtitle');
-            const badge = document.getElementById('tactical-formation-badge');
-            if (!layer) return;
-
-            if (selectedValue !== null && !isNaN(Number(selectedValue))) {
-                STATE.selectedLineupIdx = Number(selectedValue);
-            }
-
-            const lineups = STATE.recentLineups || [];
-            const lineup = lineups[STATE.selectedLineupIdx] || STATE.lastLineup;
-            const starters = (lineup && Array.isArray(lineup.starters) && lineup.starters.length === 11)
-                ? lineup.starters
-                : null;
-
-            const formName = lineup?.formation || '4-2-3-1';
-            const schemeKey = formName.includes('4-3-3') ? '4-3-3' : '4-2-3-1';
-            const slotCoords = SLOTS_CANCHA[schemeKey];
-
-            if (starters) {
-                if (badge) badge.textContent = formName;
-                if (subtitle) {
-                    const condText = lineup.cond === 'V' ? 'Visitante' : 'Local';
-                    const compText = lineup.comp ? ` • ${lineup.comp}` : '';
-                    subtitle.textContent = `XI Inicial • ${condText}${compText} • Esquema ${formName}`;
-                }
-
-                const asignaciones = asignarSlotsEnCancha(starters);
-
-                layer.innerHTML = asignaciones.map(({ player: p, slot }) => {
-                    const pos = slotCoords[slot] || { x: 50, y: 50 };
-                    const shortLabel = (p.shortName || p.name || '').split(' ').pop();
-                    return `
-                        <div style="left: ${pos.x}%; top: ${pos.y}%;" class="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer">
-                            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#0055a5] border-2 border-white text-white font-display font-extrabold text-sm flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.75)]">${p.number || '-'}</div>
-                            <span class="mt-1 px-1.5 py-0.5 rounded bg-[#0b0e14]/95 border border-pizarra-border text-[10px] sm:text-[11px] font-semibold text-white whitespace-nowrap shadow">${shortLabel}</span>
-                        </div>
-                    `;
-                }).join('');
-            } else if (STATE.squad && STATE.squad.length >= 11) {
-                const top11 = [...STATE.squad].sort((a, b) => (b.pj || 0) - (a.pj || 0)).slice(0, 11);
-                const asignaciones = asignarSlotsEnCancha(top11);
-
-                if (subtitle) subtitle.textContent = `Once base con más presencias • ${STATE.activeTournamentName}`;
-                layer.innerHTML = asignaciones.map(({ player: p, slot }) => {
-                    const pos = slotCoords[slot] || { x: 50, y: 50 };
-                    const shortLabel = (p.name || '').split(' ').pop();
-                    return `
-                        <div style="left: ${pos.x}%; top: ${pos.y}%;" class="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer">
-                            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#0055a5] border-2 border-white text-white font-display font-extrabold text-sm flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.75)]">${p.number || '-'}</div>
-                            <span class="mt-1 px-1.5 py-0.5 rounded bg-[#0b0e14]/95 border border-pizarra-border text-[10px] sm:text-[11px] font-semibold text-white whitespace-nowrap shadow">${shortLabel}</span>
-                        </div>
-                    `;
-                }).join('');
-            }
-        }
-
-        function renderAll() {
-            document.getElementById('header-velez-crest').innerHTML = `<img src="./logolva.png" onerror="this.onerror=null;this.src='${MI_ESCUDO_VELEZ}';" alt="La V Azulada" class="w-10 h-10 sm:w-11 sm:h-11 object-contain select-none">`;
-            renderEfemerideBanner();
-            renderMatchCenter();
-            renderLastFiveMatches();
-            renderUpcomingMatches();
-            renderStandingsTable();
-            renderSquadTable();
-            populateLineupSelector();
-            renderPitch(STATE.selectedLineupIdx);
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            registrarMarcaDeTiempoActualizacion();
-            initMobileInstallPrompt();
-            renderAll();
-            fetchBackendData(false);
-        });
-    </script>
+        <div class="meta-line">${m.fixture?.venue?.name || ''} ${possText ? `· ${possText}` : ''}</div>
+      `;
+    }
+
+    function renderLastStats(data) {
+      const container = document.getElementById('last-stats-container');
+      const st = data.lastMatchStats;
+      if (!st) {
+        container.innerHTML = '<div class="meta-line">Sin estadísticas disponibles del último encuentro.</div>';
+        return;
+      }
+      container.innerHTML = `
+        <div class="meta-line">vs ${st.rival} (${st.date})</div>
+        <div class="stats-grid">
+          <div class="stat-pill">
+            <span class="stat-val">${st.possession !== null && st.possession !== undefined ? `${st.possession}%` : '-'}</span>
+            <span class="stat-lbl">Posesión Vélez</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-val">${st.totalShots ?? '-'}</span>
+            <span class="stat-lbl">Remates totales</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-val">${st.shotsOnTarget ?? '-'}</span>
+            <span class="stat-lbl">Al arco</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderLastMatches(data) {
+      const container = document.getElementById('last-matches-container');
+      const list = data.lastMatches || [];
+      if (!list.length) {
+        container.innerHTML = '<div class="meta-line">Sin partidos finalizados registrados.</div>';
+        return;
+      }
+      container.innerHTML = list.map(item => `
+        <div class="list-item">
+          <div>
+            <strong>${item.rival}</strong>
+            <div class="meta-line">${item.date} · ${item.cond} · ${item.fecha}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <strong>${item.velezGoals} - ${item.rivalGoals}</strong>
+            <span class="badge ${item.outcome}">${item.outcome}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderUpcomingMatches(data) {
+      const container = document.getElementById('upcoming-matches-container');
+      const list = data.upcomingMatches || [];
+      if (!list.length) {
+        container.innerHTML = '<div class="meta-line">No hay próximos partidos programados por el momento.</div>';
+        return;
+      }
+      container.innerHTML = list.map(item => `
+        <div class="list-item">
+          <div>
+            <strong>${item.rival}</strong>
+            <div class="meta-line">${item.date} ${item.timeART || ''} · ${item.cond} · ${item.stadium || ''}</div>
+          </div>
+          <span class="meta-line">${item.fecha}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderStandings() {
+      const tbody = document.getElementById('standings-tbody');
+      if (!latestData) return;
+
+      let rows = [];
+      if (activeTableKey === 'grupoA') rows = latestData.standingsGrupoA || [];
+      else if (activeTableKey === 'grupoB') rows = latestData.standingsGrupoB || [];
+      else rows = latestData.standingsClausura || [];
+
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="10">Sin datos de tabla disponibles.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = rows.map((r, idx) => `
+        <tr class="${r.isVelez ? 'velez-row' : ''}">
+          <td>${idx + 1}</td>
+          <td>${r.name}</td>
+          <td><strong>${r.pts}</strong></td>
+          <td>${r.pj}</td>
+          <td>${r.pg}</td>
+          <td>${r.pe}</td>
+          <td>${r.pp}</td>
+          <td>${r.gf}</td>
+          <td>${r.gc}</td>
+          <td>${r.dg > 0 ? `+${r.dg}` : r.dg}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderSquad(data) {
+      const tbody = document.getElementById('squad-tbody');
+      const squad = data.squad || [];
+      if (!squad.length) {
+        tbody.innerHTML = '<tr><td colspan="7">Sin datos de plantel disponibles.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = squad.map(p => `
+        <tr>
+          <td>${p.number ?? '-'}</td>
+          <td><strong>${p.name}</strong></td>
+          <td>${p.posLabel || p.position || '-'}</td>
+          <td>${p.pj ?? 0}</td>
+          <td>${p.goals ?? 0}</td>
+          <td>${p.yellowCards ?? 0}</td>
+          <td>${p.redCards ?? 0}</td>
+        </tr>
+      `).join('');
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeTableKey = btn.dataset.table;
+        renderStandings();
+      });
+    });
+
+    async function loadVelezSite() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/velez-data`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        latestData = data;
+
+        document.getElementById('status-sub').textContent = 'Datos actualizados desde API-Football';
+        document.getElementById('tournament-label').textContent = data.activeTournamentName || 'Temporada 2026';
+        if (data.grupoAName) document.getElementById('tab-grupo-a').textContent = data.grupoAName;
+        if (data.grupoBName) document.getElementById('tab-grupo-b').textContent = data.grupoBName;
+
+        renderCurrentMatch(data);
+        renderLastStats(data);
+        renderLastMatches(data);
+        renderUpcomingMatches(data);
+        renderStandings();
+        renderSquad(data);
+      } catch (err) {
+        document.getElementById('status-sub').textContent = `Error al cargar datos: ${err.message}`;
+      }
+    }
+
+    loadVelezSite();
+  </script>
 </body>
 </html>
