@@ -236,6 +236,18 @@
                             <div id="live-poss-away-bar" style="width: 50%" class="bg-slate-600 h-full transition-all duration-300"></div>
                         </div>
                     </div>
+
+                    <!-- MINUTO A MINUTO EN VIVO (SOLO VISIBLE CUANDO EL PARTIDO ESTÁ EN JUEGO) -->
+                    <div id="live-timeline-box" class="hidden mt-3 pt-3 border-t border-pizarra-border/50 max-w-2xl mx-auto w-full">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[11px] font-mono uppercase tracking-wider text-pizarra-electric font-bold flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                                Minuto a Minuto
+                            </span>
+                            <span class="text-[10px] font-mono text-slate-400">Actualización automática</span>
+                        </div>
+                        <div id="live-timeline-list" class="max-h-56 overflow-y-auto space-y-1.5 pr-1"></div>
+                    </div>
                 </div>
 
                 <!-- CÓMO LLEGAN AMBOS EQUIPOS (SOLO CUANDO HAY PRÓXIMO PARTIDO PROGRAMADO) -->
@@ -339,7 +351,7 @@
             </div>
         </section>
 
-        <!-- PLANTILLA COMPLETA DE VÉLEZ CON BANDERAS DE NACIONALIDAD Y ESTADÍSTICAS DEL CLAUSURA -->
+        <!-- PLANTILLA COMPLETA DE VÉLEZ CON BANDERAS DE NACIONALIDAD Y ESTADÍSTICAS DEL TORNEO -->
         <section class="bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden">
             <div class="p-4 border-b border-pizarra-border bg-[#0e131c] flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
@@ -347,7 +359,7 @@
                         <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
                         PLANTILLA OFICIAL & ESTADÍSTICAS
                     </h3>
-                    <p id="squad-tournament-caption" class="text-xs text-slate-400">Dorsales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas del Torneo Clausura</p>
+                    <p id="squad-tournament-caption" class="text-xs text-slate-400">Dorsales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas del Torneo Clausura (Grupo A)</p>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2">
@@ -564,19 +576,40 @@
             return (texto || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').trim();
         }
 
+        function traducirEtiquetasEsp(texto = '') {
+            return String(texto || '')
+                .replace(/\bRound of 32\b/gi, 'Dieciseisavos de Final')
+                .replace(/\bRound of 16\b/gi, 'Octavos de Final')
+                .replace(/\bQuarter-?finals?\b/gi, 'Cuartos de Final')
+                .replace(/\bSemi-?finals?\b/gi, 'Semifinales')
+                .replace(/\bGroup\s+A\b/gi, 'Grupo A')
+                .replace(/\bGroup\s+B\b/gi, 'Grupo B')
+                .replace(/\b2nd Phase\b/gi, 'Torneo Clausura')
+                .replace(/\b1st Phase\b/gi, 'Torneo Apertura')
+                .trim();
+        }
+
+        function formatearNombreGrupoEsp(texto = '') {
+            const trad = traducirEtiquetasEsp(texto);
+            if (/\bGrupo\s*A\b/i.test(trad)) return 'Grupo A';
+            if (/\bGrupo\s*B\b/i.test(trad)) return 'Grupo B';
+            return trad || 'Grupo A';
+        }
+
         function isPlayoffRoundLabel(text = '') {
-            return /round of 16|octavos|quarter|cuartos|semi|final|play-?off|eliminaci[oó]n/i.test(String(text));
+            return /round of 32|dieciseisavos|round of 16|octavos|quarter|cuartos|semi|final|play-?off|eliminaci[oó]n/i.test(String(text));
         }
 
         function limpiarRoundSinEst(roundStr) {
             if (!roundStr) return '';
-            return String(roundStr)
+            const cleaned = String(roundStr)
                 .replace(/\b\d{1,2}\/\d{1,2}\s*-\s*\d{1,2}:\d{2}\s*(?:AM|PM)?\s*(?:EST|EDT|ART|UTC[^\s)]*)?/gi, '')
                 .replace(/\b\d{1,2}:\d{2}\s*(?:AM|PM)?\s*(?:EST|EDT|ART|UTC[^\s)]*)?/gi, '')
                 .replace(/\s*[•|-]?\s*(?:MF|FT)\s*-\s*Pens\b/gi, '')
                 .replace(/\s*-\s*Pens\b/gi, '')
                 .replace(/\s*[•|-]\s*$/g, '')
                 .trim();
+            return traducirEtiquetasEsp(cleaned);
         }
 
         function filtrarGolesPartidoSinTanda(scorersList = []) {
@@ -1080,7 +1113,6 @@
                 ctx.fillText((m.teams?.home?.name || 'Local').toUpperCase(), 290, 585);
                 ctx.fillText((m.teams?.away?.name || 'Visitante').toUpperCase(), 790, 585);
 
-                // Todos los goles del encuentro (incluyendo alargue si lo hubo)
                 const hGoals = (m.scorers?.home || []).join('\n');
                 const aGoals = (m.scorers?.away || []).join('\n');
                 ctx.font = '600 24px "JetBrains Mono", monospace';
@@ -1096,7 +1128,6 @@
                 }
                 nextY += maxGoalLines * 38 + 20;
 
-                // Tanda de penales si hubo
                 const hShootoutRaw = m.penaltyShootout?.home || [];
                 const aShootoutRaw = m.penaltyShootout?.away || [];
                 if (hShootoutRaw.length > 0 || aShootoutRaw.length > 0) {
@@ -1126,7 +1157,6 @@
                     nextY += maxPenLines * 36 + 24;
                 }
 
-                // Porcentajes de posesión del partido
                 const possData = cm.type === 'LIVE'
                     ? (m.possession && typeof m.possession.home === 'number' && typeof m.possession.away === 'number'
                         ? { home: Math.max(0, Math.min(100, Math.round(m.possession.home))), away: Math.max(0, Math.min(100, Math.round(m.possession.away))) }
@@ -1248,10 +1278,10 @@
                 let tabTitle = '';
                 if (tab === 'GRUPO_A') {
                     sourceList = STATE.standingsGrupoA.length > 0 ? STATE.standingsGrupoA : STATE.standingsClausura;
-                    tabTitle = (STATE.grupoAName || 'GRUPO A').toUpperCase();
+                    tabTitle = formatearNombreGrupoEsp(STATE.grupoAName || 'Grupo A').toUpperCase();
                 } else if (tab === 'GRUPO_B') {
                     sourceList = STATE.standingsGrupoB;
-                    tabTitle = (STATE.grupoBName || 'GRUPO B').toUpperCase();
+                    tabTitle = formatearNombreGrupoEsp(STATE.grupoBName || 'Grupo B').toUpperCase();
                 } else {
                     sourceList = STATE.standingsAnual;
                     tabTitle = 'TABLA ANUAL (COPAS)';
@@ -1557,13 +1587,26 @@
                 if (res.ok) {
                     const data = await res.json();
                     
-                    if (data.activeTournamentName) STATE.activeTournamentName = data.activeTournamentName;
-                    if (data.grupoAName) STATE.grupoAName = data.grupoAName;
-                    if (data.grupoBName) STATE.grupoBName = data.grupoBName;
+                    if (data.activeTournamentName) STATE.activeTournamentName = traducirEtiquetasEsp(data.activeTournamentName);
+                    if (data.grupoAName) STATE.grupoAName = formatearNombreGrupoEsp(data.grupoAName);
+                    if (data.grupoBName) STATE.grupoBName = formatearNombreGrupoEsp(data.grupoBName);
                     if (data.currentMatch) STATE.currentMatchData = data.currentMatch;
-                    if (data.lastMatches) STATE.lastFiveMatches = data.lastMatches;
-                    if (data.velezLast2) STATE.velezLast2 = data.velezLast2;
-                    else if (data.lastMatches) STATE.velezLast2 = data.lastMatches.slice(0, 2);
+                    if (data.lastMatches) {
+                        STATE.lastFiveMatches = data.lastMatches.map(m => ({
+                            ...m,
+                            fecha: limpiarRoundSinEst(m.fecha || ''),
+                            comp: traducirEtiquetasEsp(m.comp || '')
+                        }));
+                    }
+                    if (data.velezLast2) {
+                        STATE.velezLast2 = data.velezLast2.map(m => ({
+                            ...m,
+                            fecha: limpiarRoundSinEst(m.fecha || ''),
+                            comp: traducirEtiquetasEsp(m.comp || '')
+                        }));
+                    } else if (STATE.lastFiveMatches.length > 0) {
+                        STATE.velezLast2 = STATE.lastFiveMatches.slice(0, 2);
+                    }
 
                     if (data.rivalLast2) STATE.rivalLast2 = data.rivalLast2;
                     else if (data.rivalLastMatches) STATE.rivalLast2 = data.rivalLastMatches.slice(0, 2);
@@ -1579,6 +1622,8 @@
                                 : item.date;
                             return {
                                 ...item,
+                                fecha: limpiarRoundSinEst(item.fecha || ''),
+                                comp: traducirEtiquetasEsp(item.comp || ''),
                                 date: dateLocal,
                                 timeLocal
                             };
@@ -1645,7 +1690,7 @@
 
             if (cm.type === 'LAST_REFERENCE') {
                 if (dotEl) dotEl.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400';
-                cdEl.textContent = 'ÚLTIMO PARTIDO • PRÓXIMA FECHA A CONFIRMAR';
+                cdEl.textContent = 'PRÓXIMA FECHA A CONFIRMAR';
                 return;
             }
 
@@ -1768,6 +1813,43 @@
             return null;
         }
 
+        function renderLiveTimeline(cm, m) {
+            const timelineBox = document.getElementById('live-timeline-box');
+            const timelineList = document.getElementById('live-timeline-list');
+            if (!timelineBox || !timelineList) return;
+
+            if (cm.type !== 'LIVE') {
+                timelineBox.classList.add('hidden');
+                timelineList.innerHTML = '';
+                return;
+            }
+
+            const events = Array.isArray(m.timeline) ? m.timeline : [];
+            timelineBox.classList.remove('hidden');
+
+            if (events.length === 0) {
+                timelineList.innerHTML = `<div class="text-center text-xs font-mono text-slate-400 py-2">Sin incidencias registradas hasta el momento.</div>`;
+                return;
+            }
+
+            timelineList.innerHTML = events.map(ev => {
+                const isHomeSide = ev.side === 'home';
+                const sideColor = isHomeSide ? 'border-l-2 border-l-[#0055a5]' : 'border-l-2 border-l-slate-500';
+                return `
+                    <div class="flex items-center justify-between gap-2.5 px-3 py-1.5 rounded-lg bg-[#0b0e14]/90 border border-pizarra-border/70 ${sideColor} text-xs">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <span class="px-1.5 py-0.5 rounded bg-slate-800 text-pizarra-electric font-mono font-bold text-[11px] flex-shrink-0">${ev.minute || '--\''}</span>
+                            <span class="text-sm flex-shrink-0">${ev.icon || '•'}</span>
+                            <div class="min-w-0">
+                                <div class="text-white font-semibold truncate">${ev.title || ''}</div>
+                                ${ev.subtitle ? `<div class="text-[10px] font-mono text-slate-400 truncate">${ev.subtitle}</div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
         function renderMatchCenter() {
             const cm = STATE.currentMatchData;
             if (!cm || !cm.match) return;
@@ -1825,6 +1907,7 @@
                 if (cardsBox) cardsBox.classList.add('hidden');
                 if (possBox) possBox.classList.add('hidden');
                 if (penaltiesBadge) penaltiesBadge.classList.add('hidden');
+                renderLiveTimeline(cm, m);
                 badge.textContent = "PRÓXIMO ENCUENTRO";
                 badge.className = "px-2 py-0.5 rounded bg-slate-700/60 text-slate-300 border border-slate-600 font-bold uppercase tracking-wider text-[11px]";
                 if (homeRole) homeRole.textContent = "C.A.V.S.";
@@ -1973,12 +2056,15 @@
                 } else if (possBox) {
                     possBox.classList.add('hidden');
                 }
+
+                renderLiveTimeline(cm, m);
             } else {
                 if (scorersBox) scorersBox.classList.add('hidden');
                 if (shootoutBox) shootoutBox.classList.add('hidden');
                 if (cardsBox) cardsBox.classList.add('hidden');
                 if (possBox) possBox.classList.add('hidden');
                 if (penaltiesBadge) penaltiesBadge.classList.add('hidden');
+                renderLiveTimeline(cm, m);
                 badge.textContent = "PRÓXIMO PARTIDO OFICIAL";
                 badge.className = "px-2 py-0.5 rounded bg-sky-500/20 text-pizarra-electric border border-sky-500/40 font-bold uppercase tracking-wider text-[11px]";
                 const matchDateObj = new Date(cm.isoDate || m.fixture.date);
@@ -2041,12 +2127,14 @@
                     ? `${m.velezGoals} - ${m.rivalGoals}`
                     : `${m.rivalGoals} - ${m.velezGoals}`;
 
+                const fechaLabel = limpiarRoundSinEst(m.fecha || '');
+
                 return `
                     <div class="p-3.5 hover:bg-pizarra-cardHover/50 transition flex items-center justify-between gap-3">
                         <div class="flex items-center gap-3 min-w-0 flex-1">
                             ${renderEscudoImg(m.rival, 'w-8 h-8 flex-shrink-0', m.rivalLogo)}
                             <div class="min-w-0 flex-1">
-                                <div class="flex items-center gap-2 mb-0.5"><span class="font-mono text-[11px] font-bold text-slate-400">${m.fecha}</span><span class="text-[11px] text-slate-500">• ${m.date}</span>${condBadge}</div>
+                                <div class="flex items-center gap-2 mb-0.5"><span class="font-mono text-[11px] font-bold text-slate-400">${fechaLabel}</span><span class="text-[11px] text-slate-500">• ${m.date}</span>${condBadge}</div>
                                 <div class="font-display text-lg font-bold uppercase text-white truncate">${matchTitleHtml}</div>
                             </div>
                         </div>
@@ -2071,12 +2159,14 @@
                 const condClass = m.cond === 'L' ? 'bg-pizarra-accent/30 text-pizarra-electric border-pizarra-accent/50' : 'bg-slate-800 text-slate-300 border-slate-700';
                 const highlightNext = i === 0 ? 'bg-[#0055a5]/15 border-l-4 border-l-pizarra-electric' : 'hover:bg-pizarra-cardHover/50';
                 const displayTime = m.timeLocal || limpiarRoundSinEst((m.timeART || '').replace(/\s*ART\s*/i, '')).trim();
+                const fechaLabel = limpiarRoundSinEst(m.fecha || '');
+                const compLabel = traducirEtiquetasEsp(m.comp || '');
                 return `
                     <div class="p-3.5 transition flex items-center justify-between gap-3 ${highlightNext}">
                         <div class="flex items-center gap-3 min-w-0 flex-1">
                             ${renderEscudoImg(m.rival, 'w-8 h-8 flex-shrink-0', m.rivalLogo)}
                             <div class="min-w-0 flex-1">
-                                <div class="flex flex-wrap items-center gap-2 mb-0.5"><span class="px-1.5 py-0.5 rounded bg-[#0b0e14] border border-pizarra-border font-mono text-[10px] font-bold text-pizarra-electric">${m.fecha}</span><span class="text-[11px] text-slate-400">${m.comp}</span><span class="px-1.5 py-0.2 rounded border text-[10px] font-mono ${condClass}">${condText}</span></div>
+                                <div class="flex flex-wrap items-center gap-2 mb-0.5"><span class="px-1.5 py-0.5 rounded bg-[#0b0e14] border border-pizarra-border font-mono text-[10px] font-bold text-pizarra-electric">${fechaLabel}</span><span class="text-[11px] text-slate-400">${compLabel}</span><span class="px-1.5 py-0.2 rounded border text-[10px] font-mono ${condClass}">${condText}</span></div>
                                 <div class="font-display text-lg font-bold uppercase text-white truncate">vs ${m.rival}</div>
                                 <div class="text-[11px] text-slate-400 truncate">📍 ${m.stadium}</div>
                             </div>
@@ -2106,17 +2196,20 @@
             const tabBtnB = document.getElementById('tab-GRUPO_B');
             const tab = STATE.activeTableTab;
 
-            if (tabBtnA) tabBtnA.textContent = STATE.grupoAName || 'Grupo A';
-            if (tabBtnB) tabBtnB.textContent = STATE.grupoBName || 'Grupo B';
+            const labelGrupoA = formatearNombreGrupoEsp(STATE.grupoAName || 'Grupo A');
+            const labelGrupoB = formatearNombreGrupoEsp(STATE.grupoBName || 'Grupo B');
+
+            if (tabBtnA) tabBtnA.textContent = labelGrupoA;
+            if (tabBtnB) tabBtnB.textContent = labelGrupoB;
 
             let sourceList = [];
             let titleCol = '';
             if (tab === 'GRUPO_A') {
                 sourceList = STATE.standingsGrupoA.length > 0 ? STATE.standingsGrupoA : STATE.standingsClausura;
-                titleCol = `Equipo (${STATE.grupoAName || 'Grupo A'})`;
+                titleCol = `Equipo (${labelGrupoA})`;
             } else if (tab === 'GRUPO_B') {
                 sourceList = STATE.standingsGrupoB;
-                titleCol = `Equipo (${STATE.grupoBName || 'Grupo B'})`;
+                titleCol = `Equipo (${labelGrupoB})`;
             } else {
                 sourceList = STATE.standingsAnual;
                 titleCol = 'Equipo (Tabla anual Apertura + Clausura)';
@@ -2160,7 +2253,7 @@
                     else if (pos <= 9) effectiveCup = 'SUDAMERICANA';
                 }
 
-                const effectiveNote = t.cupNote || manualCup?.cupNote || (effectiveCup === 'LIBERTADORES' ? 'Copa Libertadores' : 'Copa Sudamericana');
+                const effectiveNote = traducirEtiquetasEsp(t.cupNote || manualCup?.cupNote || (effectiveCup === 'LIBERTADORES' ? 'Copa Libertadores' : 'Copa Sudamericana'));
 
                 if (tab === 'ANUAL' || t.cupType) {
                     if (effectiveCup === 'LIBERTADORES') {
@@ -2221,10 +2314,10 @@
 
         function getVelezGroupLabel() {
             const inGroupA = (STATE.standingsGrupoA || []).some(t => t.isVelez);
-            if (inGroupA) return STATE.grupoAName || 'Grupo A';
+            if (inGroupA) return formatearNombreGrupoEsp(STATE.grupoAName || 'Grupo A');
             const inGroupB = (STATE.standingsGrupoB || []).some(t => t.isVelez);
-            if (inGroupB) return STATE.grupoBName || 'Grupo B';
-            return STATE.grupoAName || 'Grupo A';
+            if (inGroupB) return formatearNombreGrupoEsp(STATE.grupoBName || 'Grupo B');
+            return formatearNombreGrupoEsp(STATE.grupoAName || 'Grupo A');
         }
 
         function getClausuraSquadList() {
@@ -2259,8 +2352,9 @@
         function renderSquadTable() {
             const captionEl = document.getElementById('squad-tournament-caption');
             const velezGroupLabel = getVelezGroupLabel();
+            const tournamentTitle = STATE.activeTournamentName || 'Torneo Clausura';
             if (captionEl) {
-                captionEl.textContent = `Dorsales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas del Torneo Clausura (${velezGroupLabel})`;
+                captionEl.textContent = `Dorsales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas del ${tournamentTitle} (${velezGroupLabel})`;
             }
 
             const searchQuery = (document.getElementById('squad-search')?.value || '').toLowerCase().trim();
@@ -2330,7 +2424,7 @@
                 const gc = velezStanding.gc || 0;
                 const avgGf = pj > 0 ? (gf / pj).toFixed(2) : '0.00';
                 const avgGc = pj > 0 ? (gc / pj).toFixed(2) : '0.00';
-                card1.innerHTML = `En <strong class="text-white">${pj} fechas</strong> del ${STATE.activeTournamentName}, Vélez convirtió <strong class="text-emerald-400">${gf} goles</strong> (${avgGf} p/p) y recibió <strong class="text-slate-200">${gc}</strong> (${avgGc} p/p).`;
+                card1.innerHTML = `En <strong class="text-white">${pj} fechas</strong> del ${tournamentTitle}, Vélez convirtió <strong class="text-emerald-400">${gf} goles</strong> (${avgGf} p/p) y recibió <strong class="text-slate-200">${gc}</strong> (${avgGc} p/p).`;
             }
 
             const cardScorers = document.getElementById('tactical-card-scorers');
@@ -2343,9 +2437,9 @@
                     const maxG = Number(withGoals[0].goals);
                     const leaders = withGoals.filter(p => Number(p.goals) === maxG);
                     const namesStr = leaders.map(p => `<strong class="text-white">${p.name}</strong>`).join(', ');
-                    cardScorers.innerHTML = `${leaders.length > 1 ? 'Máximos goleadores de Vélez' : 'Máximo goleador de Vélez'} en el ${STATE.activeTournamentName}: ${namesStr} con <strong class="text-emerald-400">${maxG} ${maxG === 1 ? 'gol' : 'goles'}</strong>.`;
+                    cardScorers.innerHTML = `${leaders.length > 1 ? 'Máximos goleadores de Vélez' : 'Máximo goleador de Vélez'} en el ${tournamentTitle}: ${namesStr} con <strong class="text-emerald-400">${maxG} ${maxG === 1 ? 'gol' : 'goles'}</strong>.`;
                 } else {
-                    cardScorers.innerHTML = `Vélez aún no registra goleadores individuales en el ${STATE.activeTournamentName}.`;
+                    cardScorers.innerHTML = `Vélez aún no registra goleadores individuales en el ${tournamentTitle}.`;
                 }
             }
 
@@ -2377,7 +2471,7 @@
                     const namesStr = leaders.map(p => `<strong class="text-white">${p.name}</strong>`).join(', ');
                     cardReds.innerHTML = `${leaders.length > 1 ? 'Jugadores' : 'Jugador'} de Vélez con más expulsiones: ${namesStr} con <strong class="text-rose-400">${maxR} ${maxR === 1 ? 'roja' : 'rojas'}</strong>.`;
                 } else {
-                    cardReds.innerHTML = `Vélez no registra jugadores expulsados en el ${STATE.activeTournamentName}.`;
+                    cardReds.innerHTML = `Vélez no registra jugadores expulsados en el ${tournamentTitle}.`;
                 }
             }
 
@@ -2473,7 +2567,7 @@
                 if (badge) badge.textContent = formName;
                 if (subtitle) {
                     const condText = lineup.cond === 'V' ? 'Visitante' : 'Local';
-                    const compText = lineup.comp ? ` • ${lineup.comp}` : '';
+                    const compText = lineup.comp ? ` • ${traducirEtiquetasEsp(lineup.comp)}` : '';
                     subtitle.textContent = `XI Inicial • ${condText}${compText} • Esquema ${formName}`;
                 }
 
