@@ -200,11 +200,22 @@
                     </div>
                 </div>
 
-                <!-- GOLEADORES, TARJETAS Y POSESIÓN -->
+                <!-- GOLEADORES, TANDA DE PENALES, TARJETAS Y POSESIÓN -->
                 <div class="space-y-2">
                     <div id="live-scorers-box" class="hidden pt-3 border-t border-pizarra-border/60 grid grid-cols-2 gap-4 text-xs font-mono leading-relaxed">
                         <div id="live-scorers-home" class="text-right space-y-1 text-slate-300 pr-2 border-r border-pizarra-border/50 min-w-0"></div>
                         <div id="live-scorers-away" class="text-left space-y-1 text-slate-300 pl-2 min-w-0"></div>
+                    </div>
+
+                    <!-- TANDA DE PENALES (SOLO SI EL PARTIDO FUE A PENALES) -->
+                    <div id="live-shootout-box" class="hidden mt-2 pt-2.5 border-t border-pizarra-border/40">
+                        <div class="text-center text-[10px] font-mono uppercase tracking-wider text-pizarra-electric font-bold mb-1.5">
+                            Tanda de penales
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-xs font-mono leading-relaxed">
+                            <div id="live-shootout-home" class="text-right space-y-1 text-slate-300 pr-2 border-r border-pizarra-border/50 min-w-0"></div>
+                            <div id="live-shootout-away" class="text-left space-y-1 text-slate-300 pl-2 min-w-0"></div>
+                        </div>
                     </div>
 
                     <!-- TARJETAS AMARILLAS Y ROJAS EN VIVO DEL PARTIDO EN CURSO -->
@@ -1677,6 +1688,9 @@
             const scorersBox = document.getElementById('live-scorers-box');
             const scorersHome = document.getElementById('live-scorers-home');
             const scorersAway = document.getElementById('live-scorers-away');
+            const shootoutBox = document.getElementById('live-shootout-box');
+            const shootoutHome = document.getElementById('live-shootout-home');
+            const shootoutAway = document.getElementById('live-shootout-away');
             const cardsBox = document.getElementById('live-cards-box');
             const cardsHome = document.getElementById('live-cards-home');
             const cardsAway = document.getElementById('live-cards-away');
@@ -1706,6 +1720,7 @@
 
             if (cm.type === 'TBD') {
                 if (scorersBox) scorersBox.classList.add('hidden');
+                if (shootoutBox) shootoutBox.classList.add('hidden');
                 if (cardsBox) cardsBox.classList.add('hidden');
                 if (possBox) possBox.classList.add('hidden');
                 if (penaltiesBadge) penaltiesBadge.classList.add('hidden');
@@ -1778,6 +1793,44 @@
                     scorersBox.classList.add('hidden');
                 }
 
+                // Tanda de penales detallada con ⚽ (convertido) y ❌ roja (errado/atajado)
+                const hShootoutRaw = m.penaltyShootout?.home || [];
+                const aShootoutRaw = m.penaltyShootout?.away || [];
+
+                const mapShootoutSide = (arr, isHomeSide) => {
+                    if (Array.isArray(arr) && arr.length > 0) {
+                        return arr.map(t => {
+                            const icon = t.scored
+                                ? '⚽'
+                                : '<span class="text-rose-500 font-extrabold">❌</span>';
+                            return isHomeSide
+                                ? `<div><span class="text-white font-semibold">${t.player}</span> ${icon}</div>`
+                                : `<div>${icon} <span class="text-white font-semibold">${t.player}</span></div>`;
+                        });
+                    }
+                    const fallbackList = (m.scorers?.[isHomeSide ? 'home' : 'away'] || []).filter(g => {
+                        const minMatch = String(g).match(/\b(\d{2,3})'/);
+                        return minMatch && Number(minMatch[1]) >= 120;
+                    });
+                    return fallbackList.map(g => {
+                        const cleanName = String(g).replace(/\s*\d+'\s*\(P\)/i, '').trim();
+                        return isHomeSide
+                            ? `<div><span class="text-white font-semibold">${cleanName}</span> ⚽</div>`
+                            : `<div>⚽ <span class="text-white font-semibold">${cleanName}</span></div>`;
+                    });
+                };
+
+                const hShootoutHtml = mapShootoutSide(hShootoutRaw, true);
+                const aShootoutHtml = mapShootoutSide(aShootoutRaw, false);
+
+                if (shootoutBox && shootoutHome && shootoutAway && (hShootoutHtml.length > 0 || aShootoutHtml.length > 0)) {
+                    shootoutBox.classList.remove('hidden');
+                    shootoutHome.innerHTML = hShootoutHtml.join('');
+                    shootoutAway.innerHTML = aShootoutHtml.join('');
+                } else if (shootoutBox) {
+                    shootoutBox.classList.add('hidden');
+                }
+
                 if (cm.type === 'LIVE' && cardsBox && cardsHome && cardsAway) {
                     const hy = m.cards?.home?.yellow || [];
                     const hr = m.cards?.home?.red || [];
@@ -1818,6 +1871,7 @@
                 }
             } else {
                 if (scorersBox) scorersBox.classList.add('hidden');
+                if (shootoutBox) shootoutBox.classList.add('hidden');
                 if (cardsBox) cardsBox.classList.add('hidden');
                 if (possBox) possBox.classList.add('hidden');
                 if (penaltiesBadge) penaltiesBadge.classList.add('hidden');
