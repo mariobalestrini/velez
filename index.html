@@ -209,7 +209,7 @@
                     </div>
                 </div>
 
-                <!-- PANEL 1: GOLES, TANDA DE PENALES, TARJETAS, POSESIÓN Y MINUTO A MINUTO -->
+                <!-- PANEL 1: GOLES, TANDA DE PENALES, CAMBIOS, TARJETAS, POSESIÓN Y MINUTO A MINUTO -->
                 <div id="match-panel-GOALS" class="space-y-2">
                     <div id="live-scorers-box" class="hidden pt-2 grid grid-cols-2 gap-4 text-xs font-mono leading-relaxed">
                         <div id="live-scorers-home" class="text-right space-y-1 text-slate-300 pr-2 border-r border-pizarra-border/50 min-w-0"></div>
@@ -224,6 +224,17 @@
                         <div class="grid grid-cols-2 gap-4 text-xs font-mono leading-relaxed">
                             <div id="live-shootout-home" class="text-right space-y-1 text-slate-300 pr-2 border-r border-pizarra-border/50 min-w-0"></div>
                             <div id="live-shootout-away" class="text-left space-y-1 text-slate-300 pl-2 min-w-0"></div>
+                        </div>
+                    </div>
+
+                    <!-- CAMBIOS DE JUGADORES DEL PARTIDO -->
+                    <div id="live-subs-box" class="hidden mt-2 pt-2.5 border-t border-pizarra-border/40">
+                        <div class="text-center text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold mb-1.5">
+                            Cambios
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-xs font-mono leading-relaxed">
+                            <div id="live-subs-home" class="text-right space-y-1 text-slate-300 pr-2 border-r border-pizarra-border/50 min-w-0"></div>
+                            <div id="live-subs-away" class="text-left space-y-1 text-slate-300 pl-2 min-w-0"></div>
                         </div>
                     </div>
 
@@ -266,7 +277,7 @@
                     </div>
                 </div>
 
-                <!-- PANEL 3: FORMACIONES DEL PARTIDO -->
+                <!-- PANEL 3: FORMACIONES Y CAMBIOS DEL PARTIDO -->
                 <div id="match-panel-LINEUPS" class="hidden max-w-3xl mx-auto w-full pt-2">
                     <div class="bg-[#0b0e14]/90 rounded-xl border border-pizarra-border p-4 space-y-4">
                         <div class="flex flex-wrap items-center justify-between gap-2 border-b border-pizarra-border pb-3">
@@ -1904,6 +1915,26 @@
             return null;
         }
 
+        function getPlayerCardsBadgeHtml(playerName, sideCards) {
+            const pNorm = normalizarTexto(playerName || '');
+            if (!pNorm || !sideCards) return '';
+            const lastToken = pNorm.split(' ').pop();
+
+            const matchesPlayer = (entryStr) => {
+                const eNorm = normalizarTexto(String(entryStr || '').replace(/\s+\d+(?:\+\d+)?'.*$/, ''));
+                if (!eNorm) return false;
+                return eNorm === pNorm || eNorm.includes(pNorm) || pNorm.includes(eNorm) || (lastToken && lastToken.length >= 4 && eNorm.includes(lastToken));
+            };
+
+            const redCount = (sideCards.red || []).filter(matchesPlayer).length;
+            const yellowCount = (sideCards.yellow || []).filter(matchesPlayer).length;
+
+            const badges = [];
+            for (let i = 0; i < redCount; i++) badges.push('🟥');
+            for (let i = 0; i < yellowCount; i++) badges.push('🟨');
+            return badges.length > 0 ? ` <span class="tracking-tight">${badges.join('')}</span>` : '';
+        }
+
         function switchMatchDetailTab(tabName) {
             STATE.activeMatchDetailTab = tabName;
             ['GOALS', 'STATS', 'LINEUPS'].forEach(t => {
@@ -1979,34 +2010,64 @@
                 }).join('');
             }
 
-            const sideData = m.lineups?.[STATE.activeMatchLineupSide] || m.lineups?.home || m.lineups?.away || null;
+            const activeSide = STATE.activeMatchLineupSide === 'away' ? 'away' : 'home';
+            const sideData = m.lineups?.[activeSide] || m.lineups?.home || m.lineups?.away || null;
+            const sideCards = m.cards?.[activeSide] || { yellow: [], red: [] };
+            const sideSubs = m.substitutions?.[activeSide] || [];
+
             if (!sideData || !Array.isArray(sideData.startXI) || sideData.startXI.length === 0) {
                 if (lineupTitle) lineupTitle.textContent = 'Formación';
                 if (lineupMeta) lineupMeta.textContent = '';
                 lineupContent.innerHTML = `<div class="text-center text-slate-400 py-4">Formación no cargada para este partido.</div>`;
             } else {
-                const sideTeamName = conTildeVelez(sideData.teamName || (STATE.activeMatchLineupSide === 'home' ? homeLabel : awayLabel));
+                const sideTeamName = conTildeVelez(sideData.teamName || (activeSide === 'home' ? homeLabel : awayLabel));
                 if (lineupTitle) lineupTitle.textContent = `${sideTeamName} • ${sideData.formation || '4-2-3-1'}`;
                 if (lineupMeta) lineupMeta.textContent = sideData.coach ? `DT: ${sideData.coach}` : 'Alineación oficial';
 
-                const startersHtml = sideData.startXI.map(pl => `
-                    <div class="flex items-center gap-2 p-2 rounded-lg bg-[#121721] border border-pizarra-border/80">
-                        <span class="w-6 h-6 rounded-full bg-[#0055a5]/40 border border-[#0055a5] flex items-center justify-center text-[11px] font-bold text-white flex-shrink-0">${pl.number}</span>
-                        <span class="text-white font-semibold truncate flex-1">${pl.name}</span>
-                        ${pl.pos ? `<span class="text-[10px] text-slate-400 uppercase">${pl.pos}</span>` : ''}
-                    </div>
-                `).join('');
+                const startersHtml = sideData.startXI.map(pl => {
+                    const cardBadge = getPlayerCardsBadgeHtml(pl.name, sideCards);
+                    return `
+                        <div class="flex items-center gap-2 p-2 rounded-lg bg-[#121721] border border-pizarra-border/80">
+                            <span class="w-6 h-6 rounded-full bg-[#0055a5]/40 border border-[#0055a5] flex items-center justify-center text-[11px] font-bold text-white flex-shrink-0">${pl.number}</span>
+                            <span class="text-white font-semibold truncate flex-1">${pl.name}${cardBadge}</span>
+                            ${pl.pos ? `<span class="text-[10px] text-slate-400 uppercase">${pl.pos}</span>` : ''}
+                        </div>
+                    `;
+                }).join('');
 
-                const subsHtml = (sideData.substitutes || []).length > 0
+                const subsListHtml = (sideData.substitutes || []).length > 0
                     ? `<div class="pt-3 border-t border-pizarra-border/60">
                         <div class="text-[11px] uppercase text-slate-400 mb-2">Suplentes</div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                            ${sideData.substitutes.map(pl => `
-                                <div class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[#121721]/60 border border-pizarra-border/50 text-[11px]">
-                                    <span class="font-bold text-slate-400">${pl.number}</span>
-                                    <span class="text-slate-200 truncate">${pl.name}</span>
-                                </div>
-                            `).join('')}
+                            ${sideData.substitutes.map(pl => {
+                                const cardBadge = getPlayerCardsBadgeHtml(pl.name, sideCards);
+                                return `
+                                    <div class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[#121721]/60 border border-pizarra-border/50 text-[11px]">
+                                        <span class="font-bold text-slate-400">${pl.number}</span>
+                                        <span class="text-slate-200 truncate">${pl.name}${cardBadge}</span>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>`
+                    : '';
+
+                const changesHtml = sideSubs.length > 0
+                    ? `<div class="pt-3 border-t border-pizarra-border/60">
+                        <div class="text-[11px] uppercase text-pizarra-electric mb-2">Cambios realizados</div>
+                        <div class="space-y-1.5">
+                            ${sideSubs.map(sub => {
+                                const inBadge = getPlayerCardsBadgeHtml(sub.playerIn, sideCards);
+                                const outBadge = sub.playerOut ? getPlayerCardsBadgeHtml(sub.playerOut, sideCards) : '';
+                                return `
+                                    <div class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[#121721]/70 border border-pizarra-border/60 text-[11px]">
+                                        <span class="text-pizarra-electric font-bold">${sub.minute || '--\''}</span>
+                                        <span>🔄</span>
+                                        <span class="text-emerald-400 font-semibold truncate">${sub.playerIn}${inBadge}</span>
+                                        ${sub.playerOut ? `<span class="text-slate-500">x</span><span class="text-slate-300 truncate">${sub.playerOut}${outBadge}</span>` : ''}
+                                    </div>
+                                `;
+                            }).join('')}
                         </div>
                     </div>`
                     : '';
@@ -2014,7 +2075,8 @@
                 lineupContent.innerHTML = `
                     <div class="text-[11px] uppercase text-pizarra-electric">Titulares (${sideData.startXI.length})</div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${startersHtml}</div>
-                    ${subsHtml}
+                    ${changesHtml}
+                    ${subsListHtml}
                 `;
             }
         }
@@ -2083,6 +2145,9 @@
             const shootoutBox = document.getElementById('live-shootout-box');
             const shootoutHome = document.getElementById('live-shootout-home');
             const shootoutAway = document.getElementById('live-shootout-away');
+            const subsBox = document.getElementById('live-subs-box');
+            const subsHome = document.getElementById('live-subs-home');
+            const subsAway = document.getElementById('live-subs-away');
             const cardsBox = document.getElementById('live-cards-box');
             const cardsHome = document.getElementById('live-cards-home');
             const cardsAway = document.getElementById('live-cards-away');
@@ -2123,6 +2188,7 @@
                 switchMatchDetailTab('GOALS');
                 if (scorersBox) scorersBox.classList.add('hidden');
                 if (shootoutBox) shootoutBox.classList.add('hidden');
+                if (subsBox) subsBox.classList.add('hidden');
                 if (cardsBox) cardsBox.classList.add('hidden');
                 if (possBox) possBox.classList.add('hidden');
                 if (penaltiesBadge) penaltiesBadge.classList.add('hidden');
@@ -2235,6 +2301,23 @@
                     shootoutBox.classList.add('hidden');
                 }
 
+                // Cambios de jugadores del partido en la primera solapa
+                const hSubs = m.substitutions?.home || [];
+                const aSubs = m.substitutions?.away || [];
+                if (subsBox && subsHome && subsAway && (hSubs.length > 0 || aSubs.length > 0)) {
+                    subsBox.classList.remove('hidden');
+                    subsHome.innerHTML = hSubs.map(sub => {
+                        const outPart = sub.playerOut ? ` <span class="text-slate-500">x</span> <span class="text-slate-300">${sub.playerOut}</span>` : '';
+                        return `<div><span class="text-emerald-400 font-semibold">${sub.playerIn}</span>${outPart} <span class="text-pizarra-electric">${sub.minute || ''}</span> 🔄</div>`;
+                    }).join('');
+                    subsAway.innerHTML = aSubs.map(sub => {
+                        const outPart = sub.playerOut ? ` <span class="text-slate-500">x</span> <span class="text-slate-300">${sub.playerOut}</span>` : '';
+                        return `<div>🔄 <span class="text-pizarra-electric">${sub.minute || ''}</span> <span class="text-emerald-400 font-semibold">${sub.playerIn}</span>${outPart}</div>`;
+                    }).join('');
+                } else if (subsBox) {
+                    subsBox.classList.add('hidden');
+                }
+
                 if (cm.type === 'LIVE' && cardsBox && cardsHome && cardsAway) {
                     const hy = m.cards?.home?.yellow || [];
                     const hr = m.cards?.home?.red || [];
@@ -2281,6 +2364,7 @@
                 switchMatchDetailTab('GOALS');
                 if (scorersBox) scorersBox.classList.add('hidden');
                 if (shootoutBox) shootoutBox.classList.add('hidden');
+                if (subsBox) subsBox.classList.add('hidden');
                 if (cardsBox) cardsBox.classList.add('hidden');
                 if (possBox) possBox.classList.add('hidden');
                 if (penaltiesBadge) penaltiesBadge.classList.add('hidden');
