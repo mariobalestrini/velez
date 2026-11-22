@@ -629,6 +629,33 @@
                 .trim();
         }
 
+        function abreviarNombreJugador(fullName = '') {
+            const cleaned = String(fullName || '').trim().replace(/\s+/g, ' ');
+            if (!cleaned) return '';
+            const parts = cleaned.split(' ');
+            if (parts.length === 1) return cleaned;
+            const firstInitial = parts[0].charAt(0).toUpperCase();
+            const rest = parts.slice(1).join(' ');
+            return `${firstInitial}. ${rest}`;
+        }
+
+        function renderJugadorResponsiveHtml(fullName = '') {
+            const fullEsc = conTildeVelez(fullName || '');
+            const shortEsc = conTildeVelez(abreviarNombreJugador(fullName || ''));
+            if (!shortEsc || shortEsc === fullEsc) return `<span>${fullEsc}</span>`;
+            return `<span class="sm:hidden">${shortEsc}</span><span class="hidden sm:inline">${fullEsc}</span>`;
+        }
+
+        function renderEventoConJugadorResponsiveHtml(rawText = '') {
+            const str = String(rawText || '').trim();
+            if (!str) return '';
+            const match = str.match(/^(.*?)(?:\s+(\d+(?:\+\d+)?'(?:\s*\([^)]+\))?))$/);
+            if (!match) return renderJugadorResponsiveHtml(str);
+            const playerPart = match[1].trim();
+            const suffixPart = match[2].trim();
+            return `${renderJugadorResponsiveHtml(playerPart)} <span>${suffixPart}</span>`;
+        }
+
         function traducirEtiquetasEsp(texto = '') {
             return conTildeVelez(String(texto || ''))
                 .replace(/\bRound of 64\b/gi, '32avos de Final')
@@ -2029,7 +2056,7 @@
                     return `
                         <div class="flex items-center gap-2 p-2 rounded-lg bg-[#121721] border border-pizarra-border/80">
                             <span class="w-6 h-6 rounded-full bg-[#0055a5]/40 border border-[#0055a5] flex items-center justify-center text-[11px] font-bold text-white flex-shrink-0">${pl.number}</span>
-                            <span class="text-white font-semibold truncate flex-1">${pl.name}${cardBadge}</span>
+                            <span class="text-white font-semibold truncate flex-1">${renderJugadorResponsiveHtml(pl.name)}${cardBadge}</span>
                             ${pl.pos ? `<span class="text-[10px] text-slate-400 uppercase">${pl.pos}</span>` : ''}
                         </div>
                     `;
@@ -2044,7 +2071,7 @@
                                 return `
                                     <div class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[#121721]/60 border border-pizarra-border/50 text-[11px]">
                                         <span class="font-bold text-slate-400">${pl.number}</span>
-                                        <span class="text-slate-200 truncate">${pl.name}${cardBadge}</span>
+                                        <span class="text-slate-200 truncate">${renderJugadorResponsiveHtml(pl.name)}${cardBadge}</span>
                                     </div>
                                 `;
                             }).join('')}
@@ -2063,8 +2090,8 @@
                                     <div class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[#121721]/70 border border-pizarra-border/60 text-[11px]">
                                         <span class="text-pizarra-electric font-bold">${sub.minute || '--\''}</span>
                                         <span>🔄</span>
-                                        <span class="text-emerald-400 font-semibold truncate">${sub.playerIn}${inBadge}</span>
-                                        ${sub.playerOut ? `<span class="text-slate-500">x</span><span class="text-slate-300 truncate">${sub.playerOut}${outBadge}</span>` : ''}
+                                        <span class="text-emerald-400 font-semibold truncate">${renderJugadorResponsiveHtml(sub.playerIn)}${inBadge}</span>
+                                        ${sub.playerOut ? `<span class="text-slate-500">x</span><span class="text-slate-300 truncate">${renderJugadorResponsiveHtml(sub.playerOut)}${outBadge}</span>` : ''}
                                     </div>
                                 `;
                             }).join('')}
@@ -2105,13 +2132,17 @@
                 const sideColor = isHomeSide ? 'border-l-2 border-l-[#0055a5]' : 'border-l-2 border-l-slate-500';
                 const titleClean = conTildeVelez(ev.title || '');
                 const subtitleClean = conTildeVelez(ev.subtitle || '');
+                const playerMatch = titleClean.match(/^(.*?:\s*)(.+)$/);
+                const formattedTitle = playerMatch
+                    ? `<span>${playerMatch[1]}</span>${renderJugadorResponsiveHtml(playerMatch[2])}`
+                    : `<span>${titleClean}</span>`;
                 return `
                     <div class="flex items-center justify-between gap-2.5 px-3 py-1.5 rounded-lg bg-[#0b0e14]/90 border border-pizarra-border/70 ${sideColor} text-xs">
                         <div class="flex items-center gap-2 min-w-0">
                             <span class="px-1.5 py-0.5 rounded bg-slate-800 text-pizarra-electric font-mono font-bold text-[11px] flex-shrink-0">${ev.minute || '--\''}</span>
                             <span class="text-sm flex-shrink-0">${ev.icon || '•'}</span>
                             <div class="min-w-0">
-                                <div class="text-white font-semibold truncate">${titleClean}</div>
+                                <div class="text-white font-semibold truncate">${formattedTitle}</div>
                                 ${subtitleClean ? `<div class="text-[10px] font-mono text-slate-400 truncate">${subtitleClean}</div>` : ''}
                             </div>
                         </div>
@@ -2255,8 +2286,8 @@
                 const aScorers = filtrarGolesPartidoSinTanda(m.scorers?.away || []);
                 if (scorersBox && (hScorers.length > 0 || aScorers.length > 0)) {
                     scorersBox.classList.remove('hidden');
-                    scorersHome.innerHTML = hScorers.map(g => `<div><span class="text-white font-semibold">${g}</span> ⚽</div>`).join('');
-                    scorersAway.innerHTML = aScorers.map(g => `<div>⚽ <span class="text-white font-semibold">${g}</span></div>`).join('');
+                    scorersHome.innerHTML = hScorers.map(g => `<div><span class="text-white font-semibold">${renderEventoConJugadorResponsiveHtml(g)}</span> ⚽</div>`).join('');
+                    scorersAway.innerHTML = aScorers.map(g => `<div>⚽ <span class="text-white font-semibold">${renderEventoConJugadorResponsiveHtml(g)}</span></div>`).join('');
                 } else if (scorersBox) {
                     scorersBox.classList.add('hidden');
                 }
@@ -2271,9 +2302,10 @@
                             const icon = !isMissed
                                 ? '⚽'
                                 : '<span class="text-rose-500 font-extrabold">❌</span>';
+                            const playerHtml = renderJugadorResponsiveHtml(t.player);
                             return isHomeSide
-                                ? `<div><span class="text-white font-semibold">${t.player}</span> ${icon}</div>`
-                                : `<div>${icon} <span class="text-white font-semibold">${t.player}</span></div>`;
+                                ? `<div><span class="text-white font-semibold">${playerHtml}</span> ${icon}</div>`
+                                : `<div>${icon} <span class="text-white font-semibold">${playerHtml}</span></div>`;
                         });
                     }
                     const fallbackList = (m.scorers?.[isHomeSide ? 'home' : 'away'] || []).filter(g => {
@@ -2284,9 +2316,10 @@
                         const isMissed = /err|miss|fail|no goal|saved|❌/i.test(String(g));
                         const cleanName = String(g).replace(/\s*\d+'\s*\(P\)/i, '').trim();
                         const icon = !isMissed ? '⚽' : '<span class="text-rose-500 font-extrabold">❌</span>';
+                        const playerHtml = renderJugadorResponsiveHtml(cleanName);
                         return isHomeSide
-                            ? `<div><span class="text-white font-semibold">${cleanName}</span> ${icon}</div>`
-                            : `<div>${icon} <span class="text-white font-semibold">${cleanName}</span></div>`;
+                            ? `<div><span class="text-white font-semibold">${playerHtml}</span> ${icon}</div>`
+                            : `<div>${icon} <span class="text-white font-semibold">${playerHtml}</span></div>`;
                     });
                 };
 
@@ -2307,12 +2340,12 @@
                 if (subsBox && subsHome && subsAway && (hSubs.length > 0 || aSubs.length > 0)) {
                     subsBox.classList.remove('hidden');
                     subsHome.innerHTML = hSubs.map(sub => {
-                        const outPart = sub.playerOut ? ` <span class="text-slate-500">x</span> <span class="text-slate-300">${sub.playerOut}</span>` : '';
-                        return `<div><span class="text-emerald-400 font-semibold">${sub.playerIn}</span>${outPart} <span class="text-pizarra-electric">${sub.minute || ''}</span> 🔄</div>`;
+                        const outPart = sub.playerOut ? ` <span class="text-slate-500">x</span> <span class="text-slate-300">${renderJugadorResponsiveHtml(sub.playerOut)}</span>` : '';
+                        return `<div><span class="text-emerald-400 font-semibold">${renderJugadorResponsiveHtml(sub.playerIn)}</span>${outPart} <span class="text-pizarra-electric">${sub.minute || ''}</span> 🔄</div>`;
                     }).join('');
                     subsAway.innerHTML = aSubs.map(sub => {
-                        const outPart = sub.playerOut ? ` <span class="text-slate-500">x</span> <span class="text-slate-300">${sub.playerOut}</span>` : '';
-                        return `<div>🔄 <span class="text-pizarra-electric">${sub.minute || ''}</span> <span class="text-emerald-400 font-semibold">${sub.playerIn}</span>${outPart}</div>`;
+                        const outPart = sub.playerOut ? ` <span class="text-slate-500">x</span> <span class="text-slate-300">${renderJugadorResponsiveHtml(sub.playerOut)}</span>` : '';
+                        return `<div>🔄 <span class="text-pizarra-electric">${sub.minute || ''}</span> <span class="text-emerald-400 font-semibold">${renderJugadorResponsiveHtml(sub.playerIn)}</span>${outPart}</div>`;
                     }).join('');
                 } else if (subsBox) {
                     subsBox.classList.add('hidden');
@@ -2327,12 +2360,12 @@
                     if (hy.length > 0 || hr.length > 0 || ay.length > 0 || ar.length > 0) {
                         cardsBox.classList.remove('hidden');
                         cardsHome.innerHTML = [
-                            ...hr.map(c => `<div><span class="text-rose-300 font-semibold">${c}</span> 🟥</div>`),
-                            ...hy.map(c => `<div><span class="text-amber-300 font-semibold">${c}</span> 🟨</div>`)
+                            ...hr.map(c => `<div><span class="text-rose-300 font-semibold">${renderEventoConJugadorResponsiveHtml(c)}</span> 🟥</div>`),
+                            ...hy.map(c => `<div><span class="text-amber-300 font-semibold">${renderEventoConJugadorResponsiveHtml(c)}</span> 🟨</div>`)
                         ].join('');
                         cardsAway.innerHTML = [
-                            ...ar.map(c => `<div>🟥 <span class="text-rose-300 font-semibold">${c}</span></div>`),
-                            ...ay.map(c => `<div>🟨 <span class="text-amber-300 font-semibold">${c}</span></div>`)
+                            ...ar.map(c => `<div>🟥 <span class="text-rose-300 font-semibold">${renderEventoConJugadorResponsiveHtml(c)}</span></div>`),
+                            ...ay.map(c => `<div>🟨 <span class="text-amber-300 font-semibold">${renderEventoConJugadorResponsiveHtml(c)}</span></div>`)
                         ].join('');
                     } else {
                         cardsBox.classList.add('hidden');
