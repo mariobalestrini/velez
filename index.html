@@ -76,6 +76,21 @@
                 linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
                 linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
         }
+        @keyframes lvaShimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .skeleton-shimmer {
+            background: linear-gradient(
+                90deg,
+                rgba(30, 41, 59, 0.45) 25%,
+                rgba(56, 189, 248, 0.10) 50%,
+                rgba(30, 41, 59, 0.45) 75%
+            );
+            background-size: 200% 100%;
+            animation: lvaShimmer 1.6s ease-in-out infinite;
+            border-radius: 0.5rem;
+        }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #0b0e14; }
         ::-webkit-scrollbar-thumb { background: #1f293a; border-radius: 9999px; }
@@ -216,10 +231,12 @@
                     </div>
 
                     <div class="flex flex-col items-center justify-center">
-                        <span id="match-status-title" class="text-xs sm:text-sm font-display uppercase tracking-wider text-pizarra-electric font-bold mb-1">CARGANDO FECHA...</span>
-                        <div id="match-center-box" class="bg-[#0b0e14]/95 px-4 sm:px-7 py-2.5 rounded-2xl border border-pizarra-border shadow-inner">
-                            <span class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">--:--</span>
-                            <span id="match-center-tz-label" class="block text-[10px] font-mono text-pizarra-electric font-bold tracking-widest uppercase">HORA LOCAL</span>
+                        <span id="match-status-title" class="min-h-[20px] flex items-center justify-center text-xs sm:text-sm font-display uppercase tracking-wider text-pizarra-electric font-bold mb-1">
+                            <span class="skeleton-shimmer inline-block w-28 h-3.5"></span>
+                        </span>
+                        <div id="match-center-box" class="min-h-[76px] sm:min-h-[88px] flex flex-col items-center justify-center bg-[#0b0e14]/95 px-4 sm:px-7 py-2.5 rounded-2xl border border-pizarra-border shadow-inner">
+                            <span class="skeleton-shimmer inline-block w-20 h-8 sm:h-10 mb-1"></span>
+                            <span id="match-center-tz-label" class="skeleton-shimmer inline-block w-16 h-2.5"></span>
                         </div>
                         <div id="match-penalties-badge" class="hidden mt-2 px-3 py-0.5 rounded-lg bg-sky-500/15 border border-sky-400/40 font-mono text-[11px] font-bold text-sky-300"></div>
                         <div id="prev-countdown-pill" class="mt-2.5 px-3 py-1 rounded-full bg-pizarra-accent/20 border border-pizarra-accent/40 flex items-center gap-1.5">
@@ -291,8 +308,11 @@
                         <span id="match-stats-ref-home" class="text-pizarra-electric font-bold truncate max-w-[45%]">Local</span>
                         <span id="match-stats-ref-away" class="text-slate-300 font-bold truncate max-w-[45%] text-right">Visitante</span>
                     </div>
-                    <div id="match-stats-tab-content" class="space-y-3 text-xs font-mono">
-                        <div class="text-center text-slate-400 py-4">Sincronizando estadísticas del partido...</div>
+                    <div id="match-stats-tab-content" class="min-h-[160px] space-y-3 text-xs font-mono">
+                        <div class="skeleton-shimmer h-7 w-full"></div>
+                        <div class="skeleton-shimmer h-7 w-full"></div>
+                        <div class="skeleton-shimmer h-7 w-full"></div>
+                        <div class="skeleton-shimmer h-7 w-full"></div>
                     </div>
                 </div>
 
@@ -308,8 +328,13 @@
                                 <button type="button" onclick="switchMatchLineupSide('away')" id="match-lineup-side-away" class="px-3 py-1 rounded text-slate-400 hover:text-white transition">Visitante</button>
                             </div>
                         </div>
-                        <div id="match-lineup-tab-content" class="space-y-3 text-xs font-mono">
-                            <div class="text-center text-slate-400 py-4">Sincronizando formaciones del partido...</div>
+                        <div id="match-lineup-tab-content" class="min-h-[180px] space-y-3 text-xs font-mono">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div class="skeleton-shimmer h-10 w-full"></div>
+                                <div class="skeleton-shimmer h-10 w-full"></div>
+                                <div class="skeleton-shimmer h-10 w-full"></div>
+                                <div class="skeleton-shimmer h-10 w-full"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -322,7 +347,10 @@
                         </div>
                         <div>
                             <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-2">Últimos partidos disputados</div>
-                            <div id="prev-velez-last2" class="space-y-2"></div>
+                            <div id="prev-velez-last2" class="min-h-[84px] space-y-2">
+                                <div class="skeleton-shimmer h-9 w-full"></div>
+                                <div class="skeleton-shimmer h-9 w-full"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -333,7 +361,10 @@
                         </div>
                         <div>
                             <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-2">Últimos partidos disputados</div>
-                            <div id="prev-rival-last2" class="space-y-2"></div>
+                            <div id="prev-rival-last2" class="min-h-[84px] space-y-2">
+                                <div class="skeleton-shimmer h-9 w-full"></div>
+                                <div class="skeleton-shimmer h-9 w-full"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -355,7 +386,11 @@
                         </button>
                     </div>
                 </div>
-                <div id="last-five-list" class="divide-y divide-pizarra-border/70 flex-1"></div>
+                <div id="last-five-list" class="min-h-[220px] divide-y divide-pizarra-border/70 flex-1 p-3 space-y-2">
+                    <div class="skeleton-shimmer h-10 w-full"></div>
+                    <div class="skeleton-shimmer h-10 w-full"></div>
+                    <div class="skeleton-shimmer h-10 w-full"></div>
+                </div>
             </div>
 
             <div class="lg:col-span-6 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden flex flex-col">
@@ -369,7 +404,11 @@
                         <span class="text-[10px] font-mono font-bold uppercase">Compartir</span>
                     </button>
                 </div>
-                <div id="upcoming-matches-list" class="divide-y divide-pizarra-border/70 flex-1"></div>
+                <div id="upcoming-matches-list" class="min-h-[220px] divide-y divide-pizarra-border/70 flex-1 p-3 space-y-2">
+                    <div class="skeleton-shimmer h-10 w-full"></div>
+                    <div class="skeleton-shimmer h-10 w-full"></div>
+                    <div class="skeleton-shimmer h-10 w-full"></div>
+                </div>
             </div>
         </section>
 
@@ -396,7 +435,7 @@
                 </div>
             </div>
 
-            <div class="overflow-x-auto">
+            <div class="min-h-[240px] overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs sm:text-sm">
                     <thead>
                         <tr id="standings-thead" class="bg-[#0b0e14]/80 text-slate-400 font-mono text-[11px] uppercase border-b border-pizarra-border"></tr>
@@ -438,7 +477,7 @@
                 </div>
             </div>
 
-            <div class="overflow-x-auto">
+            <div class="min-h-[260px] overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs sm:text-sm">
                     <thead>
                         <tr class="bg-[#0b0e14]/85 text-slate-400 font-mono text-[11px] uppercase border-b border-pizarra-border select-none">
@@ -517,27 +556,28 @@
                     <div class="space-y-2.5 text-xs text-slate-300 leading-relaxed">
                         <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
                             <div class="font-display uppercase text-sm font-bold text-pizarra-electric mb-0.5">1. Balance de Goles (Torneo)</div>
-                            <p id="tactical-card-1">Sincronizando goles a favor y en contra oficiales del certamen...</p>
+                            <p id="tactical-card-1" class="min-h-[20px]"><span class="skeleton-shimmer inline-block w-4/5 h-3.5"></span></p>
                         </div>
                         <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
                             <div class="font-display uppercase text-sm font-bold text-emerald-400 mb-0.5">2. Goleador de Vélez en el Torneo</div>
-                            <p id="tactical-card-scorers">Calculando máximo artillero de Vélez en el certamen...</p>
+                            <p id="tactical-card-scorers" class="min-h-[20px]"><span class="skeleton-shimmer inline-block w-3/4 h-3.5"></span></p>
                         </div>
                         <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
                             <div class="font-display uppercase text-sm font-bold text-amber-400 mb-0.5">3. Disciplina • Más Amarillas</div>
-                            <p id="tactical-card-yellows">Calculando jugador con más tarjetas amarillas en el plantel...</p>
+                            <p id="tactical-card-yellows" class="min-h-[20px]"><span class="skeleton-shimmer inline-block w-2/3 h-3.5"></span></p>
                         </div>
                         <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
                             <div class="font-display uppercase text-sm font-bold text-rose-400 mb-0.5">4. Disciplina • Más Rojas</div>
-                            <p id="tactical-card-reds">Calculando expulsiones registradas en el plantel...</p>
+                            <p id="tactical-card-reds" class="min-h-[20px]"><span class="skeleton-shimmer inline-block w-1/2 h-3.5"></span></p>
                         </div>
                         <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border space-y-2">
                             <div class="flex items-center justify-between gap-2">
                                 <span class="font-display uppercase text-sm font-bold text-sky-300">5. Último Partido</span>
                                 <span id="last-match-stats-rival" class="font-mono text-[11px] text-slate-400">vs Rival</span>
                             </div>
-                            <div id="last-match-stats-body" class="space-y-2">
-                                <p class="text-slate-400">Sincronizando posesión y remates...</p>
+                            <div id="last-match-stats-body" class="min-h-[44px] space-y-2">
+                                <div class="skeleton-shimmer h-3.5 w-full"></div>
+                                <div class="skeleton-shimmer h-3.5 w-4/5"></div>
                             </div>
                         </div>
                     </div>
