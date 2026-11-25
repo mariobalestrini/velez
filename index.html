@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es" class="dark">
 <head>
+    <!-- === METADATOS SEO Y REDES SOCIALES (OPEN GRAPH / X) === -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LA V AZULADA | Estadísticas en Vivo & Pizarra Táctica de Vélez Sarsfield</title>
@@ -17,19 +18,22 @@
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
-<!-- Twitter / X Cards -->
+    <!-- Twitter / X Cards -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@lavazulada">
     <meta name="twitter:title" content="La V Azulada | Estadísticas en Vivo & Pizarra Táctica de Vélez">
     <meta name="twitter:description" content="Próximo partido, minuto a minuto, tablas actualizadas, plantel oficial y formaciones de Vélez Sarsfield.">
     <meta name="twitter:image" content="https://www.lavazulada.com/og-image.jpg">
 
+    <!-- === FAVICONS Y CONFIGURACIÓN PWA (iOS / ANDROID) === -->
     <link rel="icon" href="/favicon.ico?v=3" sizes="any">
     <link rel="icon" type="image/png" sizes="32x32" href="/escudo-velez.png?v=3">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="La V Azulada">
+
+    <!-- === ESTILOS (TAILWIND CDN), FUENTES Y SCRIPTS BASE === -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="./posiciones.js?v=20261125"></script>
     <script src="./efemerides.js?v=20261125"></script>
@@ -37,6 +41,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- Paleta de colores y tipografías personalizadas de La V Azulada -->
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -62,6 +68,8 @@
             }
         }
     </script>
+
+    <!-- Estilos globales: fondo con degradado, grilla táctica y animación skeleton -->
     <style>
         html {
             scroll-behavior: smooth;
@@ -98,6 +106,8 @@
         ::-webkit-scrollbar-track { background: #0b0e14; }
         ::-webkit-scrollbar-thumb { background: #1f293a; border-radius: 9999px; }
     </style>
+
+    <!-- Ajustes visuales exclusivos para celulares en vertical -->
     <style>
       @media (max-width: 639px) and (orientation: portrait) {
         #match-home-name,
@@ -125,8 +135,10 @@
 </head>
 <body class="min-h-screen flex flex-col font-sans antialiased selection:bg-[#0055a5] selection:text-white">
 
+    <!-- === NOTIFICACIONES FLOTANTES (TOASTS) === -->
     <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
+    <!-- === BANNER DE INSTALACIÓN PWA (SOLO MÓVILES) === -->
     <div id="pwa-install-banner" class="hidden fixed bottom-3 left-3 right-3 z-50 mx-auto max-w-md bg-[#121721]/95 backdrop-blur-md border-2 border-[#0055a5] rounded-2xl p-3.5 shadow-[0_12px_35px_rgba(0,0,0,0.85)] transition-all duration-300">
         <div class="flex items-start gap-3">
             <img src="./escudo-velez.png" alt="Vélez" class="w-11 h-11 object-contain flex-shrink-0 mt-0.5">
@@ -145,8 +157,10 @@
         </div>
     </div>
 
-       <header class="sticky top-0 z-40 bg-[#0b0e14]/95 backdrop-blur-md border-b border-pizarra-border">
+    <!-- === HEADER FIJO: LOGO, MENÚ DE NAVEGACIÓN Y BOTÓN ACTUALIZAR === -->
+    <header class="sticky top-0 z-40 bg-[#0b0e14]/95 backdrop-blur-md border-b border-pizarra-border">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+            <!-- Escudo y título principal -->
             <div class="flex items-center gap-3">
                 <div id="header-velez-crest" class="w-10 h-11 sm:w-11 sm:h-12 flex-shrink-0 flex items-center justify-center drop-shadow-[0_0_12px_rgba(0,85,165,0.65)]"></div>
                 <div>
@@ -162,6 +176,7 @@
                 </div>
             </div>
 
+            <!-- Botonera de accesos rápidos y reloj de actualización -->
             <div class="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-between sm:justify-end">
                 <div class="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-pizarra-card border border-pizarra-border text-xs font-mono text-slate-400 mr-1">
                     <span>Últ. act:</span>
@@ -174,11 +189,11 @@
                 <a href="#sec-tablas" class="flex-1 sm:flex-initial text-center px-1.5 sm:px-3 py-2 sm:py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-[11px] sm:text-xs font-mono font-bold text-slate-200 hover:text-pizarra-electric transition">
                     Tablas
                 </a>
-                <a href="#sec-plantel" class="flex-1 sm:flex-initial text-center px-1.5 sm:px-3 py-2 sm:py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-[11px] sm:text-xs font-mono font-bold text-slate-200 hover:text-pizarra-electric transition">
-                    Plantel
-                </a>
                 <a href="#sec-pizarra" class="flex-1 sm:flex-initial text-center px-1.5 sm:px-3 py-2 sm:py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-[11px] sm:text-xs font-mono font-bold text-slate-200 hover:text-pizarra-electric transition">
                     Pizarra
+                </a>
+                <a href="#sec-plantel" class="flex-1 sm:flex-initial text-center px-1.5 sm:px-3 py-2 sm:py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-[11px] sm:text-xs font-mono font-bold text-slate-200 hover:text-pizarra-electric transition">
+                    Plantel
                 </a>
                 <a href="/fixture" class="flex-1 sm:flex-initial text-center px-1.5 sm:px-3 py-2 sm:py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-[11px] sm:text-xs font-mono font-bold text-pizarra-electric hover:text-white transition">
                     Fixture
@@ -195,16 +210,20 @@
         </div>
     </header>
 
-
+    <!-- === CONTENIDO PRINCIPAL === -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 pt-2.5 sm:pt-5 pb-5 space-y-4 sm:space-y-6">
 
+        <!-- ================================================================
+             SECCIÓN 1: BANNER DE ÚLTIMA NOTICIA / EFEMÉRIDE DEL DÍA
+             Controlado por js/efemerides-api.js (Prioridad: Noticia > Efeméride)
+             ================================================================ -->
         <section id="efemeride-section" class="hidden relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0e192b] via-[#121721] to-[#0d1f36] border border-[#0055a5]/70 shadow-2xl">
             <div class="px-4 py-2 bg-[#0055a5]/25 border-b border-[#0055a5]/40 flex flex-wrap items-center justify-between gap-2 text-xs">
                 <div class="flex items-center gap-2">
                     <span id="efemeride-badge" class="px-2 py-0.5 rounded bg-[#0055a5] text-white font-mono font-bold uppercase tracking-wider text-[10px]">UN DÍA COMO HOY</span>
                     <span id="efemeride-date-label" class="font-mono text-pizarra-electric font-bold"></span>
                 </div>
-                <button onclick="shareSectionAsPng('EFEMERIDE')" title="Compartir efeméride en historia" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-200 hover:text-pizarra-electric transition">
+                <button onclick="shareSectionAsPng('EFEMERIDE')" title="Compartir en historia" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-200 hover:text-pizarra-electric transition">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
                     <span class="text-[10px] font-mono font-bold uppercase">Compartir</span>
                 </button>
@@ -221,7 +240,12 @@
             </div>
         </section>
 
+        <!-- ================================================================
+             SECCIÓN 2: PARTIDO PRINCIPAL (EN VIVO / PRÓXIMO / ÚLTIMO RESULTADO)
+             Controlado por js/match-view.js
+             ================================================================ -->
         <section id="sec-partido" class="scroll-mt-24 relative overflow-hidden rounded-2xl bg-pizarra-card border border-pizarra-border tactical-grid shadow-2xl">
+            <!-- Barra superior del partido: competencia, estadio, TV y botón compartir -->
             <div class="px-4 py-2.5 bg-[#0e131c] border-b border-pizarra-border flex flex-wrap items-center justify-between gap-2 text-xs">
                 <div class="flex flex-wrap items-center gap-2">
                     <span id="match-badge-type" class="px-2 py-0.5 rounded bg-sky-500/20 text-pizarra-electric border border-sky-500/40 font-bold uppercase tracking-wider text-[11px]">PRÓXIMO PARTIDO OFICIAL</span>
@@ -239,6 +263,7 @@
             </div>
 
             <div class="p-5 sm:p-7 space-y-6">
+                <!-- Marcador central: Local vs Visitante + Horario / Resultado / Cuenta regresiva -->
                 <div class="grid grid-cols-3 items-center gap-2 sm:gap-4 text-center">
                     <div class="flex flex-col items-center">
                         <div id="match-home-crest" class="w-16 h-16 sm:w-20 sm:h-20 mb-2 flex items-center justify-center drop-shadow-[0_0_16px_rgba(0,85,165,0.55)]"></div>
@@ -268,6 +293,7 @@
                     </div>
                 </div>
 
+                <!-- Pestañas internas del partido (visibles en vivo y post-partido) -->
                 <div id="match-detail-tabs-wrapper" class="hidden pt-3 border-t border-pizarra-border/70">
                     <div class="flex items-center justify-center gap-1.5 bg-[#0b0e14] p-1 rounded-xl border border-pizarra-border max-w-md mx-auto text-xs font-mono font-bold uppercase">
                         <button type="button" onclick="switchMatchDetailTab('GOALS')" id="match-tab-GOALS" class="flex-1 py-1.5 px-3 rounded-lg bg-pizarra-accent text-white transition">Goles</button>
@@ -276,6 +302,7 @@
                     </div>
                 </div>
 
+                <!-- Panel: Goles, penales, tarjetas, posesión y minuto a minuto -->
                 <div id="match-panel-GOALS" class="space-y-2">
                     <div id="live-scorers-box" class="hidden pt-2 grid grid-cols-2 gap-4 text-xs font-mono leading-relaxed">
                         <div id="live-scorers-home" class="text-right space-y-1 text-slate-300 pr-2 border-r border-pizarra-border/50 min-w-0"></div>
@@ -319,6 +346,7 @@
                     </div>
                 </div>
 
+                <!-- Panel: Estadísticas comparativas del partido -->
                 <div id="match-panel-STATS" class="hidden max-w-md mx-auto w-full pt-2 space-y-3">
                     <div id="match-stats-header-ref" class="flex items-center justify-between text-[11px] font-mono pb-1 border-b border-pizarra-border/60">
                         <span id="match-stats-ref-home" class="text-pizarra-electric font-bold truncate max-w-[45%]">Local</span>
@@ -332,6 +360,7 @@
                     </div>
                 </div>
 
+                <!-- Panel: Formaciones del partido (Local / Visitante) -->
                 <div id="match-panel-LINEUPS" class="hidden max-w-3xl mx-auto w-full pt-2">
                     <div class="bg-[#0b0e14]/90 rounded-xl border border-pizarra-border p-4 space-y-4">
                         <div class="flex flex-wrap items-center justify-between gap-2 border-b border-pizarra-border pb-3">
@@ -355,6 +384,7 @@
                     </div>
                 </div>
 
+                <!-- Comparativa previa: Últimos 2 encuentros de Vélez y del rival -->
                 <div id="both-teams-form-box" class="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-5 border-t border-pizarra-border/80">
                     <div class="bg-[#0b0e14]/90 rounded-xl border border-pizarra-border p-4 space-y-3.5">
                         <div class="flex items-center justify-between border-b border-pizarra-border pb-2.5">
@@ -387,7 +417,11 @@
             </div>
         </section>
 
+        <!-- ================================================================
+             SECCIÓN 3: RACHAS (ÚLTIMOS 5 PARTIDOS Y PRÓXIMOS 4 ENCUENTROS)
+             ================================================================ -->
         <section id="sec-rachas" class="scroll-mt-24 grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Columna izquierda: Últimos 5 partidos disputados -->
             <div class="lg:col-span-6 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden flex flex-col">
                 <div class="p-4 border-b border-pizarra-border flex flex-wrap items-center justify-between gap-2 bg-[#0e131c]">
                     <h3 class="font-display text-xl font-bold uppercase tracking-wide text-white flex items-center gap-2">
@@ -409,6 +443,7 @@
                 </div>
             </div>
 
+            <!-- Columna derecha: Próximos partidos de Vélez -->
             <div class="lg:col-span-6 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden flex flex-col">
                 <div class="p-4 border-b border-pizarra-border flex items-center justify-between gap-2 bg-[#0e131c]">
                     <h3 class="font-display text-xl font-bold uppercase tracking-wide text-white flex items-center gap-2">
@@ -428,6 +463,10 @@
             </div>
         </section>
 
+        <!-- ================================================================
+             SECCIÓN 4: TABLAS DE PRIMERA DIVISIÓN (GRUPO A / GRUPO B / ANUAL)
+             Controlado por js/standings-squad.js
+             ================================================================ -->
         <section id="sec-tablas" class="scroll-mt-24 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden">
             <div class="p-4 border-b border-pizarra-border flex flex-wrap items-center justify-between gap-3 bg-[#0e131c]">
                 <div>
@@ -438,6 +477,7 @@
                     <p id="standings-subtitle" class="text-xs text-slate-400">Datos oficiales de fase regular • Clasificación a Copas (sin playoffs)</p>
                 </div>
 
+                <!-- Selector de tabla y botón compartir -->
                 <div class="flex flex-wrap items-center gap-2">
                     <div class="flex flex-wrap bg-[#0b0e14] p-1 rounded-xl border border-pizarra-border text-xs font-semibold gap-1">
                         <button onclick="switchTableTab('GRUPO_A')" id="tab-GRUPO_A" class="px-3.5 py-1.5 rounded-lg bg-pizarra-accent text-white transition">Grupo A</button>
@@ -451,6 +491,7 @@
                 </div>
             </div>
 
+            <!-- Cuerpo de la tabla de posiciones -->
             <div class="min-h-[240px] overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs sm:text-sm">
                     <thead>
@@ -460,6 +501,7 @@
                 </table>
             </div>
 
+            <!-- Referencias de clasificación a copas -->
             <div class="px-4 py-2.5 bg-[#0e131c] border-t border-pizarra-border flex flex-wrap items-center gap-4 text-[11px] text-slate-400">
                 <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span><span>Clasificación a Copa Libertadores</span></div>
                 <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-amber-400"></span><span>Clasificación a Copa Sudamericana</span></div>
@@ -467,55 +509,14 @@
             </div>
         </section>
 
-        <section id="sec-plantel" class="scroll-mt-24 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden">
-            <div class="p-4 border-b border-pizarra-border bg-[#0e131c] flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h3 class="font-display text-xl sm:text-2xl font-bold uppercase tracking-wide text-white flex items-center gap-2">
-                        <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
-                        PLANTILLA OFICIAL & ESTADÍSTICAS
-                    </h3>
-                    <p id="squad-tournament-caption" class="text-xs text-slate-400">Dorsales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas del Torneo Clausura (Grupo A)</p>
-                </div>
-
-                <div class="flex flex-wrap items-center gap-2">
-                    <div class="flex bg-[#0b0e14] p-1 rounded-lg border border-pizarra-border text-xs font-semibold overflow-x-auto">
-                        <button onclick="filterSquadPos('TODOS')" id="pos-btn-TODOS" class="px-2.5 py-1 rounded bg-pizarra-accent text-white transition">Todos</button>
-                        <button onclick="filterSquadPos('ARQ')" id="pos-btn-ARQ" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition">Arqueros</button>
-                        <button onclick="filterSquadPos('DEF')" id="pos-btn-DEF" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition">Defensores</button>
-                        <button onclick="filterSquadPos('MED')" id="pos-btn-MED" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition">Mediocampistas</button>
-                        <button onclick="filterSquadPos('DEL')" id="pos-btn-DEL" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition">Delanteros</button>
-                    </div>
-
-                    <div class="relative">
-                        <input type="text" id="squad-search" oninput="renderSquadTable()" placeholder="Buscar jugador..." class="bg-[#0b0e14] border border-pizarra-border rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pizarra-electric w-44 sm:w-52">
-                        <svg class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    </div>
-                </div>
-            </div>
-
-            <div class="min-h-[260px] overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                    <thead>
-                        <tr class="bg-[#0b0e14]/85 text-slate-400 font-mono text-[11px] uppercase border-b border-pizarra-border select-none">
-                            <th onclick="sortSquadBy('number')" class="py-3 px-3 text-center cursor-pointer hover:text-white transition">Dorsal ↕</th>
-                            <th onclick="sortSquadBy('name')" class="py-3 px-3 cursor-pointer hover:text-white transition">Jugador ↕</th>
-                            <th onclick="sortSquadBy('group')" class="py-3 px-2 text-center cursor-pointer hover:text-white transition">Puesto ↕</th>
-                            <th onclick="sortSquadBy('age')" class="py-3 px-2 text-center cursor-pointer hover:text-white transition">Edad ↕</th>
-                            <th onclick="sortSquadBy('pj')" class="py-3 px-2 text-center cursor-pointer hover:text-white transition">PJ ↕</th>
-                            <th onclick="sortSquadBy('goals')" class="py-3 px-2 text-center text-emerald-400 cursor-pointer hover:text-emerald-300 transition">Goles ↕</th>
-                            <th onclick="sortSquadBy('cleanSheets')" class="py-3 px-2 text-center text-pizarra-electric cursor-pointer hover:text-sky-300 transition">Vallas Invictas ↕</th>
-                            <th onclick="sortSquadBy('yellowCards')" class="py-3 px-2 text-center text-amber-400 cursor-pointer hover:text-amber-300 transition">🟨 TA ↕</th>
-                            <th onclick="sortSquadBy('redCards')" class="py-3 px-3 text-center text-rose-400 cursor-pointer hover:text-rose-300 transition">🟥 TR ↕</th>
-                        </tr>
-                    </thead>
-                    <tbody id="full-squad-tbody" class="divide-y divide-pizarra-border/60"></tbody>
-                </table>
-            </div>
-        </section>
-
+        <!-- ================================================================
+             SECCIÓN 5: LA PIZARRA TÁCTICA & RENDIMIENTO DEL XI
+             Controlado por js/standings-squad.js (renderPitch y renderMatchTacticalAnalysis)
+             ================================================================ -->
         <section id="sec-pizarra" class="scroll-mt-24 grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Columna izquierda: Cancha interactiva con los 11 jugadores -->
             <div class="lg:col-span-7 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden flex flex-col">
-                <div class="p-4 border-b border-pizarra-border flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 bg-[#0e131c]">
+                <div class="p-4 border-b border-pizarra-border flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 bg-[#0e131c] min-h-[76px]">
                     <div class="min-w-0">
                         <h3 class="font-display text-xl font-bold uppercase tracking-wide text-white flex items-center gap-2">
                             <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
@@ -535,6 +536,7 @@
                 </div>
                 <div class="p-4 sm:p-6 bg-[#0b0e14] flex-1 flex items-center justify-center tactical-grid">
                     <div class="relative w-full max-w-md aspect-[3/4] rounded-xl overflow-hidden border-2 border-[#1f293a] bg-[#0d1520] shadow-2xl">
+                        <!-- Dibujo SVG del campo de juego -->
                         <svg viewBox="0 0 300 400" class="w-full h-full stroke-slate-700/80 fill-none" stroke-width="1.5">
                             <rect x="0" y="0" width="300" height="400" fill="#0c131d" stroke="none"/>
                             <rect x="0" y="0" width="300" height="50" fill="#101926" stroke="none"/>
@@ -552,23 +554,34 @@
                             <rect x="112" y="366" width="76" height="22"/>
                             <path d="M120,330 Q150,312 180,330"/>
                         </svg>
+                        <!-- Capa donde se posicionan dinámicamente los 11 dorsales -->
                         <div id="pitch-players-layer" class="absolute inset-0"></div>
                     </div>
                 </div>
             </div>
 
-            <div class="lg:col-span-5 bg-pizarra-card rounded-2xl border border-pizarra-border p-5 flex flex-col justify-between space-y-4">
-                <div>
-                    <div class="flex items-center justify-between gap-2 border-b border-pizarra-border pb-3 mb-3.5">
-                        <h4 class="font-display text-xl font-bold uppercase text-white">Rendimiento & XI</h4>
-                        <div class="flex items-center gap-2">
-                            <span id="tactical-formation-badge" class="px-2 py-0.5 rounded bg-pizarra-accent/20 text-pizarra-electric font-mono text-xs border border-pizarra-accent/40">4-2-3-1</span>
-                            <button onclick="shareSectionAsPng('PERFORMANCE_XI')" title="Compartir historia" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                                <span class="text-[10px] font-mono font-bold uppercase">Compartir</span>
-                            </button>
-                        </div>
+            <!-- Columna derecha: Rendimiento & XI (5 tarjetas de análisis + 3 KPIs) -->
+            <div class="lg:col-span-5 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden flex flex-col">
+                <!-- Encabezado igualado al de La Pizarra Táctica -->
+                <div class="p-4 border-b border-pizarra-border flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 bg-[#0e131c] min-h-[76px]">
+                    <div class="min-w-0">
+                        <h4 class="font-display text-xl font-bold uppercase tracking-wide text-white flex items-center gap-2">
+                            <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
+                            Rendimiento & XI
+                        </h4>
+                        <p class="text-[11px] font-mono text-pizarra-electric mt-0.5 truncate">Análisis del partido seleccionado</p>
                     </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <span id="tactical-formation-badge" class="px-2 py-0.5 rounded bg-pizarra-accent/20 text-pizarra-electric font-mono text-xs border border-pizarra-accent/40">4-2-3-1</span>
+                        <button onclick="shareSectionAsPng('PERFORMANCE_XI')" title="Compartir historia" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                            <span class="text-[10px] font-mono font-bold uppercase">Compartir</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Cuerpo interno: 5 tarjetas tácticas + 3 KPIs inferiores -->
+                <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
                     <div class="space-y-2.5 text-xs text-slate-300 leading-relaxed">
                         <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
                             <div class="font-display uppercase text-sm font-bold text-pizarra-electric mb-0.5">1. Formación Inicial (Torneo)</div>
@@ -588,7 +601,7 @@
                         </div>
                         <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border space-y-2">
                             <div class="flex items-center justify-between gap-2">
-                                <span class="font-display uppercase text-sm font-bold text-sky-300">5. Poseción de pelota</span>
+                                <span class="font-display uppercase text-sm font-bold text-sky-300">5. Posesión de pelota</span>
                                 <span id="last-match-stats-rival" class="font-mono text-[11px] text-slate-400">vs Rival</span>
                             </div>
                             <div id="last-match-stats-body" class="min-h-[44px] space-y-2">
@@ -597,16 +610,71 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- KPIs inferiores del encuentro -->
+                    <div class="grid grid-cols-3 gap-2 pt-3 border-t border-pizarra-border text-center">
+                        <div class="p-2.5 rounded-xl bg-[#0b0e14] border border-pizarra-border"><span id="kpi-total-goals" class="block font-display text-2xl font-extrabold text-emerald-400">--</span><span class="text-[10px] font-mono uppercase text-slate-400">Tiros Totales</span></div>
+                        <div class="p-2.5 rounded-xl bg-[#0b0e14] border border-pizarra-border"><span id="kpi-clean-sheets" class="block font-display text-2xl font-extrabold text-pizarra-electric">--</span><span class="text-[10px] font-mono uppercase text-slate-400">Tiros al arco</span></div>
+                        <div class="p-2.5 rounded-xl bg-[#0b0e14] border border-pizarra-border"><span id="kpi-total-cards" class="block font-display text-2xl font-extrabold text-amber-400">--</span><span class="text-[10px] font-mono uppercase text-slate-400">Goles</span></div>
+                    </div>
                 </div>
-                <div class="grid grid-cols-3 gap-2 pt-3 border-t border-pizarra-border text-center">
-                    <div class="p-2.5 rounded-xl bg-[#0b0e14] border border-pizarra-border"><span id="kpi-total-goals" class="block font-display text-2xl font-extrabold text-emerald-400">--</span><span class="text-[10px] font-mono uppercase text-slate-400">Tiros Totales</span></div>
-                    <div class="p-2.5 rounded-xl bg-[#0b0e14] border border-pizarra-border"><span id="kpi-clean-sheets" class="block font-display text-2xl font-extrabold text-pizarra-electric">--</span><span class="text-[10px] font-mono uppercase text-slate-400">Tiros al arco</span></div>
-                    <div class="p-2.5 rounded-xl bg-[#0b0e14] border border-pizarra-border"><span id="kpi-total-cards" class="block font-display text-2xl font-extrabold text-amber-400">--</span><span class="text-[10px] font-mono uppercase text-slate-400">Goles</span></div>
+            </div>
+        </section>
+
+        <!-- ================================================================
+             SECCIÓN 6: PLANTILLA OFICIAL & ESTADÍSTICAS DEL TORNEO
+             Controlado por js/standings-squad.js (renderSquadTable)
+             ================================================================ -->
+        <section id="sec-plantel" class="scroll-mt-24 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden">
+            <div class="p-4 border-b border-pizarra-border bg-[#0e131c] flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h3 class="font-display text-xl sm:text-2xl font-bold uppercase tracking-wide text-white flex items-center gap-2">
+                        <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
+                        PLANTILLA OFICIAL & ESTADÍSTICAS
+                    </h3>
+                    <p id="squad-tournament-caption" class="text-xs text-slate-400">Dorsales, PJ, Goles, Tarjetas y Vallas Invictas (🧤) • Estadísticas del Torneo Clausura (Grupo A)</p>
                 </div>
+
+                <!-- Filtros por puesto y buscador de jugadores -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <div class="flex bg-[#0b0e14] p-1 rounded-lg border border-pizarra-border text-xs font-semibold overflow-x-auto">
+                        <button onclick="filterSquadPos('TODOS')" id="pos-btn-TODOS" class="px-2.5 py-1 rounded bg-pizarra-accent text-white transition">Todos</button>
+                        <button onclick="filterSquadPos('ARQ')" id="pos-btn-ARQ" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition">Arqueros</button>
+                        <button onclick="filterSquadPos('DEF')" id="pos-btn-DEF" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition">Defensores</button>
+                        <button onclick="filterSquadPos('MED')" id="pos-btn-MED" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition">Mediocampistas</button>
+                        <button onclick="filterSquadPos('DEL')" id="pos-btn-DEL" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition">Delanteros</button>
+                    </div>
+
+                    <div class="relative">
+                        <input type="text" id="squad-search" oninput="renderSquadTable()" placeholder="Buscar jugador..." class="bg-[#0b0e14] border border-pizarra-border rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-pizarra-electric w-44 sm:w-52">
+                        <svg class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla ordenable del plantel -->
+            <div class="min-h-[260px] overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                    <thead>
+                        <tr class="bg-[#0b0e14]/85 text-slate-400 font-mono text-[11px] uppercase border-b border-pizarra-border select-none">
+                            <th onclick="sortSquadBy('number')" class="py-3 px-3 text-center cursor-pointer hover:text-white transition">Dorsal ↕</th>
+                            <th onclick="sortSquadBy('name')" class="py-3 px-3 cursor-pointer hover:text-white transition">Jugador ↕</th>
+                            <th onclick="sortSquadBy('group')" class="py-3 px-2 text-center cursor-pointer hover:text-white transition">Puesto ↕</th>
+                            <th onclick="sortSquadBy('age')" class="py-3 px-2 text-center cursor-pointer hover:text-white transition">Edad ↕</th>
+                            <th onclick="sortSquadBy('pj')" class="py-3 px-2 text-center cursor-pointer hover:text-white transition">PJ ↕</th>
+                            <th onclick="sortSquadBy('goals')" class="py-3 px-2 text-center text-emerald-400 cursor-pointer hover:text-emerald-300 transition">Goles ↕</th>
+                            <th onclick="sortSquadBy('cleanSheets')" class="py-3 px-2 text-center text-pizarra-electric cursor-pointer hover:text-sky-300 transition">Vallas Invictas ↕</th>
+                            <th onclick="sortSquadBy('yellowCards')" class="py-3 px-2 text-center text-amber-400 cursor-pointer hover:text-amber-300 transition">🟨 TA ↕</th>
+                            <th onclick="sortSquadBy('redCards')" class="py-3 px-3 text-center text-rose-400 cursor-pointer hover:text-rose-300 transition">🟥 TR ↕</th>
+                        </tr>
+                    </thead>
+                    <tbody id="full-squad-tbody" class="divide-y divide-pizarra-border/60"></tbody>
+                </table>
             </div>
         </section>
     </main>
 
+    <!-- === PIE DE PÁGINA: REDES SOCIALES Y CONTACTO === -->
     <footer class="mt-8 border-t border-pizarra-border bg-[#090c11] py-4 px-4 text-xs text-slate-500">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
             <span class="font-mono text-slate-300 font-semibold">lavazulada.com</span>
@@ -631,6 +699,7 @@
         </div>
     </footer>
 
+    <!-- === SCRIPTS DE LÓGICA DE LA APLICACIÓN === -->
     <script src="./js/nombres-equipos.js?v=20261125"></script>
     <script src="./js/formatters.js?v=20261125"></script>
     <script src="./js/match-view.js?v=20261125"></script>
