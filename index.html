@@ -145,10 +145,10 @@
         </div>
     </div>
 
-    <header class="sticky top-0 z-40 bg-[#0b0e14]/95 backdrop-blur-md border-b border-pizarra-border">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
-            <div class="flex items-center gap-2.5 sm:gap-3">
-                <div id="header-velez-crest" class="w-9 h-10 sm:w-11 sm:h-12 flex-shrink-0 flex items-center justify-center drop-shadow-[0_0_12px_rgba(0,85,165,0.65)]"></div>
+       <header class="sticky top-0 z-40 bg-[#0b0e14]/95 backdrop-blur-md border-b border-pizarra-border">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div id="header-velez-crest" class="w-10 h-11 sm:w-11 sm:h-12 flex-shrink-0 flex items-center justify-center drop-shadow-[0_0_12px_rgba(0,85,165,0.65)]"></div>
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-white uppercase leading-none">
@@ -158,11 +158,11 @@
                             C.A. Vélez Sarsfield • 1910
                         </span>
                     </div>
-                    <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Estadísticas en Vivo & Pizarra Táctica</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Estadísticas en Vivo & Pizarra Táctica</p>
                 </div>
             </div>
 
-            <div class="flex flex-wrap items-center gap-1 sm:gap-2 w-full sm:w-auto justify-between sm:justify-end">
+            <div class="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-between sm:justify-end">
                 <div class="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-pizarra-card border border-pizarra-border text-xs font-mono text-slate-400 mr-1">
                     <span>Últ. act:</span>
                     <span id="last-updated-time" class="text-white font-bold">--:--:--</span>
@@ -171,19 +171,19 @@
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500 animate-ping"></span>
                     <span>EN VIVO</span>
                 </span>
-                <a href="#sec-tablas" class="flex-1 sm:flex-initial text-center px-2 sm:px-3 py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-[11px] sm:text-xs font-mono font-bold text-slate-200 hover:text-pizarra-electric transition">
+                <a href="#sec-tablas" class="flex-1 sm:flex-initial text-center px-1.5 sm:px-3 py-2 sm:py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-[11px] sm:text-xs font-mono font-bold text-slate-200 hover:text-pizarra-electric transition">
                     Tablas
                 </a>
-                <a href="#sec-plantel" class="flex-1 sm:flex-initial text-center px-2 sm:px-3 py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-[11px] sm:text-xs font-mono font-bold text-slate-200 hover:text-pizarra-electric transition">
+                <a href="#sec-plantel" class="flex-1 sm:flex-initial text-center px-1.5 sm:px-3 py-2 sm:py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-[11px] sm:text-xs font-mono font-bold text-slate-200 hover:text-pizarra-electric transition">
                     Plantel
                 </a>
-                <a href="#sec-pizarra" class="flex-1 sm:flex-initial text-center px-2 sm:px-3 py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-[11px] sm:text-xs font-mono font-bold text-slate-200 hover:text-pizarra-electric transition">
+                <a href="#sec-pizarra" class="flex-1 sm:flex-initial text-center px-1.5 sm:px-3 py-2 sm:py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-[11px] sm:text-xs font-mono font-bold text-slate-200 hover:text-pizarra-electric transition">
                     Pizarra
                 </a>
-                <a href="/fixture" class="flex-1 sm:flex-initial text-center px-2 sm:px-3 py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-[11px] sm:text-xs font-mono font-bold text-pizarra-electric hover:text-white transition">
+                <a href="/fixture" class="flex-1 sm:flex-initial text-center px-1.5 sm:px-3 py-2 sm:py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-[11px] sm:text-xs font-mono font-bold text-pizarra-electric hover:text-white transition">
                     Fixture
                 </a>
-                <a href="/estadio" class="flex-1 sm:flex-initial text-center px-2 sm:px-3 py-1.5 rounded-lg bg-pizarra-accent/20 hover:bg-pizarra-accent/35 border border-pizarra-accent/50 text-[11px] sm:text-xs font-mono font-bold text-pizarra-electric hover:text-white transition">
+                <a href="/estadio" class="flex-1 sm:flex-initial text-center px-1.5 sm:px-3 py-2 sm:py-1.5 rounded-lg bg-pizarra-accent/20 hover:bg-pizarra-accent/35 border border-pizarra-accent/50 text-[11px] sm:text-xs font-mono font-bold text-pizarra-electric hover:text-white transition">
                     Estadio
                 </a>
                 <button onclick="manualRefresh()" title="Actualizar datos" class="hidden sm:inline-flex p-2 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-white transition active:scale-95">
