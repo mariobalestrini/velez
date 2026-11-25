@@ -63,6 +63,9 @@
         }
     </script>
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
         body {
             background-color: #0b0e14;
             color: #e2e8f0;
@@ -180,6 +183,17 @@
         </div>
     </header>
 
+    <nav aria-label="Navegación de secciones" class="sticky top-[68px] sm:top-[76px] z-30 bg-[#0b0e14]/90 backdrop-blur-md border-b border-pizarra-border/80">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2 flex items-center gap-1.5 overflow-x-auto text-xs font-mono font-bold whitespace-nowrap">
+            <a href="#sec-partido" class="px-3 py-1 rounded-lg bg-pizarra-card hover:bg-pizarra-accent/30 border border-pizarra-border text-pizarra-electric hover:text-white transition">Partido</a>
+            <a href="#sec-rachas" class="px-3 py-1 rounded-lg bg-pizarra-card hover:bg-pizarra-accent/30 border border-pizarra-border text-slate-300 hover:text-white transition">Últimos / Próximos</a>
+            <a href="#sec-tablas" class="px-3 py-1 rounded-lg bg-pizarra-card hover:bg-pizarra-accent/30 border border-pizarra-border text-slate-300 hover:text-white transition">Tablas</a>
+            <a href="#sec-plantel" class="px-3 py-1 rounded-lg bg-pizarra-card hover:bg-pizarra-accent/30 border border-pizarra-border text-slate-300 hover:text-white transition">Plantel</a>
+            <a href="#sec-pizarra" class="px-3 py-1 rounded-lg bg-pizarra-card hover:bg-pizarra-accent/30 border border-pizarra-border text-slate-300 hover:text-white transition">Pizarra</a>
+            <a href="/estadio" class="ml-auto px-3 py-1 rounded-lg bg-pizarra-accent/20 hover:bg-pizarra-accent/40 border border-pizarra-accent/50 text-pizarra-electric hover:text-white transition">Estadio →</a>
+        </div>
+    </nav>
+
     <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-5 space-y-6">
 
         <section id="efemeride-section" class="hidden relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0e192b] via-[#121721] to-[#0d1f36] border border-[#0055a5]/70 shadow-2xl">
@@ -205,7 +219,7 @@
             </div>
         </section>
 
-        <section class="relative overflow-hidden rounded-2xl bg-pizarra-card border border-pizarra-border tactical-grid shadow-2xl">
+        <section id="sec-partido" class="scroll-mt-28 relative overflow-hidden rounded-2xl bg-pizarra-card border border-pizarra-border tactical-grid shadow-2xl">
             <div class="px-4 py-2.5 bg-[#0e131c] border-b border-pizarra-border flex flex-wrap items-center justify-between gap-2 text-xs">
                 <div class="flex flex-wrap items-center gap-2">
                     <span id="match-badge-type" class="px-2 py-0.5 rounded bg-sky-500/20 text-pizarra-electric border border-sky-500/40 font-bold uppercase tracking-wider text-[11px]">PRÓXIMO PARTIDO OFICIAL</span>
@@ -371,7 +385,7 @@
             </div>
         </section>
 
-        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <section id="sec-rachas" class="scroll-mt-28 grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div class="lg:col-span-6 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden flex flex-col">
                 <div class="p-4 border-b border-pizarra-border flex flex-wrap items-center justify-between gap-2 bg-[#0e131c]">
                     <h3 class="font-display text-xl font-bold uppercase tracking-wide text-white flex items-center gap-2">
@@ -412,7 +426,7 @@
             </div>
         </section>
 
-        <section class="bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden">
+        <section id="sec-tablas" class="scroll-mt-28 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden">
             <div class="p-4 border-b border-pizarra-border flex flex-wrap items-center justify-between gap-3 bg-[#0e131c]">
                 <div>
                     <h3 class="font-display text-xl sm:text-2xl font-bold uppercase tracking-wide text-white flex items-center gap-2">
@@ -451,7 +465,7 @@
             </div>
         </section>
 
-        <section class="bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden">
+        <section id="sec-plantel" class="scroll-mt-28 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden">
             <div class="p-4 border-b border-pizarra-border bg-[#0e131c] flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h3 class="font-display text-xl sm:text-2xl font-bold uppercase tracking-wide text-white flex items-center gap-2">
@@ -497,7 +511,7 @@
             </div>
         </section>
 
-        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <section id="sec-pizarra" class="scroll-mt-28 grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div class="lg:col-span-7 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden flex flex-col">
                 <div class="p-4 border-b border-pizarra-border flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 bg-[#0e131c]">
                     <div class="min-w-0">
