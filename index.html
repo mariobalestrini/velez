@@ -146,9 +146,9 @@
     </div>
 
     <header class="sticky top-0 z-40 bg-[#0b0e14]/95 backdrop-blur-md border-b border-pizarra-border">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
-            <div class="flex items-center gap-3">
-                <div id="header-velez-crest" class="w-10 h-11 sm:w-11 sm:h-12 flex-shrink-0 flex items-center justify-center drop-shadow-[0_0_12px_rgba(0,85,165,0.65)]"></div>
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+            <div class="flex items-center gap-2.5 sm:gap-3">
+                <div id="header-velez-crest" class="w-9 h-10 sm:w-11 sm:h-12 flex-shrink-0 flex items-center justify-center drop-shadow-[0_0_12px_rgba(0,85,165,0.65)]"></div>
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-white uppercase leading-none">
@@ -158,35 +158,35 @@
                             C.A. Vélez Sarsfield • 1910
                         </span>
                     </div>
-                    <p class="text-xs text-slate-400 mt-0.5">Estadísticas en Vivo & Pizarra Táctica</p>
+                    <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Estadísticas en Vivo & Pizarra Táctica</p>
                 </div>
             </div>
 
-            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 ml-auto">
+            <div class="flex flex-wrap items-center gap-1 sm:gap-2 w-full sm:w-auto justify-between sm:justify-end">
                 <div class="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-pizarra-card border border-pizarra-border text-xs font-mono text-slate-400 mr-1">
                     <span>Últ. act:</span>
                     <span id="last-updated-time" class="text-white font-bold">--:--:--</span>
                 </div>
-                <span id="live-header-badge" class="hidden items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-red-500/15 border border-red-500/40 text-xs font-mono font-bold text-red-400">
+                <span id="live-header-badge" class="hidden items-center gap-1.5 px-2 py-1 rounded-lg bg-red-500/15 border border-red-500/40 text-[11px] sm:text-xs font-mono font-bold text-red-400">
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500 animate-ping"></span>
                     <span>EN VIVO</span>
                 </span>
-                <a href="#sec-tablas" class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-xs font-mono font-bold text-slate-200 hover:text-pizarra-electric transition">
+                <a href="#sec-tablas" class="flex-1 sm:flex-initial text-center px-2 sm:px-3 py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-[11px] sm:text-xs font-mono font-bold text-slate-200 hover:text-pizarra-electric transition">
                     Tablas
                 </a>
-                <a href="#sec-plantel" class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-xs font-mono font-bold text-slate-200 hover:text-pizarra-electric transition">
+                <a href="#sec-plantel" class="flex-1 sm:flex-initial text-center px-2 sm:px-3 py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-[11px] sm:text-xs font-mono font-bold text-slate-200 hover:text-pizarra-electric transition">
                     Plantel
                 </a>
-                <a href="#sec-pizarra" class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-xs font-mono font-bold text-slate-200 hover:text-pizarra-electric transition">
+                <a href="#sec-pizarra" class="flex-1 sm:flex-initial text-center px-2 sm:px-3 py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-[11px] sm:text-xs font-mono font-bold text-slate-200 hover:text-pizarra-electric transition">
                     Pizarra
                 </a>
-                <a href="/fixture" class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-xs font-mono font-bold text-pizarra-electric hover:text-white transition">
+                <a href="/fixture" class="flex-1 sm:flex-initial text-center px-2 sm:px-3 py-1.5 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-[11px] sm:text-xs font-mono font-bold text-pizarra-electric hover:text-white transition">
                     Fixture
                 </a>
-                <a href="/estadio" class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-pizarra-accent/20 hover:bg-pizarra-accent/35 border border-pizarra-accent/50 text-xs font-mono font-bold text-pizarra-electric hover:text-white transition">
+                <a href="/estadio" class="flex-1 sm:flex-initial text-center px-2 sm:px-3 py-1.5 rounded-lg bg-pizarra-accent/20 hover:bg-pizarra-accent/35 border border-pizarra-accent/50 text-[11px] sm:text-xs font-mono font-bold text-pizarra-electric hover:text-white transition">
                     Estadio
                 </a>
-                <button onclick="manualRefresh()" title="Actualizar datos" class="p-2 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-white transition active:scale-95">
+                <button onclick="manualRefresh()" title="Actualizar datos" class="hidden sm:inline-flex p-2 rounded-lg bg-pizarra-card hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-white transition active:scale-95">
                     <svg id="refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                     </svg>
@@ -194,6 +194,7 @@
             </div>
         </div>
     </header>
+
 
     <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-5 space-y-6">
 
