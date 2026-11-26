@@ -516,24 +516,35 @@
         <section id="sec-pizarra" class="scroll-mt-24 grid grid-cols-1 lg:grid-cols-12 gap-6">
             <!-- Columna izquierda: Cancha interactiva con los 11 jugadores -->
             <div class="lg:col-span-7 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden flex flex-col">
-                <div class="p-4 border-b border-pizarra-border flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 bg-[#0e131c] min-h-[76px]">
+                <div class="p-4 border-b border-pizarra-border flex items-center justify-between gap-3 bg-[#0e131c] min-h-[76px]">
                     <div class="min-w-0">
                         <h3 class="font-display text-xl font-bold uppercase tracking-wide text-white flex items-center gap-2">
                             <span class="w-1.5 h-5 bg-[#0055a5] rounded-full"></span>
                             La Pizarra Táctica • Formaciones
                         </h3>
-                        <p id="lineup-match-subtitle" class="text-[11px] font-mono text-pizarra-electric mt-0.5 truncate">Sincronizando formaciones de los últimos 5 partidos...</p>
+                        <p id="lineup-match-subtitle" class="text-[11px] font-mono text-pizarra-electric mt-0.5 truncate">Sincronizando formaciones de los últimos partidos...</p>
                     </div>
-                    <div class="flex items-center gap-2 flex-shrink-0">
-                        <select id="formation-selector" onchange="renderPitch(this.value)" class="bg-[#0b0e14] border border-pizarra-border text-xs font-mono text-white rounded-lg px-3 py-1.5 focus:outline-none focus:border-pizarra-electric max-w-[190px] sm:max-w-[230px] truncate">
+                    <button onclick="shareSectionAsPng('FORMATION')" title="Compartir formación en historia" class="flex-shrink-0 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                        <span class="text-[10px] font-mono font-bold uppercase">Compartir</span>
+                    </button>
+                </div>
+
+                <!-- Barra de controles: Selector de partido + Switch XI Inicial / XI Final -->
+                <div class="px-4 py-2.5 bg-[#0b0e14]/90 border-b border-pizarra-border flex flex-wrap items-center justify-between gap-2.5">
+                    <div class="flex items-center gap-2 flex-1 min-w-[200px]">
+                        <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold whitespace-nowrap">Partido:</span>
+                        <select id="formation-selector" onchange="renderPitch(this.value)" class="flex-1 sm:flex-initial bg-[#121721] hover:bg-[#181f2c] border border-pizarra-electric/50 text-xs font-mono font-bold text-white rounded-lg px-3 py-1.5 cursor-pointer focus:outline-none focus:border-pizarra-electric transition shadow-sm">
                             <option value="0">Último XI Oficial</option>
                         </select>
-                        <button onclick="shareSectionAsPng('FORMATION')" title="Compartir formación en historia" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-[#0b0e14] hover:bg-pizarra-cardHover border border-pizarra-border text-slate-300 hover:text-pizarra-electric transition">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                            <span class="text-[10px] font-mono font-bold uppercase">Compartir</span>
-                        </button>
+                    </div>
+
+                    <div id="xi-mode-toggle" class="hidden flex items-center bg-[#121721] p-1 rounded-lg border border-pizarra-border text-[11px] font-mono font-bold">
+                        <button type="button" id="btn-xi-inicial" onclick="setFinalXIView(false)" class="px-2.5 py-1 rounded bg-pizarra-accent text-white transition">XI Inicial</button>
+                        <button type="button" id="btn-xi-final" onclick="setFinalXIView(true)" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition">XI Final</button>
                     </div>
                 </div>
+
                 <div class="p-4 sm:p-6 bg-[#0b0e14] flex-1 flex items-center justify-center tactical-grid">
                     <div class="relative w-full max-w-md aspect-[3/4] rounded-xl overflow-hidden border-2 border-[#1f293a] bg-[#0d1520] shadow-2xl">
                         <!-- Dibujo SVG del campo de juego -->
@@ -600,16 +611,15 @@
                             <p id="tactical-card-reds" class="min-h-[20px]"><span class="skeleton-shimmer inline-block w-1/2 h-3.5"></span></p>
                         </div>
                         <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border space-y-2">
-                        <div class="flex items-center justify-between gap-2">
-                        <span class="font-display uppercase text-sm font-bold text-sky-300">5. Posesión de pelota</span>
-                            <span id="last-match-stats-rival" class="hidden"></span>
-                        </div>
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="font-display uppercase text-sm font-bold text-sky-300">5. Posesión de pelota</span>
+                                <span id="last-match-stats-rival" class="hidden"></span>
+                            </div>
                             <div id="last-match-stats-body" class="min-h-[44px] space-y-2">
-                            <div class="skeleton-shimmer h-3.5 w-full"></div>
-                            <div class="skeleton-shimmer h-3.5 w-4/5"></div>
+                                <div class="skeleton-shimmer h-3.5 w-full"></div>
+                                <div class="skeleton-shimmer h-3.5 w-4/5"></div>
+                            </div>
                         </div>
-                        </div>
-
                     </div>
 
                     <!-- KPIs inferiores del encuentro -->
@@ -704,7 +714,7 @@
     <script src="./js/nombres-equipos.js?v=20261125"></script>
     <script src="./js/formatters.js?v=20261125"></script>
     <script src="./js/match-view.js?v=20261125"></script>
-    <script src="./js/standings-squad.js?v=20261125"></script>
+    <script src="./js/standings-squad.js?v=20261126"></script>
     <script src="./js/share-png.js?v=20261125"></script>
     <script src="./js/app.js?v=20261125-3"></script>
     <script>
