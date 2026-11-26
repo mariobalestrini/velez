@@ -531,12 +531,18 @@
                 </div>
 
                 <!-- Barra de controles: Selector de partido + Switch XI Inicial / XI Final -->
+                <!-- Barra de controles: Selector de partido + Switch XI Inicial / XI Final -->
                 <div class="px-4 py-2.5 bg-[#0b0e14]/90 border-b border-pizarra-border flex flex-wrap items-center justify-between gap-2.5">
                     <div class="flex items-center gap-2 flex-1 min-w-[200px]">
                         <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold whitespace-nowrap">Partido:</span>
-                        <select id="formation-selector" onchange="renderPitch(this.value)" class="flex-1 sm:flex-initial bg-[#121721] hover:bg-[#181f2c] border border-pizarra-electric/50 text-xs font-mono font-bold text-white rounded-lg px-3 py-1.5 cursor-pointer focus:outline-none focus:border-pizarra-electric transition shadow-sm">
-                            <option value="0">Último XI Oficial</option>
-                        </select>
+                        <div class="relative flex-1 sm:flex-initial">
+                            <select id="formation-selector" onchange="renderPitch(this.value)" class="w-full appearance-none bg-[#121721] hover:bg-[#181f2c] border border-pizarra-electric/50 text-xs font-mono font-bold text-white rounded-lg pl-3 pr-8 py-1.5 cursor-pointer focus:outline-none focus:border-pizarra-electric transition shadow-sm">
+                                <option value="0">Último XI Oficial</option>
+                            </select>
+                            <svg class="w-3.5 h-3.5 text-pizarra-electric pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
                     </div>
 
                     <div id="xi-mode-toggle" class="hidden flex items-center bg-[#121721] p-1 rounded-lg border border-pizarra-border text-[11px] font-mono font-bold">
@@ -544,6 +550,7 @@
                         <button type="button" id="btn-xi-final" onclick="setFinalXIView(true)" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition">XI Final</button>
                     </div>
                 </div>
+
 
                 <div class="p-4 sm:p-6 bg-[#0b0e14] flex-1 flex items-center justify-center tactical-grid">
                     <div class="relative w-full max-w-md aspect-[3/4] rounded-xl overflow-hidden border-2 border-[#1f293a] bg-[#0d1520] shadow-2xl">
