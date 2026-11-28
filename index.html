@@ -531,7 +531,6 @@
                 </div>
 
                 <!-- Barra de controles: Selector de partido + Switch XI Inicial / XI Final -->
-                <!-- Barra de controles: Selector de partido + Switch XI Inicial / XI Final -->
                 <div class="px-4 py-2.5 bg-[#0b0e14]/90 border-b border-pizarra-border flex flex-wrap items-center justify-between gap-2.5">
                     <div class="flex items-center gap-2 flex-1 min-w-[200px]">
                         <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold whitespace-nowrap">Partido:</span>
@@ -550,7 +549,6 @@
                         <button type="button" id="btn-xi-final" onclick="setFinalXIView(true)" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition">XI Final</button>
                     </div>
                 </div>
-
 
                 <div class="p-4 sm:p-6 bg-[#0b0e14] flex-1 flex items-center justify-center tactical-grid">
                     <div class="relative w-full max-w-md aspect-[3/4] rounded-xl overflow-hidden border-2 border-[#1f293a] bg-[#0d1520] shadow-2xl">
@@ -578,7 +576,7 @@
                 </div>
             </div>
 
-            <!-- Columna derecha: Rendimiento & XI (5 tarjetas de análisis + 3 KPIs) -->
+            <!-- Columna derecha: Rendimiento & XI (6 tarjetas de análisis + 3 KPIs) -->
             <div class="lg:col-span-5 bg-pizarra-card rounded-2xl border border-pizarra-border overflow-hidden flex flex-col">
                 <!-- Encabezado igualado al de La Pizarra Táctica -->
                 <div class="p-4 border-b border-pizarra-border flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 bg-[#0e131c] min-h-[76px]">
@@ -598,7 +596,7 @@
                     </div>
                 </div>
 
-                <!-- Cuerpo interno: 5 tarjetas tácticas + 3 KPIs inferiores -->
+                <!-- Cuerpo interno: 6 tarjetas tácticas + 3 KPIs inferiores -->
                 <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
                     <div class="space-y-2.5 text-xs text-slate-300 leading-relaxed">
                         <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
@@ -622,16 +620,14 @@
                                 <span class="font-display uppercase text-sm font-bold text-sky-300">5. Posesión de pelota</span>
                                 <span id="last-match-stats-rival" class="hidden"></span>
                             </div>
-                            <!-- 6. Efectividad en el área -->
-                            <div class="p-3.5 rounded-xl bg-[#0b0e14]/80 border border-pizarra-border space-y-1">
-                            <h4 class="font-display text-xs font-bold uppercase tracking-wider text-violet-400">6. Efectividad en el área</h4>
-                                <p id="tactical-card-6" class="text-xs text-slate-300 leading-relaxed">Calculando puntería y conversión...</p>
-                                </div>
-
                             <div id="last-match-stats-body" class="min-h-[44px] space-y-2">
                                 <div class="skeleton-shimmer h-3.5 w-full"></div>
                                 <div class="skeleton-shimmer h-3.5 w-4/5"></div>
                             </div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-[#0b0e14] border border-pizarra-border">
+                            <div class="font-display uppercase text-sm font-bold text-violet-400 mb-0.5">6. Efectividad en el área</div>
+                            <p id="tactical-card-6" class="min-h-[20px]"><span class="skeleton-shimmer inline-block w-3/4 h-3.5"></span></p>
                         </div>
                     </div>
 
@@ -727,7 +723,7 @@
     <script src="./js/nombres-equipos.js?v=20261125"></script>
     <script src="./js/formatters.js?v=20261125"></script>
     <script src="./js/match-view.js?v=20261125"></script>
-    <script src="./js/standings-squad.js?v=20261126"></script>
+    <script src="./js/standings-squad.js?v=20261127"></script>
     <script src="./js/share-png.js?v=20261125"></script>
     <script src="./js/app.js?v=20261125-3"></script>
     <script>
